@@ -3,7 +3,7 @@
 @section('content')
 <!-- Hero Section -->
 <section class="relative bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 py-20 overflow-hidden">
-    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmYmJmMjQiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE2YzAtMi4yMSAxLjc5LTQgNC00czQgMS43OSA0IDQtMS43OSA0LTQgNC00LTEuNzktNC00em0wIDI4YzAtMi4yMSAxLjc5LTQgNC00czQgMS43OSA0IDQtMS43OSA0LTQgNC00LTEuNzktNC00em0tMjAgMGMwLTIuMjEgMS43OS00IDQtNHM0IDEuNzkgNCA0LTEuNzkgNC00IDQtNC0xLjc5LTQtNHptMC0yOGMwLTIuMjEgMS43OS00IDQtNHM0IDEuNzkgNCA0LTEuNzkgNC00IDQtNC0xLjc5LTQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-40"></div>
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmYmJmMjQiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE2YzAtMi4yMSAxLjc5LTQgNC00czQgMS43OSA0IDQtMS43OSA0LTQgNC00LTEuNzktNC00em0wIDI4YzAtMi4yMSAxLjc5LTQgNC00czQgMS43OSA0IDQtMS43OSA0LTQgNC00LTEuNzktNC00em0tMjAgMGMwLTIuMjEgMS43OS00IDQtNHM0IDEuNzkgNCA0LTEuNzkgNC00IDQtNC0xLjc5LTQtNHptMC0yOGMwLTIuMjEgMS43OS00IDQtNHM0IDEuNzkgNCA0LTEuNzkgNC00IDQtNC0xLzc5LTQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-40"></div>
     <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
         <div class="inline-block mb-4 px-4 py-2 bg-white/70 backdrop-blur-sm rounded-full text-amber-700 font-medium text-sm shadow-sm">
             Hubungi Kami
@@ -130,8 +130,8 @@
             <div class="lg:col-span-2">
                 <div class="bg-white rounded-3xl p-8 md:p-10 shadow-xl border border-gray-100">
                     <div class="mb-8">
-                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Kirim Pesan</h2>
-                        <p class="text-gray-600">Isi formulir di bawah dan kami akan segera menghubungi Anda</p>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Keluhan & Masukan</h2>
+                        <p class="text-gray-600">Sampaikan keluhan, kritik, atau saran Anda untuk perbaikan layanan kami</p>
                     </div>
                     
                     <form id="contact-form" class="space-y-6">
@@ -181,18 +181,19 @@
                         <!-- Subject -->
                         <div class="group">
                             <label for="subject" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Subyek <span class="text-red-500">*</span>
+                                Jenis Masukan <span class="text-red-500">*</span>
                             </label>
                             <select 
                                 id="subject" 
                                 name="subject"
                                 required
                                 class="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 focus:bg-white transition-all duration-300 outline-none appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNCw2TDgsMTBMMTIsNiIgc3Ryb2tlPSIjOTk5IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==')] bg-no-repeat bg-[center_right_1rem]">
-                                <option value="">Pilih subyek pesan</option>
-                                <option value="pemesanan">Pemesanan Produk</option>
-                                <option value="informasi">Informasi Produk</option>
-                                <option value="kerjasama">Kerjasama Bisnis</option>
-                                <option value="keluhan">Keluhan & Saran</option>
+                                <option value="">Pilih jenis masukan</option>
+                                <option value="keluhan">Keluhan Produk</option>
+                                <option value="pelayanan">Keluhan Pelayanan</option>
+                                <option value="saran">Saran Perbaikan</option>
+                                <option value="kritik">Kritik Konstruktif</option>
+                                <option value="pujian">Pujian & Apresiasi</option>
                                 <option value="lainnya">Lainnya</option>
                             </select>
                         </div>
@@ -200,7 +201,7 @@
                         <!-- Message -->
                         <div class="group">
                             <label for="message" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Pesan <span class="text-red-500">*</span>
+                                Detail Keluhan/Masukan <span class="text-red-500">*</span>
                             </label>
                             <textarea 
                                 id="message" 
@@ -208,7 +209,7 @@
                                 rows="6"
                                 required
                                 class="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 focus:bg-white transition-all duration-300 outline-none resize-none"
-                                placeholder="Tulis pesan Anda di sini..."></textarea>
+                                placeholder="Jelaskan keluhan, kritik, atau saran Anda secara detail..."></textarea>
                         </div>
 
                         <!-- Submit Button -->
@@ -216,7 +217,7 @@
                             type="submit"
                             class="group w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-4 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 hover:-translate-y-0.5">
                             <i class="fas fa-paper-plane group-hover:translate-x-1 transition-transform duration-300"></i>
-                            <span>Kirim Pesan</span>
+                            <span>Kirim Keluhan & Masukan</span>
                         </button>
                     </form>
 
@@ -227,8 +228,8 @@
                                 <i class="fas fa-check-circle"></i>
                             </div>
                             <div>
-                                <h4 class="font-bold mb-1">Pesan Terkirim!</h4>
-                                <p class="text-sm">Pesan Anda telah berhasil dikirim. Kami akan membalas dalam 1x24 jam.</p>
+                                <h4 class="font-bold mb-1">Masukan Terkirim!</h4>
+                                <p class="text-sm">Terima kasih atas keluhan dan masukan Anda. Kami akan menindaklanjuti dalam 1x24 jam.</p>
                             </div>
                         </div>
                     </div>
@@ -250,33 +251,32 @@
         </div>
         
         <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-            <!-- Map Placeholder -->
-            <div class="relative h-96 bg-gradient-to-br from-amber-100 via-yellow-100 to-orange-100 overflow-hidden">
-                <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmYmJmMjQiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIyIi8+PC9nPjwvZz48L3N2Zz4=')] opacity-50"></div>
+            
+            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+            <!-- Google Maps Embed -->
+            <div class="relative h-96 overflow-hidden">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d249.35285759975096!2d123.06330396764739!3d0.5329438503564721!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32792b780460c259%3A0x1b2f118222ef6fa6!2sPT.%20Madu%20Suwawa%20Gorontalo!5e0!3m2!1sen!2sid!4v1762269274786!5m2!1sen!2sid" 
+                    width="100%" 
+                    height="100%" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade"
+                    class="absolute inset-0">
+                </iframe>
                 
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="text-center z-10">
-                        <div class="mb-6 inline-block bg-white rounded-full p-6 shadow-xl">
-                            <i class="fas fa-map-marked-alt text-5xl text-amber-600"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Suwawa, Bone Bolango</h3>
-                        <p class="text-gray-700 font-medium">Gorontalo - Indonesia</p>
-                    </div>
+                <!-- Overlay with Info -->
+                <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg max-w-xs">
+                    <h3 class="font-bold text-gray-900 mb-1">Madu Suwawa</h3>
+                    <p class="text-sm text-gray-600 mb-2">Jl. Raya Suwawa No. 123</p>
+                    <a href="https://maps.app.goo.gl/ebq8fAxwNSDtHARn7" 
+                       target="_blank"
+                       class="inline-flex items-center gap-2 bg-amber-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-amber-600 transition-colors">
+                        <i class="fas fa-directions"></i>
+                        Buka di Maps
+                    </a>
                 </div>
-                
-                <!-- Map Marker -->
-                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-                    <div class="relative">
-                        <div class="absolute inset-0 bg-amber-500 rounded-full blur-xl opacity-50 animate-pulse"></div>
-                        <div class="relative bg-gradient-to-br from-amber-500 to-orange-600 text-white p-4 rounded-full shadow-2xl">
-                            <i class="fas fa-map-pin text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Decorative circles -->
-                <div class="absolute top-10 left-10 w-20 h-20 bg-white/20 rounded-full blur-2xl"></div>
-                <div class="absolute bottom-10 right-10 w-32 h-32 bg-white/20 rounded-full blur-2xl"></div>
             </div>
             
             <!-- Map Info -->
@@ -287,21 +287,21 @@
                             <i class="fas fa-road text-2xl text-blue-600"></i>
                         </div>
                         <h4 class="font-bold text-gray-900 mb-2">Akses Mudah</h4>
-                        <p class="text-sm text-gray-600">Dapat diakses melalui jalan raya utama</p>
-                    </div>
-                    <div class="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 text-center">
-                        <div class="inline-block bg-gradient-to-br from-green-100 to-emerald-100 p-4 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                            <i class="fas fa-parking text-2xl text-green-600"></i>
-                        </div>
-                        <h4 class="font-bold text-gray-900 mb-2">Parkir Luas</h4>
-                        <p class="text-sm text-gray-600">Area parkir yang nyaman untuk pengunjung</p>
+                        <p class="text-sm text-gray-600">Lokasi strategis dengan akses jalan yang mudah dijangkau</p>
                     </div>
                     <div class="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 text-center">
                         <div class="inline-block bg-gradient-to-br from-amber-100 to-orange-100 p-4 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
                             <i class="fas fa-industry text-2xl text-amber-600"></i>
                         </div>
                         <h4 class="font-bold text-gray-900 mb-2">Area Produksi</h4>
-                        <p class="text-sm text-gray-600">Lokasi produksi madu yang terjamin kebersihannya</p>
+                        <p class="text-sm text-gray-600">Fasilitas produksi modern dengan standar kebersihan tinggi</p>
+                    </div>
+                    <div class="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 text-center">
+                        <div class="inline-block bg-gradient-to-br from-green-100 to-emerald-100 p-4 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-store text-2xl text-green-600"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-900 mb-2">Banyak Cabang</h4>
+                        <p class="text-sm text-gray-600">Tersedia di berbagai cabang untuk memudahkan pelanggan</p>
                     </div>
                 </div>
             </div>

@@ -113,10 +113,6 @@
 
                     <!-- Hover Action -->
                     <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0">
-                        <button class="bg-white text-amber-600 px-6 py-3 rounded-full font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
-                            <i class="fas fa-eye"></i>
-                            Quick View
-                        </button>
                     </div>
                 </div>
 

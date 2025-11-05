@@ -168,19 +168,14 @@
     <div class="max-w-4xl mx-auto px-4 text-center">
         <div class="bg-white rounded-3xl p-12 shadow-2xl border border-amber-100">
             <h3 class="text-3xl font-bold text-gray-900 mb-4">
-                Siap Berbagi Pengalaman?
+                Siap Menikmati Keaslian Madu?
             </h3>
             <p class="text-gray-600 text-lg mb-8 leading-relaxed max-w-2xl mx-auto">
-                Ceritakan pengalaman Anda menggunakan madu Suwawa dan inspirasi pelanggan lainnya untuk hidup lebih sehat.
+                Dapatkan madu Suwawa berkualitas premium langsung dari alam untuk kesehatan dan kebugaran Anda.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('contact') }}" 
-                   class="group bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3">
-                    <i class="fas fa-pen-fancy"></i>
-                    <span>Berikan Testimonial</span>
-                </a>
                 <a href="{{ route('products') }}" 
-                   class="group bg-white border-2 border-amber-200 text-amber-600 px-8 py-4 rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3 hover:border-amber-300">
+                   class="group bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3">
                     <i class="fas fa-shopping-bag"></i>
                     <span>Beli Madu Suwawa</span>
                 </a>

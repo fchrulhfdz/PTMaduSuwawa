@@ -27,36 +27,44 @@
     <div class="max-w-7xl mx-auto px-4">
         <!-- Filter Tabs -->
         <div class="flex flex-wrap justify-center gap-4 mb-16">
-            <button class="category-filter px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1" data-category="all">
+            <button class="category-filter px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 active" data-category="all">
                 <span class="flex items-center">
                     <i class="fas fa-boxes mr-3"></i>
                     Semua Produk
                 </span>
             </button>
-            <button class="category-filter px-8 py-4 rounded-2xl bg-white text-gray-700 font-bold border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-amber-300 group" data-category="Madu Hutan">
-                <span class="flex items-center group-hover:text-amber-600">
-                    <i class="fas fa-tree mr-3 text-green-500 group-hover:text-green-600"></i>
-                    Madu Hutan
-                </span>
-            </button>
-            <button class="category-filter px-8 py-4 rounded-2xl bg-white text-gray-700 font-bold border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-amber-300 group" data-category="Madu Budidaya">
-                <span class="flex items-center group-hover:text-amber-600">
-                    <i class="fas fa-seedling mr-3 text-green-500 group-hover:text-green-600"></i>
-                    Madu Budidaya
-                </span>
-            </button>
-            <button class="category-filter px-8 py-4 rounded-2xl bg-white text-gray-700 font-bold border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-amber-300 group" data-category="Madu Organik">
-                <span class="flex items-center group-hover:text-amber-600">
-                    <i class="fas fa-leaf mr-3 text-green-500 group-hover:text-green-600"></i>
-                    Madu Organik
-                </span>
-            </button>
+            
+            <!-- Dynamic Category Buttons -->
+            @php
+                $categories = $products->pluck('category')->unique()->sort();
+            @endphp
+            
+            @foreach($categories as $category)
+                @php
+                    $icons = [
+                        'Madu Hutan' => 'tree',
+                        'Madu Budidaya' => 'seedling', 
+                        'Madu Organik' => 'leaf',
+                        'Madu Spesial' => 'star',
+                        'default' => 'tag'
+                    ];
+                    
+                    $icon = $icons[$category] ?? $icons['default'];
+                @endphp
+                
+                <button class="category-filter px-8 py-4 rounded-2xl bg-white text-gray-700 font-bold border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-amber-300 group" data-category="{{ $category }}">
+                    <span class="flex items-center group-hover:text-amber-600">
+                        <i class="fas fa-{{ $icon }} mr-3 text-green-500 group-hover:text-green-600"></i>
+                        {{ $category }}
+                    </span>
+                </button>
+            @endforeach
         </div>
 
         <!-- Products Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8" id="products-container">
             @forelse($products as $product)
-            <div class="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden hover:-translate-y-2" data-category="{{ $product->category }}">
+            <div class="product-card group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden hover:-translate-y-2" data-category="{{ $product->category }}">
                 <!-- Product Image -->
                 <div class="relative h-80 bg-gradient-to-br from-amber-50 to-orange-100 overflow-hidden">
                     @if($product->image)
@@ -93,14 +101,6 @@
                             <i class="fas fa-tag mr-2"></i>
                             {{ $product->category }}
                         </span>
-                    </div>
-
-                    <!-- Hover Action -->
-                    <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0">
-                        <button class="bg-white text-amber-600 px-6 py-3 rounded-full font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center">
-                            <i class="fas fa-eye mr-2"></i>
-                            Lihat Detail
-                        </button>
                     </div>
                 </div>
 
@@ -276,62 +276,118 @@ document.addEventListener('DOMContentLoaded', function() {
     const productsContainer = document.getElementById('products-container');
     const noProducts = document.getElementById('no-products');
 
+    // Function to update active button
+    function updateActiveButton(activeButton) {
+        filterButtons.forEach(btn => {
+            btn.classList.remove(
+                'bg-gradient-to-r', 'from-amber-500', 'to-orange-500', 
+                'text-white', 'shadow-lg', 'active'
+            );
+            btn.classList.add(
+                'bg-white', 'text-gray-700', 'border-2', 
+                'border-gray-200', 'shadow-lg'
+            );
+        });
+        
+        activeButton.classList.remove(
+            'bg-white', 'text-gray-700', 'border-2', 
+            'border-gray-200', 'shadow-lg'
+        );
+        activeButton.classList.add(
+            'bg-gradient-to-r', 'from-amber-500', 'to-orange-500', 
+            'text-white', 'shadow-lg', 'active'
+        );
+    }
+
+    // Function to filter products
+    function filterProducts(category) {
+        let visibleProducts = 0;
+
+        productCards.forEach(card => {
+            const cardCategory = card.getAttribute('data-category');
+            
+            if (category === 'all' || cardCategory === category) {
+                card.style.display = 'block';
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                // Animate in
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 50);
+                
+                visibleProducts++;
+            } else {
+                card.style.transition = 'all 0.3s ease';
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.display = 'none';
+                }, 300);
+            }
+        });
+
+        // Show/hide no products message
+        if (visibleProducts === 0) {
+            productsContainer.style.display = 'none';
+            noProducts.classList.remove('hidden');
+            noProducts.style.opacity = '0';
+            noProducts.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                noProducts.style.transition = 'all 0.5s ease';
+                noProducts.style.opacity = '1';
+                noProducts.style.transform = 'translateY(0)';
+            }, 50);
+        } else {
+            noProducts.classList.add('hidden');
+            productsContainer.style.display = 'grid';
+        }
+    }
+
+    // Add click event listeners to filter buttons
     filterButtons.forEach(button => {
         button.addEventListener('click', function() {
-            // Update active button with smooth transition
-            filterButtons.forEach(btn => {
-                btn.classList.remove('bg-gradient-to-r', 'from-amber-500', 'to-orange-500', 'text-white', 'shadow-lg');
-                btn.classList.add('bg-white', 'text-gray-700', 'border-2', 'border-gray-200', 'shadow-lg');
-            });
-            
-            this.classList.remove('bg-white', 'text-gray-700', 'border-2', 'border-gray-200', 'shadow-lg');
-            this.classList.add('bg-gradient-to-r', 'from-amber-500', 'to-orange-500', 'text-white', 'shadow-lg');
-
             const category = this.getAttribute('data-category');
-            let visibleProducts = 0;
-
-            // Filter products with fade animation
-            productCards.forEach(card => {
-                if (category === 'all' || card.getAttribute('data-category') === category) {
-                    card.style.display = 'block';
-                    card.style.animation = 'fadeIn 0.5s ease-in';
-                    visibleProducts++;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-
-            // Show/hide no products message
-            if (visibleProducts === 0) {
-                productsContainer.style.display = 'none';
-                noProducts.classList.remove('hidden');
-                noProducts.style.animation = 'fadeIn 0.5s ease-in';
-            } else {
-                productsContainer.style.display = 'grid';
-                noProducts.classList.add('hidden');
-            }
+            
+            // Update active button
+            updateActiveButton(this);
+            
+            // Filter products
+            filterProducts(category);
         });
     });
 
     // Add hover effects for product cards
-    const productCardsAll = document.querySelectorAll('[data-category]');
-    productCardsAll.forEach(card => {
+    productCards.forEach(card => {
         card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-8px)';
+            this.style.transform = 'translateY(-8px) scale(1.02)';
         });
         
         card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
+            this.style.transform = 'translateY(0) scale(1)';
         });
     });
+
+    // Initialize with all products showing
+    filterProducts('all');
 });
 
 // Add CSS animations
 const style = document.createElement('style');
 style.textContent = `
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from { 
+            opacity: 0; 
+            transform: translateY(20px); 
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0); 
+        }
     }
     
     .line-clamp-2 {
@@ -339,6 +395,20 @@ style.textContent = `
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
+    }
+    
+    .product-card {
+        transition: all 0.3s ease;
+    }
+    
+    .category-filter {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .category-filter.active {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }
 `;
 document.head.appendChild(style);

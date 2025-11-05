@@ -3,207 +3,578 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Struk Transaksi - {{ $setting->store_name }}</title>
+    <title>Kasir Pintar - Transaksi Baru</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gradient-to-br from-gray-50 to-gray-100 print:bg-white">
-    <div class="min-h-screen flex items-center justify-center p-4 print:p-0">
-        <div class="max-w-md w-full bg-white rounded-2xl shadow-xl print:shadow-none overflow-hidden border border-gray-200/60 print:border-0">
-            <!-- Header dengan gradient -->
-            <div class="bg-gradient-to-r from-amber-500 to-amber-400 text-white p-6 text-center">
-                @if($setting->logo)
-                <div class="w-20 h-20 mx-auto mb-3 bg-white rounded-2xl p-2 shadow-lg">
-                    <img src="{{ asset('storage/' . $setting->logo) }}" alt="Logo" class="w-full h-full object-contain">
-                </div>
-                @else
-                <div class="w-16 h-16 mx-auto mb-3 bg-white/20 rounded-2xl flex items-center justify-center">
-                    <i class="fas fa-store text-2xl"></i>
-                </div>
-                @endif
-                <h1 class="text-2xl font-bold tracking-tight">{{ $setting->store_name }}</h1>
-                <p class="text-amber-100 text-sm mt-1 whitespace-pre-line">{{ $setting->address }}</p>
-                <div class="flex items-center justify-center space-x-4 mt-3 text-amber-100 text-sm">
-                    <span><i class="fas fa-calendar mr-1"></i>{{ $sale->created_at->format('d/m/Y') }}</span>
-                    <span><i class="fas fa-clock mr-1"></i>{{ $sale->created_at->format('H:i') }}</span>
-                </div>
-            </div>
-
-            <!-- Transaction Info -->
-            <div class="p-6 bg-gradient-to-br from-gray-50 to-white">
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                        <div class="text-xs text-gray-500 font-medium mb-1">No. Transaksi</div>
-                        <div class="text-sm font-mono font-bold text-gray-800">#{{ str_pad($sale->id, 6, '0', STR_PAD_LEFT) }}</div>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-lg">
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-2xl font-bold"><i class="fas fa-cash-register mr-3"></i>Smart Cashier</h1>
+                        <p class="text-blue-100">Sistem Kasir Pintar - Transaksi Baru</p>
                     </div>
-                    <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                        <div class="text-xs text-gray-500 font-medium mb-1">Kasir</div>
-                        <div class="text-sm font-semibold text-gray-800">{{ $sale->user->name }}</div>
-                    </div>
-                </div>
-
-                <!-- Items List -->
-                <div class="mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800">Detail Pembelian</h3>
-                        <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-shopping-basket text-amber-600 text-sm"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-3">
-                        @foreach($sale->items as $item)
-                        <div class="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
-                            <div class="flex-1">
-                                <div class="font-medium text-gray-800">{{ $item->product->name }}</div>
-                                <div class="text-xs text-gray-500 mt-1">
-                                    <span class="font-mono">Rp {{ number_format($item->product->price, 0, ',', '.') }}</span>
-                                    <span class="mx-2">•</span>
-                                    <span>{{ $item->qty }} pcs</span>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <div class="font-mono font-semibold text-gray-800">
-                                    Rp {{ number_format($item->subtotal, 0, ',', '.') }}
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-
-                <!-- Totals -->
-                <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-5 border border-gray-200">
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center py-2 border-b border-gray-200">
-                            <span class="text-gray-600 font-medium">Subtotal</span>
-                            <span class="font-mono text-gray-800">Rp {{ number_format($sale->total, 0, ',', '.') }}</span>
-                        </div>
-                        <div class="flex justify-between items-center py-2 border-b border-gray-200">
-                            <span class="text-gray-600 font-medium">Bayar</span>
-                            <span class="font-mono text-green-600 font-semibold">Rp {{ number_format($sale->payment, 0, ',', '.') }}</span>
-                        </div>
-                        <div class="flex justify-between items-center py-2">
-                            <span class="text-gray-600 font-medium">Kembali</span>
-                            <span class="font-mono text-blue-600 font-bold">Rp {{ number_format($sale->change, 0, ',', '.') }}</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Grand Total -->
-                    <div class="mt-4 pt-4 border-t border-gray-300 border-dashed">
-                        <div class="flex justify-between items-center">
-                            <span class="text-lg font-bold text-gray-800">TOTAL</span>
-                            <span class="text-xl font-mono font-bold text-amber-600">Rp {{ number_format($sale->total, 0, ',', '.') }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Payment Status -->
-                <div class="mt-4 flex justify-center">
-                    <div class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold flex items-center space-x-2">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Pembayaran Berhasil</span>
+                    <div class="text-right">
+                        <div class="text-sm opacity-90">{{ date('d F Y') }}</div>
+                        <div id="live-clock" class="text-lg font-mono font-bold"></div>
                     </div>
                 </div>
             </div>
+        </header>
 
-            <!-- Footer -->
-            <div class="bg-gradient-to-r from-gray-800 to-gray-900 text-white p-6 text-center">
-                <div class="space-y-3">
-                    @if($setting->footer_text)
-                    <p class="text-gray-300 text-sm leading-relaxed whitespace-pre-line">{{ $setting->footer_text }}</p>
-                    @endif
-                    <div class="flex items-center justify-center space-x-4 text-gray-400 text-sm">
-                        <span><i class="fas fa-phone mr-1"></i>{{ $setting->phone ?? '- '}}</span>
-                        <span><i class="fas fa-envelope mr-1"></i>{{ $setting->email ?? '-' }}</span>
-                    </div>
-                    <p class="text-amber-300 font-semibold mt-3 flex items-center justify-center space-x-2">
-                        <i class="fas fa-heart"></i>
-                        <span>Terima kasih atas kunjungan Anda</span>
-                    </p>
+        <!-- Navigation -->
+        <nav class="bg-white shadow-sm border-b">
+            <div class="container mx-auto px-4">
+                <div class="flex space-x-4 py-4">
+                    <!-- Tombol Kembali -->
+                    <a href="{{ route('admin.dashboard') ?? url('/admin') }}" 
+                       class="flex items-center space-x-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Kembali</span>
+                    </a>
+                    
+                    <!-- Tombol Transaksi Baru -->
+                    <a href="{{ route('admin.transactions.create') }}" 
+                       class="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                        <i class="fas fa-plus"></i>
+                        <span>Transaksi Baru</span>
+                    </a>
+                    
+                    <!-- Tombol Daftar Transaksi -->
+                    <a href="{{ route('admin.transactions.index') }}" 
+                       class="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-list"></i>
+                        <span>Daftar Transaksi</span>
+                    </a>
                 </div>
-                
-                <!-- Barcode/QR Code Placeholder -->
-                <div class="mt-4 pt-4 border-t border-gray-700">
-                    <div class="bg-white/10 rounded-lg p-3 inline-block">
-                        <div class="text-xs text-gray-400 mb-1">Struk Digital</div>
-                        <div class="w-32 h-32 bg-white/20 rounded flex items-center justify-center mx-auto">
-                            <i class="fas fa-qrcode text-3xl text-gray-400"></i>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column - Product Selection & Cart -->
+                <div class="lg:col-span-2">
+                    <!-- Product List -->
+                    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Daftar Produk Tersedia</h2>
+                        
+                        <!-- Search Bar -->
+                        <div class="mb-4">
+                            <input type="text" id="product-search" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   placeholder="Cari produk...">
+                        </div>
+
+                        <!-- Products Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="products-grid">
+                            @foreach($products as $product)
+                            <div class="product-card border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                                 data-product-id="{{ $product->id }}"
+                                 data-product-name="{{ $product->name }}"
+                                 data-product-price="{{ $product->price }}"
+                                 data-product-stock="{{ $product->stock }}">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="font-semibold text-gray-800">{{ $product->name }}</h3>
+                                    <span class="text-xs px-2 py-1 rounded-full 
+                                        {{ $product->stock > 10 ? 'bg-green-100 text-green-800' : 
+                                           ($product->stock > 0 ? 'bg-yellow-100 text-yellow-800' : 
+                                           'bg-red-100 text-red-800') }}">
+                                        Stok: {{ $product->stock }}
+                                    </span>
+                                </div>
+                                <p class="text-lg font-bold text-green-600 mb-3">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                                
+                                <!-- Quantity Controls -->
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-2">
+                                        <button onclick="decreaseProductQuantity({{ $product->id }})" 
+                                                class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors
+                                                {{ $product->stock == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                                {{ $product->stock == 0 ? 'disabled' : '' }}>
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span id="product-quantity-{{ $product->id }}" class="w-8 text-center font-medium">0</span>
+                                        <button onclick="increaseProductQuantity({{ $product->id }})" 
+                                                class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors
+                                                {{ $product->stock == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                                {{ $product->stock == 0 ? 'disabled' : '' }}>
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                    <button onclick="addToCart({{ $product->id }})" 
+                                            class="bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-sm
+                                            {{ $product->stock == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                            {{ $product->stock == 0 ? 'disabled' : '' }}>
+                                        <i class="fas fa-cart-plus mr-1"></i>
+                                        Tambah
+                                    </button>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+
+                        @if($products->isEmpty())
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-box-open text-4xl mb-3"></i>
+                            <p>Tidak ada produk tersedia</p>
+                        </div>
+                        @endif
+                    </div>
+
+                    <!-- Shopping Cart -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Keranjang Belanja</h2>
+                        
+                        <div class="space-y-3" id="cart-items">
+                            <!-- Cart items will be added here -->
+                        </div>
+
+                        <div id="empty-cart" class="text-center py-8 text-gray-500">
+                            <i class="fas fa-shopping-cart text-4xl mb-3"></i>
+                            <p>Keranjang belanja kosong</p>
+                            <p class="text-sm">Pilih produk dari daftar di atas</p>
                         </div>
                     </div>
+                </div>
+
+                <!-- Right Column - Summary -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-xl shadow-lg p-6 sticky top-8">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Ringkasan Transaksi</h2>
+                        
+                        <!-- Transaction Code -->
+                        <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                            <div class="text-sm text-gray-600">Kode Transaksi</div>
+                            <div class="font-mono font-bold text-blue-600">{{ $transactionCode }}</div>
+                        </div>
+
+                        <!-- Calculation Summary -->
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Subtotal</span>
+                                <span id="subtotal" class="font-medium">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Pajak (10%)</span>
+                                <span id="tax" class="font-medium">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Diskon</span>
+                                <span id="discount" class="font-medium">Rp 0</span>
+                            </div>
+                            <hr>
+                            <div class="flex justify-between text-lg font-bold">
+                                <span class="text-gray-800">Total</span>
+                                <span id="total" class="text-green-600">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-3">Metode Pembayaran</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setPaymentMethod('cash')" 
+                                        class="payment-method-btn p-3 border rounded-lg text-center hover:bg-gray-50"
+                                        data-method="cash">
+                                    <i class="fas fa-money-bill-wave text-green-500 text-xl mb-1"></i>
+                                    <div class="text-sm font-medium">Cash</div>
+                                </button>
+                                <button onclick="setPaymentMethod('qris')" 
+                                        class="payment-method-btn p-3 border rounded-lg text-center hover:bg-gray-50"
+                                        data-method="qris">
+                                    <i class="fas fa-qrcode text-blue-500 text-xl mb-1"></i>
+                                    <div class="text-sm font-medium">QRIS</div>
+                                </button>
+                                <button onclick="setPaymentMethod('debit_card')" 
+                                        class="payment-method-btn p-3 border rounded-lg text-center hover:bg-gray-50"
+                                        data-method="debit_card">
+                                    <i class="fas fa-credit-card text-purple-500 text-xl mb-1"></i>
+                                    <div class="text-sm font-medium">Debit Card</div>
+                                </button>
+                                <button onclick="setPaymentMethod('credit_card')" 
+                                        class="payment-method-btn p-3 border rounded-lg text-center hover:bg-gray-50"
+                                        data-method="credit_card">
+                                    <i class="fas fa-credit-card text-orange-500 text-xl mb-1"></i>
+                                    <div class="text-sm font-medium">Credit Card</div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cash Payment -->
+                        <div id="cash-payment-section" class="mb-6 hidden">
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Uang Diberikan</label>
+                                    <input type="number" id="cash-paid" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                           placeholder="0" oninput="calculateChange()">
+                                </div>
+                                <div class="p-3 bg-green-50 rounded-lg">
+                                    <div class="text-sm text-gray-600">Kembalian</div>
+                                    <div id="change-amount" class="text-lg font-bold text-green-600">Rp 0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="space-y-3">
+                            <button onclick="processTransaction()" 
+                                    class="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors font-semibold">
+                                <i class="fas fa-check mr-2"></i>Proses Transaksi
+                            </button>
+                            <button onclick="resetForm()" 
+                                    class="w-full bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors">
+                                <i class="fas fa-redo mr-2"></i>Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-green-500 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Transaksi Berhasil!</h3>
+                <p class="text-gray-600 mb-6">Transaksi telah berhasil diproses dan disimpan.</p>
+                <div class="flex space-x-3">
+                    <button onclick="closeSuccessModal()" 
+                            class="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                        Tutup
+                    </button>
+                    <button id="print-receipt-btn" 
+                            class="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-print mr-2"></i>Print Struk
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 print:hidden">
-        <div class="bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-200/60 p-4 flex space-x-3">
-            <button onclick="window.print()" 
-                    class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center space-x-2 font-semibold">
-                <i class="fas fa-print"></i>
-                <span>Cetak Struk</span>
-            </button>
-            <a href="{{ route('admin.transactions.index') }}" 
-               class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-6 py-3 rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center space-x-2 font-semibold">
-                <i class="fas fa-plus"></i>
-                <span>Transaksi Baru</span>
-            </a>
-            <button onclick="downloadReceipt()" 
-                    class="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center space-x-2 font-semibold">
-                <i class="fas fa-download"></i>
-                <span>Download</span>
-            </button>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script>
-        // Auto print when page loads
-        window.onload = function() {
-            window.print();
-        };
+        let cart = [];
+        let selectedPaymentMethod = '';
+        let currentTransactionId = null;
+        let productQuantities = {};
 
-        function downloadReceipt() {
-            // Implement download functionality
-            alert('Fitur download struk akan diimplementasikan');
+        // Live Clock
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('id-ID', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            document.getElementById('live-clock').textContent = timeString;
         }
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        // Add some interactive effects
-        document.addEventListener('DOMContentLoaded', function() {
-            const receipt = document.querySelector('.max-w-md');
-            receipt.classList.add('animate-fade-in-up');
+        // Product Search
+        document.getElementById('product-search').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const productCards = document.querySelectorAll('.product-card');
+            
+            productCards.forEach(card => {
+                const productName = card.getAttribute('data-product-name').toLowerCase();
+                if (productName.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         });
+
+        // Increase Product Quantity
+        function increaseProductQuantity(productId) {
+            if (!productQuantities[productId]) {
+                productQuantities[productId] = 0;
+            }
+            
+            const productElement = document.querySelector(`[data-product-id="${productId}"]`);
+            const stock = parseInt(productElement.getAttribute('data-product-stock'));
+            
+            if (productQuantities[productId] < stock) {
+                productQuantities[productId]++;
+                document.getElementById(`product-quantity-${productId}`).textContent = productQuantities[productId];
+            } else {
+                alert('Stok tidak mencukupi!');
+            }
+        }
+
+        // Decrease Product Quantity
+        function decreaseProductQuantity(productId) {
+            if (!productQuantities[productId]) {
+                productQuantities[productId] = 0;
+            }
+            
+            if (productQuantities[productId] > 0) {
+                productQuantities[productId]--;
+                document.getElementById(`product-quantity-${productId}`).textContent = productQuantities[productId];
+            }
+        }
+
+        // Add to Cart
+        async function addToCart(productId) {
+            const quantity = productQuantities[productId] || 0;
+            
+            if (quantity === 0) {
+                alert('Pilih jumlah produk terlebih dahulu!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/transactions/product/${productId}`);
+                const product = await response.json();
+
+                // Check stock
+                if (quantity > product.stock) {
+                    alert('Stok tidak mencukupi!');
+                    return;
+                }
+
+                // Check if product already in cart
+                const existingItem = cart.find(item => item.product_id === productId);
+                
+                if (existingItem) {
+                    const newTotalQuantity = existingItem.quantity + quantity;
+                    if (newTotalQuantity > product.stock) {
+                        alert('Stok tidak mencukupi!');
+                        return;
+                    }
+                    existingItem.quantity = newTotalQuantity;
+                    existingItem.total = existingItem.price * newTotalQuantity;
+                } else {
+                    cart.push({
+                        product_id: productId,
+                        name: product.name,
+                        price: product.price,
+                        quantity: quantity,
+                        total: product.price * quantity,
+                        stock: product.stock
+                    });
+                }
+
+                // Reset quantity counter
+                productQuantities[productId] = 0;
+                document.getElementById(`product-quantity-${productId}`).textContent = '0';
+
+                updateCartDisplay();
+                updateSummary();
+                
+            } catch (error) {
+                console.error('Error adding product to cart:', error);
+                alert('Terjadi kesalahan saat menambahkan produk');
+            }
+        }
+
+        // Update Cart Display
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cart-items');
+            const emptyCart = document.getElementById('empty-cart');
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = '';
+                emptyCart.style.display = 'block';
+                return;
+            }
+            
+            emptyCart.style.display = 'none';
+            
+            let cartHTML = '';
+            cart.forEach((item, index) => {
+                cartHTML += `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-800">${item.name}</div>
+                            <div class="text-sm text-gray-600">
+                                ${item.quantity} x Rp ${item.price.toLocaleString('id-ID')} = 
+                                <span class="font-semibold text-green-600">Rp ${item.total.toLocaleString('id-ID')}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <button onclick="removeFromCart(${index})" 
+                                    class="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center hover:bg-red-200 transition-colors">
+                                <i class="fas fa-trash text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            cartItems.innerHTML = cartHTML;
+        }
+
+        // Remove from Cart
+        function removeFromCart(index) {
+            if (confirm('Hapus produk ini dari keranjang?')) {
+                cart.splice(index, 1);
+                updateCartDisplay();
+                updateSummary();
+            }
+        }
+
+        // Update Summary Calculation
+        function updateSummary() {
+            let subtotal = cart.reduce((sum, item) => sum + item.total, 0);
+            const tax = subtotal * 0.1; // 10% tax
+            const discount = 0;
+            const total = subtotal + tax - discount;
+
+            document.getElementById('subtotal').textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
+            document.getElementById('tax').textContent = 'Rp ' + tax.toLocaleString('id-ID');
+            document.getElementById('discount').textContent = 'Rp ' + discount.toLocaleString('id-ID');
+            document.getElementById('total').textContent = 'Rp ' + total.toLocaleString('id-ID');
+
+            if (selectedPaymentMethod === 'cash') {
+                calculateChange();
+            }
+        }
+
+        // Set Payment Method
+        function setPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            
+            document.querySelectorAll('.payment-method-btn').forEach(btn => {
+                if (btn.dataset.method === method) {
+                    btn.classList.add('border-2', 'border-blue-500', 'bg-blue-50');
+                } else {
+                    btn.classList.remove('border-2', 'border-blue-500', 'bg-blue-50');
+                }
+            });
+
+            const cashSection = document.getElementById('cash-payment-section');
+            if (method === 'cash') {
+                cashSection.classList.remove('hidden');
+                calculateChange();
+            } else {
+                cashSection.classList.add('hidden');
+            }
+        }
+
+        // Calculate Change
+        function calculateChange() {
+            if (selectedPaymentMethod !== 'cash') return;
+
+            const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, '')) || 0;
+            const cashPaid = parseFloat(document.getElementById('cash-paid').value) || 0;
+            const change = cashPaid - total;
+
+            document.getElementById('change-amount').textContent = 'Rp ' + (change > 0 ? change : 0).toLocaleString('id-ID');
+        }
+
+        // Process Transaction
+        async function processTransaction() {
+            // Validasi tanpa customer name
+            if (cart.length === 0) {
+                alert('Keranjang belanja kosong!');
+                return;
+            }
+
+            if (!selectedPaymentMethod) {
+                alert('Pilih metode pembayaran!');
+                return;
+            }
+
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/[^\d]/g, '')) || 0;
+            const tax = parseFloat(document.getElementById('tax').textContent.replace(/[^\d]/g, '')) || 0;
+            const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, '')) || 0;
+            const cashPaid = selectedPaymentMethod === 'cash' ? parseFloat(document.getElementById('cash-paid').value) || 0 : 0;
+            const changeAmount = selectedPaymentMethod === 'cash' ? (cashPaid - total > 0 ? cashPaid - total : 0) : 0;
+
+            if (selectedPaymentMethod === 'cash' && cashPaid < total) {
+                alert('Uang yang dibayarkan kurang!');
+                return;
+            }
+
+            const transactionData = {
+                transaction_code: '{{ $transactionCode }}',
+                customer_name: 'Customer', // Default customer name
+                customer_phone: '', // Empty phone
+                items: cart.map(item => ({
+                    product_id: item.product_id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    total: item.total
+                })),
+                subtotal: subtotal,
+                tax: tax,
+                discount: 0,
+                total: total,
+                payment_method: selectedPaymentMethod,
+                cash_paid: cashPaid,
+                change_amount: changeAmount
+            };
+
+            try {
+                const response = await fetch('{{ route("admin.transactions.store") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify(transactionData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    currentTransactionId = result.transaction_id;
+                    document.getElementById('print-receipt-btn').onclick = () => {
+                        window.open(result.print_url, '_blank');
+                    };
+                    showSuccessModal();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan: ' + error.message);
+            }
+        }
+
+        // Show Success Modal
+        function showSuccessModal() {
+            document.getElementById('success-modal').classList.remove('hidden');
+        }
+
+        // Close Success Modal
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+            window.location.href = '{{ route("admin.transactions.index") }}';
+        }
+
+        // Reset Form
+        function resetForm() {
+            if (confirm('Reset form transaksi? Semua data akan dihapus.')) {
+                document.getElementById('cash-paid').value = '';
+                cart = [];
+                selectedPaymentMethod = '';
+                productQuantities = {};
+                
+                // Reset all quantity counters
+                document.querySelectorAll('[id^="product-quantity-"]').forEach(element => {
+                    element.textContent = '0';
+                });
+                
+                document.querySelectorAll('.payment-method-btn').forEach(btn => {
+                    btn.classList.remove('border-2', 'border-blue-500', 'bg-blue-50');
+                });
+                
+                document.getElementById('cash-payment-section').classList.add('hidden');
+                updateCartDisplay();
+                updateSummary();
+            }
+        }
     </script>
-
-    <style>
-        @keyframes fade-in-up {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .animate-fade-in-up {
-            animation: fade-in-up 0.6s ease-out;
-        }
-
-        @media print {
-            .max-w-md {
-                margin: 0;
-                box-shadow: none;
-                border-radius: 0;
-                max-width: none;
-            }
-            body {
-                background: white;
-            }
-            .fixed {
-                display: none;
-            }
-        }
-    </style>
 </body>
 </html>

@@ -23,15 +23,21 @@ Route::get('/testimoni', [HomeController::class, 'testimonial'])->name('testimon
 Route::prefix('admin')->middleware(['auth'])->group(function () {
 
     // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     // Products
     Route::resource('/products', ProductController::class)->names('admin.products');
 
-    // Transactions
+    // Transactions - Updated with new routes for smart cashier
     Route::resource('/transactions', TransactionController::class)
-        ->names('admin.transactions')
-        ->except(['show', 'edit']);
+        ->names('admin.transactions');
+    
+    // Additional transaction routes for smart cashier features
+    Route::prefix('transactions')->name('admin.transactions.')->group(function () {
+        Route::get('/{id}/print', [TransactionController::class, 'printReceipt'])->name('print');
+        Route::get('/today/sales', [TransactionController::class, 'getTodaySales'])->name('today.sales');
+        Route::get('/product/{id}', [TransactionController::class, 'getProduct'])->name('product.get');
+    });
 
     // Testimonials
     Route::resource('/testimonials', TestimonialController::class)
@@ -39,12 +45,12 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::post('/testimonials/{testimonial}/toggle-status', [TestimonialController::class, 'toggleStatus'])
         ->name('admin.testimonials.toggle-status');
 
-    // Reports
-    Route::prefix('reports')->name('admin.reports.')->group(function () {
-        Route::get('/', [ReportController::class, 'index'])->name('index');
-        Route::get('/daily', [ReportController::class, 'daily'])->name('daily');
-        Route::get('/monthly', [ReportController::class, 'monthly'])->name('monthly');
-    });
+    Route::prefix('admin')->name('admin.')->group(function () {
+    // Reports Routes
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/monthly', [ReportController::class, 'monthly'])->name('reports.monthly');
+    Route::get('/reports/daily', [ReportController::class, 'daily'])->name('reports.daily');
+});
 
     // Settings
     Route::prefix('settings')->name('admin.settings.')->group(function () {

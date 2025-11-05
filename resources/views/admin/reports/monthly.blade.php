@@ -1,5 +1,8 @@
 @extends('layouts.admin')
 
+@section('title', 'Laporan Bulanan - Smart Cashier')
+@section('subtitle', 'Analisis performa penjualan bulanan dan tren')
+
 @section('content')
 <div class="space-y-8">
     <!-- Header Section -->
@@ -30,11 +33,11 @@
                 <input type="month" 
                        name="month" 
                        value="{{ $month }}"
-                       class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-honey-500 focus:border-transparent shadow-sm transition-all duration-200">
+                       class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all duration-200">
             </div>
             <div class="flex items-end">
                 <button type="submit" 
-                        class="w-full px-4 py-3 bg-gradient-to-r from-honey-500 to-honey-600 hover:from-honey-600 hover:to-honey-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
+                        class="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
                     <i class="fas fa-filter mr-2"></i>Terapkan Filter
                 </button>
             </div>
@@ -65,7 +68,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-600">Total Produk Terjual</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ $transactions->unique('product_id')->count() }}</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ $totalProducts ?? 0 }}</p>
                 </div>
             </div>
         </div>
@@ -145,59 +148,63 @@
                 <thead class="bg-gray-50/80">
                     <tr>
                         <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Tanggal</th>
+                        <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Kode Transaksi</th>
                         <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Produk</th>
                         <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Kategori</th>
                         <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Quantity</th>
                         <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Harga Satuan</th>
                         <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Total Harga</th>
-                        <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Kasir</th>
+                        <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Customer</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-100">
-                    @forelse($transactions as $transaction)
+                    @forelse($reportData as $item)
                     <tr class="hover:bg-gray-50/80 transition-colors duration-150">
                         <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ $transaction->date->format('d/m/Y') }}
+                            {{ $item->date->format('d/m/Y') }}
+                        </td>
+                        <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
+                            {{ $item->transaction_code }}
                         </td>
                         <td class="px-8 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-10 w-10">
-                                    @if($transaction->product->image)
+                                    @if($item->product->image)
                                         <img class="h-10 w-10 rounded-xl object-cover shadow-sm" 
-                                             src="{{ asset('storage/' . $transaction->product->image) }}" 
-                                             alt="{{ $transaction->product->name }}">
+                                             src="{{ asset('storage/' . $item->product->image) }}" 
+                                             alt="{{ $item->product->name }}">
                                     @else
                                         <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-sm">
-                                            <i class="fas fa-honey-pot text-gray-400"></i>
+                                            <i class="fas fa-box text-gray-400"></i>
                                         </div>
                                     @endif
                                 </div>
                                 <div class="ml-4">
-                                    <div class="text-sm font-semibold text-gray-900">{{ $transaction->product->name }}</div>
+                                    <div class="text-sm font-semibold text-gray-900">{{ $item->product_name }}</div>
                                 </div>
                             </div>
                         </td>
                         <td class="px-8 py-4 whitespace-nowrap">
                             <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-800 border border-amber-200">
-                                {{ $transaction->product->category }}
+                                {{ $item->product_category }}
                             </span>
                         </td>
                         <td class="px-8 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            {{ $transaction->quantity }}
+                            {{ $item->quantity }}
                         </td>
                         <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            Rp {{ number_format($transaction->product->price, 0, ',', '.') }}
+                            Rp {{ number_format($item->unit_price, 0, ',', '.') }}
                         </td>
                         <td class="px-8 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                            Rp {{ number_format($transaction->total_price, 0, ',', '.') }}
+                            Rp {{ number_format($item->total_price, 0, ',', '.') }}
                         </td>
                         <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-700">
-                            {{ $transaction->user->name }}
+                            {{ $item->customer_name ?? 'Walk-in Customer' }}
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="px-8 py-12 text-center">
+                        <td colspan="8" class="px-8 py-12 text-center">
                             <div class="flex flex-col items-center justify-center text-gray-400">
                                 <i class="fas fa-inbox text-4xl mb-3"></i>
                                 <p class="text-lg font-medium">Tidak ada transaksi</p>
@@ -207,10 +214,10 @@
                     </tr>
                     @endforelse
                 </tbody>
-                @if($transactions->count() > 0)
+                @if(count($reportData) > 0)
                 <tfoot class="bg-gradient-to-r from-gray-50 to-gray-100">
                     <tr>
-                        <td colspan="3" class="px-8 py-4 text-sm font-bold text-gray-900 text-right">
+                        <td colspan="4" class="px-8 py-4 text-sm font-bold text-gray-900 text-right">
                             TOTAL BULANAN:
                         </td>
                         <td class="px-8 py-4 text-sm font-bold text-gray-900">
@@ -229,6 +236,7 @@
     </div>
 </div>
 
+@push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 function printReport() {
@@ -242,8 +250,8 @@ function printReport() {
                 .header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #e5e7eb; }
                 .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
                 .summary-card { border: 1px solid #e5e7eb; padding: 20px; border-radius: 12px; text-align: center; background: #f9fafb; }
-                table { width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 14px; }
-                th, td { border: 1px solid #e5e7eb; padding: 12px; text-align: left; }
+                table { width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 12px; }
+                th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; }
                 th { background-color: #f3f4f6; font-weight: 600; }
                 .total-row { font-weight: bold; background-color: #f9fafb; }
                 .footer { margin-top: 30px; text-align: right; font-style: italic; color: #6b7280; }
@@ -259,7 +267,7 @@ function printReport() {
             <div class="summary">
                 <div class="summary-card">
                     <strong style="color: #374151;">Total Produk Terjual</strong><br>
-                    <span style="font-size: 24px; font-weight: bold; color: #1f2937;">{{ $transactions->unique('product_id')->count() }}</span>
+                    <span style="font-size: 24px; font-weight: bold; color: #1f2937;">{{ $totalProducts }}</span>
                 </div>
                 <div class="summary-card">
                     <strong style="color: #374151;">Total Transaksi</strong><br>
@@ -279,28 +287,30 @@ function printReport() {
                 <thead>
                     <tr>
                         <th>Tanggal</th>
+                        <th>Kode Transaksi</th>
                         <th>Produk</th>
                         <th>Kategori</th>
                         <th>Quantity</th>
                         <th>Harga Satuan</th>
                         <th>Total Harga</th>
-                        <th>Kasir</th>
+                        <th>Customer</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($transactions as $transaction)
+                    @foreach($reportData as $item)
                     <tr>
-                        <td>{{ $transaction->date->format('d/m/Y') }}</td>
-                        <td>{{ $transaction->product->name }}</td>
-                        <td>{{ $transaction->product->category }}</td>
-                        <td>{{ $transaction->quantity }}</td>
-                        <td>Rp {{ number_format($transaction->product->price, 0, ',', '.') }}</td>
-                        <td>Rp {{ number_format($transaction->total_price, 0, ',', '.') }}</td>
-                        <td>{{ $transaction->user->name }}</td>
+                        <td>{{ $item->date->format('d/m/Y') }}</td>
+                        <td>{{ $item->transaction_code }}</td>
+                        <td>{{ $item->product_name }}</td>
+                        <td>{{ $item->product_category }}</td>
+                        <td>{{ $item->quantity }}</td>
+                        <td>Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
+                        <td>Rp {{ number_format($item->total_price, 0, ',', '.') }}</td>
+                        <td>{{ $item->customer_name ?? 'Walk-in Customer' }}</td>
                     </tr>
                     @endforeach
                     <tr class="total-row">
-                        <td colspan="3"><strong>TOTAL</strong></td>
+                        <td colspan="4"><strong>TOTAL</strong></td>
                         <td><strong>{{ $totalQuantity }}</strong></td>
                         <td></td>
                         <td><strong>Rp {{ number_format($totalRevenue, 0, ',', '.') }}</strong></td>
@@ -352,16 +362,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const dailyRevenueCtx = document.getElementById('dailyRevenueChart').getContext('2d');
     
     const dailyRevenueData = {
-        labels: {!! json_encode($dailyRevenue->pluck('date')) !!},
+        labels: {!! json_encode($dailyRevenueChart->pluck('date')) !!},
         datasets: [{
             label: 'Pendapatan Harian',
-            data: {!! json_encode($dailyRevenue->pluck('revenue')) !!},
-            backgroundColor: 'rgba(245, 158, 11, 0.1)',
-            borderColor: 'rgba(245, 158, 11, 1)',
+            data: {!! json_encode($dailyRevenueChart->pluck('revenue')) !!},
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderColor: 'rgba(59, 130, 246, 1)',
             borderWidth: 3,
             tension: 0.4,
             fill: true,
-            pointBackgroundColor: 'rgba(245, 158, 11, 1)',
+            pointBackgroundColor: 'rgba(59, 130, 246, 1)',
             pointBorderColor: '#fff',
             pointBorderWidth: 2,
             pointRadius: 5,
@@ -444,10 +454,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const productSalesCtx = document.getElementById('productSalesChart').getContext('2d');
     
     const productSalesData = {
-        labels: {!! json_encode($productSales->pluck('product_name')) !!},
+        labels: {!! json_encode($productSalesChart->pluck('product_name')) !!},
         datasets: [{
             label: 'Quantity Terjual',
-            data: {!! json_encode($productSales->pluck('total_quantity')) !!},
+            data: {!! json_encode($productSalesChart->pluck('total_quantity')) !!},
             backgroundColor: [
                 'rgba(245, 158, 11, 0.8)',
                 'rgba(16, 185, 129, 0.8)',
@@ -558,4 +568,5 @@ document.addEventListener('DOMContentLoaded', function() {
     background: #94a3b8;
 }
 </style>
+@endpush
 @endsection

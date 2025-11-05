@@ -6,76 +6,284 @@ use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Transaction::with(['product', 'user']);
-        
-        // Filter tanggal
-        if ($request->has('start_date') && $request->start_date) {
-            $query->whereDate('date', '>=', $request->start_date);
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+        $productId = $request->get('product_id');
+
+        // Query transactions dengan filter
+        $transactionsQuery = Transaction::with([])
+            ->filterByDate($startDate, $endDate)
+            ->filterByProduct($productId)
+            ->where('status', 'completed')
+            ->latest();
+
+        // Get transactions untuk table
+        $transactions = $transactionsQuery->paginate(50);
+
+        // Process transactions untuk display di table
+        $reportData = [];
+        $totalProductsSold = 0;
+        $totalQuantity = 0;
+
+        foreach ($transactions as $transaction) {
+            $items = $transaction->getTransactionItems();
+            foreach ($items as $item) {
+                // Jika ada filter product, hanya tampilkan product yang dipilih
+                if ($productId && $item->product_id != $productId) {
+                    continue;
+                }
+                
+                $reportData[] = (object) [
+                    'date' => $transaction->created_at,
+                    'product_id' => $item->product_id,
+                    'product_name' => $item->product_name,
+                    'product_category' => $item->product_category,
+                    'quantity' => $item->quantity,
+                    'unit_price' => $item->product_price,
+                    'total_price' => $item->total_price,
+                    'customer_name' => $transaction->customer_name,
+                    'transaction_code' => $transaction->transaction_code,
+                    'product' => (object) [
+                        'name' => $item->product_name,
+                        'category' => $item->product_category,
+                        'price' => $item->product_price,
+                        'image' => $item->product->image ?? null
+                    ]
+                ];
+                $totalProductsSold++;
+                $totalQuantity += $item->quantity;
+            }
         }
-        
-        if ($request->has('end_date') && $request->end_date) {
-            $query->whereDate('date', '<=', $request->end_date);
-        }
-        
-        // Filter produk
-        if ($request->has('product_id') && $request->product_id) {
-            $query->where('product_id', $request->product_id);
-        }
-        
-        $transactions = $query->latest()->paginate(15);
-        
-        // Statistik
-        $totalTransactions = $query->count();
-        $totalProductsSold = $query->distinct('product_id')->count('product_id');
-        $totalQuantity = $query->sum('quantity');
-        $totalRevenue = $query->sum('total_price');
-        
-        $products = Product::all();
-        
+
+        // Hitung statistics
+        $totalTransactions = $transactions->count();
+        $totalRevenue = $transactions->sum('total');
+
+        $products = Product::orderBy('name')->get();
+
         return view('admin.reports.index', compact(
-            'transactions', 
-            'products', 
-            'totalTransactions',
+            'reportData',
+            'transactions',
             'totalProductsSold',
+            'totalTransactions',
+            'totalRevenue',
             'totalQuantity',
-            'totalRevenue'
+            'products',
+            'startDate',
+            'endDate',
+            'productId'
         ));
     }
 
-    public function dailyReport(Request $request)
-    {
-        $date = $request->get('date', now()->format('Y-m-d'));
-        
-        $transactions = Transaction::with(['product', 'user'])
-            ->whereDate('date', $date)
-            ->latest()
-            ->get();
-            
-        $totalRevenue = $transactions->sum('total_price');
-        $totalQuantity = $transactions->sum('quantity');
-        
-        return view('admin.reports.daily', compact('transactions', 'totalRevenue', 'totalQuantity', 'date'));
-    }
-
-    public function monthlyReport(Request $request)
+    public function monthly(Request $request)
     {
         $month = $request->get('month', now()->format('Y-m'));
         
-        $transactions = Transaction::with(['product', 'user'])
-            ->whereYear('date', substr($month, 0, 4))
-            ->whereMonth('date', substr($month, 5, 2))
+        $startDate = Carbon::parse($month)->startOfMonth();
+        $endDate = Carbon::parse($month)->endOfMonth();
+
+        // Get transactions for the month
+        $transactions = Transaction::with([])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('status', 'completed')
             ->latest()
             ->get();
+
+        // Process data untuk chart dan table
+        $reportData = [];
+        $dailyRevenue = [];
+        $productSales = [];
+        $totalQuantity = 0;
+
+        foreach ($transactions as $transaction) {
+            $items = $transaction->getTransactionItems();
             
-        $totalRevenue = $transactions->sum('total_price');
-        $totalQuantity = $transactions->sum('quantity');
+            // Daily revenue data
+            $day = $transaction->created_at->format('Y-m-d');
+            if (!isset($dailyRevenue[$day])) {
+                $dailyRevenue[$day] = 0;
+            }
+            $dailyRevenue[$day] += $transaction->total;
+
+            foreach ($items as $item) {
+                // Report data untuk table
+                $reportData[] = (object) [
+                    'date' => $transaction->created_at,
+                    'product_id' => $item->product_id,
+                    'product_name' => $item->product_name,
+                    'product_category' => $item->product_category,
+                    'quantity' => $item->quantity,
+                    'unit_price' => $item->product_price,
+                    'total_price' => $item->total_price,
+                    'customer_name' => $transaction->customer_name,
+                    'transaction_code' => $transaction->transaction_code,
+                    'product' => (object) [
+                        'name' => $item->product_name,
+                        'category' => $item->product_category,
+                        'price' => $item->product_price,
+                        'image' => $item->product->image ?? null
+                    ],
+                    'user' => (object) [
+                        'name' => 'System'
+                    ]
+                ];
+
+                $totalQuantity += $item->quantity;
+
+                // Product sales data untuk chart
+                if (!isset($productSales[$item->product_id])) {
+                    $productSales[$item->product_id] = [
+                        'product_name' => $item->product_name,
+                        'total_quantity' => 0,
+                        'total_revenue' => 0
+                    ];
+                }
+                $productSales[$item->product_id]['total_quantity'] += $item->quantity;
+                $productSales[$item->product_id]['total_revenue'] += $item->total_price;
+            }
+        }
+
+        // Format data untuk chart
+        $dailyRevenueChart = collect($dailyRevenue)->map(function ($revenue, $date) {
+            return [
+                'date' => Carbon::parse($date)->format('d M'),
+                'revenue' => $revenue
+            ];
+        })->values();
+
+        $productSalesChart = collect($productSales)->sortByDesc('total_quantity')->take(10)->values();
+
+        // Statistics
+        $totalRevenue = $transactions->sum('total');
+        $totalProducts = count(array_unique(array_column($reportData, 'product_id')));
+
+        return view('admin.reports.monthly', compact(
+            'reportData',
+            'transactions',
+            'dailyRevenueChart',
+            'productSalesChart',
+            'totalRevenue',
+            'totalQuantity',
+            'totalProducts',
+            'month'
+        ));
+    }
+
+    public function daily(Request $request)
+    {
+        $date = $request->get('date', now()->format('Y-m-d'));
         
-        return view('admin.reports.monthly', compact('transactions', 'totalRevenue', 'totalQuantity', 'month'));
+        $startDate = Carbon::parse($date)->startOfDay();
+        $endDate = Carbon::parse($date)->endOfDay();
+
+        // Get transactions for the day
+        $transactions = Transaction::with([])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('status', 'completed')
+            ->latest()
+            ->get();
+
+        // Process data
+        $reportData = [];
+        $topProducts = [];
+        $salesByHour = [];
+        $totalQuantity = 0;
+
+        foreach ($transactions as $transaction) {
+            $items = $transaction->getTransactionItems();
+            
+            // Sales by hour data
+            $hour = $transaction->created_at->format('H');
+            if (!isset($salesByHour[$hour])) {
+                $salesByHour[$hour] = 0;
+            }
+            $salesByHour[$hour]++;
+
+            foreach ($items as $item) {
+                // Report data untuk table
+                $reportData[] = (object) [
+                    'created_at' => $transaction->created_at,
+                    'date' => $transaction->created_at,
+                    'product_id' => $item->product_id,
+                    'product_name' => $item->product_name,
+                    'product_category' => $item->product_category,
+                    'quantity' => $item->quantity,
+                    'unit_price' => $item->product_price,
+                    'total_price' => $item->total_price,
+                    'customer_name' => $transaction->customer_name,
+                    'transaction_code' => $transaction->transaction_code,
+                    'product' => (object) [
+                        'name' => $item->product_name,
+                        'category' => $item->product_category,
+                        'price' => $item->product_price,
+                        'image' => $item->product->image ?? null
+                    ],
+                    'user' => (object) [
+                        'name' => 'System'
+                    ]
+                ];
+
+                $totalQuantity += $item->quantity;
+
+                // Top products data
+                if (!isset($topProducts[$item->product_id])) {
+                    $topProducts[$item->product_id] = (object) [
+                        'product' => (object) [
+                            'name' => $item->product_name,
+                            'category' => $item->product_category,
+                            'image' => $item->product->image ?? null
+                        ],
+                        'total_quantity' => 0,
+                        'total_revenue' => 0
+                    ];
+                }
+                $topProducts[$item->product_id]->total_quantity += $item->quantity;
+                $topProducts[$item->product_id]->total_revenue += $item->total_price;
+            }
+        }
+
+        // Format data
+        $topProducts = collect($topProducts)->sortByDesc('total_quantity')->take(5)->values();
+        $salesByHour = collect($salesByHour)->map(function ($count, $hour) {
+            return (object) [
+                'hour' => $hour,
+                'transaction_count' => $count
+            ];
+        })->sortBy('hour')->values();
+
+        // Statistics
+        $totalRevenue = $transactions->sum('total');
+        $totalProducts = count(array_unique(array_column($reportData, 'product_id')));
+
+        // Previous day comparison
+        $previousDate = Carbon::parse($date)->subDay();
+        $previousDayTransactions = Transaction::whereDate('created_at', $previousDate)
+            ->where('status', 'completed')
+            ->get();
+
+        $previousDayData = [
+            'transaction_count' => $previousDayTransactions->count(),
+            'revenue' => $previousDayTransactions->sum('total'),
+            'quantity' => $previousDayTransactions->sum('total_quantity')
+        ];
+
+        return view('admin.reports.daily', compact(
+            'reportData',
+            'transactions',
+            'topProducts',
+            'salesByHour',
+            'totalRevenue',
+            'totalQuantity',
+            'totalProducts',
+            'date',
+            'previousDayData'
+        ));
     }
 }

@@ -3,177 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Madu Suwawa</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <title>@yield('title', 'Dashboard - Smart Cashier')</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    @stack('styles')
 </head>
-<body 
-    class="bg-gradient-to-br from-gray-50 to-gray-100" 
-    x-data="{ sidebarOpen: false }"
->
-    <!-- Sidebar -->
-<div 
-class="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white 
-       transform transition-all duration-300 ease-in-out z-50 shadow-2xl
-       lg:translate-x-0 lg:transition-none"
-:class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
-    <div class="p-6 border-b border-gray-700">
-        <div class="flex items-center space-x-3">
-            <div class="p-2 bg-amber-500 rounded-xl shadow-lg">
-                <i class="fas fa-honeycomb text-white text-lg"></i>
-            </div>
-            <div>
-                <h1 class="text-xl font-bold bg-gradient-to-r from-amber-400 to-amber-300 bg-clip-text text-transparent">
-                    Madu Suwawa
-                </h1>
-                <p class="text-gray-400 text-xs font-medium">Admin Panel</p>
-            </div>
-        </div>
-    </div>
-    
-    <nav class="mt-6 px-3 space-y-1">
-        <a href="{{ route('admin.dashboard') }}" 
-           class="flex items-center px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-white shadow-lg shadow-amber-500/25' : 'text-gray-300 hover:bg-gray-700/50 hover:text-white hover:translate-x-1' }}">
-            <i class="fas fa-chart-bar w-6 text-center mr-3"></i>
-            <span class="font-medium">Dashboard</span>
-        </a>
-        
-        <a href="{{ route('admin.products.index') }}" 
-           class="flex items-center px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.products.*') ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-white shadow-lg shadow-amber-500/25' : 'text-gray-300 hover:bg-gray-700/50 hover:text-white hover:translate-x-1' }}">
-            <i class="fas fa-box w-6 text-center mr-3"></i>
-            <span class="font-medium">Produk</span>
-        </a>
-        
-        <a href="{{ route('admin.transactions.index') }}" 
-           class="flex items-center px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.transactions.*') ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-white shadow-lg shadow-amber-500/25' : 'text-gray-300 hover:bg-gray-700/50 hover:text-white hover:translate-x-1' }}">
-            <i class="fas fa-shopping-cart w-6 text-center mr-3"></i>
-            <span class="font-medium">Transaksi</span>
-        </a>
-        
-        <!-- Menu Testimonial Baru -->
-        <a href="{{ route('admin.testimonials.index') }}" 
-           class="flex items-center px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.testimonials.*') ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-white shadow-lg shadow-amber-500/25' : 'text-gray-300 hover:bg-gray-700/50 hover:text-white hover:translate-x-1' }}">
-            <i class="fas fa-comment-alt w-6 text-center mr-3"></i>
-            <span class="font-medium">Testimonial</span>
-        </a>
-        
-        <a href="{{ route('admin.reports.index') }}" 
-           class="flex items-center px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.reports.*') ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-white shadow-lg shadow-amber-500/25' : 'text-gray-300 hover:bg-gray-700/50 hover:text-white hover:translate-x-1' }}">
-            <i class="fas fa-chart-line w-6 text-center mr-3"></i>
-            <span class="font-medium">Laporan</span>
-        </a>
-        
-        <a href="{{ route('admin.settings.index') }}" 
-           class="flex items-center px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.settings.*') ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-white shadow-lg shadow-amber-500/25' : 'text-gray-300 hover:bg-gray-700/50 hover:text-white hover:translate-x-1' }}">
-            <i class="fas fa-cog w-6 text-center mr-3"></i>
-            <span class="font-medium">Pengaturan</span>
-        </a>
-    </nav>
-</div>
-
-    <!-- Main Content -->
-    <div class="lg:ml-64 min-h-screen flex flex-col">
+<body class="bg-gray-50">
+    <div class="min-h-screen">
         <!-- Header -->
-        <header class="bg-white/80 backdrop-blur-lg border-b border-gray-200/60 shadow-sm sticky top-0 z-40">
-            <div class="flex items-center justify-between px-6 py-4">
-                <!-- Mobile Toggle Button -->
-                <button @click="sidebarOpen = !sidebarOpen" 
-                        class="lg:hidden p-2 rounded-xl bg-white shadow-lg border border-gray-200 text-gray-600 hover:text-amber-600 hover:shadow-xl transition-all duration-200">
-                    <i class="fas fa-bars text-lg"></i>
-                </button>
-                
-                <!-- Page Title -->
-                <div class="flex-1 text-center lg:text-left">
-                    <h1 class="text-xl font-bold text-gray-800">
-                        @hasSection('page-title')
-                            @yield('page-title')
-                        @else
-                            Madu Suwawa - Gorontalo 
-                        @endif
-                    </h1>
-                </div>
-                
-                <!-- User Menu - Dipindahkan ke kanan -->
-                <div class="flex items-center space-x-4">
-                    
-                    <!-- User Dropdown -->
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" 
-                                class="flex items-center space-x-2 p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200">
-                            <div class="w-8 h-8 bg-gradient-to-r from-amber-500 to-amber-400 rounded-full flex items-center justify-center shadow-lg">
-                                <span class="text-white text-sm font-bold">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
-                            </div>
-                            <span class="hidden md:block text-gray-700 font-medium">{{ Auth::user()->name }}</span>
-                            <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
-                        </button>
-                        
-                        <!-- Dropdown Menu -->
-                        <div x-show="open" 
-                             @click.away="open = false"
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 scale-95"
-                             x-transition:enter-end="opacity-100 scale-100"
-                             x-transition:leave="transition ease-in duration-75"
-                             x-transition:leave-start="opacity-100 scale-100"
-                             x-transition:leave-end="opacity-0 scale-95"
-                             class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 py-1 z-50">
-                            <div class="px-4 py-2 border-b border-gray-100">
-                                <p class="text-sm font-medium text-gray-900">{{ Auth::user()->name }}</p>
-                                <p class="text-xs text-gray-500">Administrator</p>
-                            </div>
-                            <div class="border-t border-gray-100 my-1"></div>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" 
-                                        class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                    <i class="fas fa-sign-out-alt mr-3"></i>
-                                    Keluar
-                                </button>
-                            </form>
-                        </div>
+        <header class="bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-lg">
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-2xl font-bold"><i class="fas fa-cash-register mr-3"></i>Smart Cashier</h1>
+                        <p class="text-blue-100">@yield('subtitle', 'Dashboard Sistem Kasir Pintar')</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm opacity-90">{{ date('d F Y') }}</div>
+                        <div id="live-clock" class="text-lg font-mono font-bold"></div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Page Content -->
-        <main class="flex-1 p-6">
-            @yield('content')
-        </main>
+        <!-- Navigation -->
+        <nav class="bg-white shadow-sm border-b">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-wrap gap-4 py-4">
+                    <a href="{{ route('admin.dashboard') }}" 
+                       class="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{{ route('admin.transactions.create') }}" 
+                       class="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                        <i class="fas fa-plus"></i>
+                        <span>Kasir</span>
+                    </a>
+                    <a href="{{ route('admin.transactions.index') }}" 
+                       class="flex items-center space-x-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
+                        <i class="fas fa-list"></i>
+                        <span>Daftar Transaksi</span>
+                    </a>
+                    <a href="{{ route('admin.products.index') }}" 
+                       class="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+                        <i class="fas fa-box"></i>
+                        <span>Produk</span>
+                    </a>
+                    <a href="{{ route('admin.testimonials.index') }}" 
+                       class="flex items-center space-x-2 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors">
+                        <i class="fas fa-comment-alt"></i>
+                        <span>Testimonials</span>
+                    </a>
+                    
+                    <!-- Reports Button -->
+                    <a href="{{ route('admin.reports.index') }}" 
+                       class="flex items-center space-x-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Laporan</span>
+                    </a>
 
-        <!-- Footer -->
-        <footer class="bg-white/60 backdrop-blur-lg border-t border-gray-200/60 py-4 px-6">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-600 text-sm">
-                    &copy; {{ date('Y') }} Madu Suwawa. All rights reserved.
-                </p>
-                <div class="flex space-x-4 mt-2 md:mt-0">
-                    <a href="#" class="text-gray-400 hover:text-amber-600 transition-colors duration-200">
-                        <i class="fab fa-facebook text-lg"></i>
+                    <!-- Settings Button -->
+                    <a href="{{ route('admin.settings.index') }}" 
+                       class="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-cog"></i>
+                        <span>Pengaturan</span>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-amber-600 transition-colors duration-200">
-                        <i class="fab fa-instagram text-lg"></i>
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-amber-600 transition-colors duration-200">
-                        <i class="fab fa-whatsapp text-lg"></i>
-                    </a>
+
+                    <!-- Logout Button -->
+                    <form method="POST" action="{{ route('logout') }}" class="inline" id="logout-form">
+                        @csrf
+                        <button type="submit" 
+                                class="flex items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </button>
+                    </form>
                 </div>
             </div>
-        </footer>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            @yield('content')
+        </main>
     </div>
 
-    <!-- Overlay for mobile sidebar -->
-    <div x-show="sidebarOpen" 
-         @click="sidebarOpen = false"
-         class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40 lg:hidden"
-         x-transition:enter="transition-opacity ease-linear duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition-opacity ease-linear duration-300"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0">
-    </div>
+    <!-- JavaScript -->
+    <script>
+        // Live Clock
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('id-ID', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            const liveClock = document.getElementById('live-clock');
+            if (liveClock) {
+                liveClock.textContent = timeString;
+            }
+        }
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start live clock
+            setInterval(updateClock, 1000);
+            updateClock();
+
+            // Confirm logout
+            const logoutForm = document.getElementById('logout-form');
+            if (logoutForm) {
+                logoutForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    if (confirm('Apakah Anda yakin ingin logout?')) {
+                        this.submit();
+                    }
+                });
+            }
+
+            // Add active state to current page navigation
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('nav a');
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('ring-2', 'ring-white', 'ring-opacity-50');
+                }
+            });
+        });
+
+        // Notification function
+        function showNotification(message, type = 'success') {
+            const bgColor = type === 'success' ? 'bg-green-500' : 
+                           type === 'error' ? 'bg-red-500' :
+                           type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500';
+            
+            const icon = type === 'success' ? 'fa-check-circle' : 
+                        type === 'error' ? 'fa-exclamation-circle' :
+                        type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+            
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-xl shadow-lg transform translate-x-full transition-transform duration-300 z-50`;
+            notification.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fas ${icon}"></i>
+                    <span class="font-medium">${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Make functions globally available
+        window.showNotification = showNotification;
+    </script>
+
+    @stack('scripts')
 </body>
 </html>
