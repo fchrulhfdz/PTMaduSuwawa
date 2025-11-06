@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TestimonialController;
+use App\Http\Controllers\Admin\ProfitCalculationController;
 use Illuminate\Support\Facades\Route;
 
 // 🌐 Public Routes
@@ -43,17 +44,27 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
     Route::post('/testimonials/{testimonial}/toggle-status', [TestimonialController::class, 'toggleStatus'])
         ->name('testimonials.toggle-status');
 
-    // Reports Routes - DIPERBAIKI: Hapus prefix admin yang nested
+    // Reports Routes
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/monthly', [ReportController::class, 'monthly'])->name('reports.monthly');
     Route::get('/reports/daily', [ReportController::class, 'daily'])->name('reports.daily');
 
-    // Settings - DIPERBAIKI: Sesuaikan dengan struktur yang benar
+    // Profit Calculation Routes
+Route::prefix('profit')->name('profit.')->group(function () {
+    Route::get('/', [ProfitCalculationController::class, 'index'])->name('index');
+    Route::post('/calculate', [ProfitCalculationController::class, 'calculate'])->name('calculate');
+    Route::post('/calculate-from-transactions', [ProfitCalculationController::class, 'calculateFromTransactions'])->name('calculate-from-transactions');
+    Route::get('/{profit}', [ProfitCalculationController::class, 'show'])->name('show');
+    Route::delete('/{profit}', [ProfitCalculationController::class, 'destroy'])->name('destroy');
+    Route::get('/quick-stats', [ProfitCalculationController::class, 'getQuickStats'])->name('quick-stats');
+});
+
+    // Settings
     Route::prefix('settings')->group(function () {
         Route::get('/', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/', [SettingController::class, 'update'])->name('settings.update');
 
-        // Receipt Settings - TAMBAHKAN ROUTE INI
+        // Receipt Settings
         Route::get('/receipt-settings', [SettingController::class, 'getReceiptSettings'])->name('settings.receipt-settings');
 
         // Backup

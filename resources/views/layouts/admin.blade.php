@@ -74,6 +74,13 @@
                         <span>Laporan</span>
                     </a>
 
+                    <!-- Profit Calculation Button -->
+                    <a href="{{ route('admin.profit.index') }}" 
+                       class="flex items-center space-x-2 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors">
+                        <i class="fas fa-calculator"></i>
+                        <span>Hitung Laba</span>
+                    </a>
+
                     <!-- Settings Button -->
                     <a href="{{ route('admin.settings.index') }}" 
                        class="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
@@ -88,6 +95,7 @@
         <main class="container mx-auto px-4 py-8">
             @yield('content')
         </main>
+    </div>
 
     <!-- JavaScript -->
     <script>
@@ -171,4 +179,4 @@
 
     @stack('scripts')
 </body>
-</html> 
+</html>
