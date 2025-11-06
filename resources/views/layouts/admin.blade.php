@@ -10,26 +10,37 @@
 </head>
 <body class="bg-gray-50">
     <div class="min-h-screen">
-        <!-- Header -->
-        <header class="bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-lg">
-            <div class="container mx-auto px-4 py-6">
+        <!-- Header - Sticky -->
+        <header class="bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-lg sticky top-0 z-50">
+            <div class="container mx-auto px-4 py-4">
                 <div class="flex justify-between items-center">
                     <div>
                         <h1 class="text-2xl font-bold"><i class="fas fa-cash-register mr-3"></i>Smart Cashier</h1>
                         <p class="text-blue-100">@yield('subtitle', 'Dashboard Sistem Kasir Pintar')</p>
                     </div>
-                    <div class="text-right">
-                        <div class="text-sm opacity-90">{{ date('d F Y') }}</div>
-                        <div id="live-clock" class="text-lg font-mono font-bold"></div>
+                    <div class="flex items-center space-x-6">
+                        <div class="text-right">
+                            <div class="text-sm opacity-90">{{ date('d F Y') }}</div>
+                            <div id="live-clock" class="text-lg font-mono font-bold"></div>
+                        </div>
+                        <!-- Logout Button as Icon -->
+                        <form method="POST" action="{{ route('logout') }}" class="inline" id="logout-form">
+                            @csrf
+                            <button type="submit" 
+                                    class="flex items-center justify-center w-10 h-10 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg hover:shadow-xl"
+                                    title="Logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Navigation -->
-        <nav class="bg-white shadow-sm border-b">
+        <!-- Navigation - Sticky -->
+        <nav class="bg-white shadow-sm border-b sticky top-[72px] z-40">
             <div class="container mx-auto px-4">
-                <div class="flex flex-wrap gap-4 py-4">
+                <div class="flex flex-wrap gap-3 py-3">
                     <a href="{{ route('admin.dashboard') }}" 
                        class="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
                         <i class="fas fa-chart-line"></i>
@@ -69,16 +80,6 @@
                         <i class="fas fa-cog"></i>
                         <span>Pengaturan</span>
                     </a>
-
-                    <!-- Logout Button -->
-                    <form method="POST" action="{{ route('logout') }}" class="inline" id="logout-form">
-                        @csrf
-                        <button type="submit" 
-                                class="flex items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </button>
-                    </form>
                 </div>
             </div>
         </nav>
@@ -87,7 +88,6 @@
         <main class="container mx-auto px-4 py-8">
             @yield('content')
         </main>
-    </div>
 
     <!-- JavaScript -->
     <script>
@@ -171,4 +171,4 @@
 
     @stack('scripts')
 </body>
-</html>
+</html> 

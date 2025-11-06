@@ -28,7 +28,7 @@
         <!-- Navigation -->
         <nav class="bg-white shadow-sm border-b">
             <div class="container mx-auto px-4">
-                <div class="flex space-x-8 py-4">
+                <div class="flex flex-wrap gap-4 py-4">
                     <a href="{{ route('admin.dashboard') }}" 
                        class="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
                         <i class="fas fa-chart-line"></i>
@@ -37,7 +37,7 @@
                     <a href="{{ route('admin.transactions.create') }}" 
                        class="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
                         <i class="fas fa-plus"></i>
-                        <span>Transaksi Baru</span>
+                        <span>Kasir</span>
                     </a>
                     <a href="{{ route('admin.transactions.index') }}" 
                        class="flex items-center space-x-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
@@ -49,178 +49,209 @@
                         <i class="fas fa-box"></i>
                         <span>Produk</span>
                     </a>
+                    <a href="{{ route('admin.testimonials.index') }}" 
+                       class="flex items-center space-x-2 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors">
+                        <i class="fas fa-comment-alt"></i>
+                        <span>Testimonials</span>
+                    </a>
+                    
+                    <!-- Reports Button -->
+                    <a href="{{ route('admin.reports.index') }}" 
+                       class="flex items-center space-x-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Laporan</span>
+                    </a>
+
+                    <!-- Settings Button -->
+                    <a href="{{ route('admin.settings.index') }}" 
+                       class="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-cog"></i>
+                        <span>Pengaturan</span>
+                    </a>
+
+                    <!-- Logout Button -->
+                    <form method="POST" action="{{ route('logout') }}" class="inline" id="logout-form">
+                        @csrf
+                        <button type="submit" 
+                                class="flex items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </button>
+                    </form>
                 </div>
             </div>
         </nav>
 
         <!-- Main Content -->
         <main class="container mx-auto px-4 py-8">
-            <!-- Header -->
-            <div class="mb-8">
-                <div class="flex items-center space-x-4">
-                    <a href="{{ route('admin.products.index') }}" 
-                       class="inline-flex items-center justify-center p-2 bg-white hover:bg-gray-50 text-gray-600 rounded-lg shadow-sm border border-gray-200 transition-all duration-200 hover:scale-105">
-                        <i class="fas fa-arrow-left text-sm"></i>
-                    </a>
-                    <div>
-                        <h1 class="text-2xl font-bold text-gray-800">Edit Produk</h1>
-                        <p class="mt-1 text-sm text-gray-600">Perbarui informasi produk {{ $product->name }}</p>
+            <div class="space-y-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <div class="flex items-center space-x-4">
+                        <a href="{{ route('admin.products.index') }}" 
+                        class="inline-flex items-center justify-center p-2 bg-white hover:bg-gray-50 text-gray-600 rounded-lg shadow-sm border border-gray-200 transition-all duration-200 hover:scale-105">
+                            <i class="fas fa-arrow-left text-sm"></i>
+                        </a>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-800">Edit Produk</h1>
+                            <p class="mt-1 text-sm text-gray-600">Perbarui informasi produk {{ $product->name }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Form Section -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <form action="{{ route('admin.products.update', $product) }}" method="POST" enctype="multipart/form-data" id="productForm">
-                    @csrf
-                    @method('PUT')
-                    
-                    <div class="space-y-6">
-                        <!-- Product Info Grid -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <!-- Left Column -->
-                            <div class="space-y-6">
-                                <!-- Product Name -->
-                                <div>
-                                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Nama Produk</label>
-                                    <input type="text" 
-                                           name="name" 
-                                           id="name"
-                                           value="{{ old('name', $product->name) }}"
-                                           required
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
-                                    @error('name')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <!-- Category -->
-                                <div>
-                                    <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
-                                    <select name="category" 
-                                            id="category"
+                <!-- Form Section -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <form action="{{ route('admin.products.update', $product) }}" method="POST" enctype="multipart/form-data" id="productForm">
+                        @csrf
+                        @method('PUT')
+                        
+                        <div class="space-y-6">
+                            <!-- Product Info Grid -->
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <!-- Left Column -->
+                                <div class="space-y-6">
+                                    <!-- Product Name -->
+                                    <div>
+                                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Nama Produk</label>
+                                        <input type="text" 
+                                            name="name" 
+                                            id="name"
+                                            value="{{ old('name', $product->name) }}"
                                             required
                                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
-                                        <option value="Madu Hutan" {{ $product->category == 'Madu Hutan' ? 'selected' : '' }}>Madu Hutan</option>
-                                        <option value="Madu Budidaya" {{ $product->category == 'Madu Budidaya' ? 'selected' : '' }}>Madu Budidaya</option>
-                                        <option value="Madu Organik" {{ $product->category == 'Madu Organik' ? 'selected' : '' }}>Madu Organik</option>
-                                        <option value="Madu Spesial" {{ $product->category == 'Madu Spesial' ? 'selected' : '' }}>Madu Spesial</option>
-                                    </select>
-                                    @error('category')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <!-- Price & Stock -->
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="price" class="block text-sm font-medium text-gray-700 mb-2">Harga (Rp)</label>
-                                        <input type="number" 
-                                               name="price" 
-                                               id="price"
-                                               value="{{ old('price', $product->price) }}"
-                                               min="0"
-                                               step="1000"
-                                               required
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
-                                        @error('price')
+                                        @error('name')
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
                                     </div>
 
+                                    <!-- Category -->
                                     <div>
-                                        <label for="stock" class="block text-sm font-medium text-gray-700 mb-2">Stok</label>
-                                        <input type="number" 
-                                               name="stock" 
-                                               id="stock"
-                                               value="{{ old('stock', $product->stock) }}"
-                                               min="0"
-                                               required
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
-                                        @error('stock')
+                                        <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+                                        <select name="category" 
+                                                id="category"
+                                                required
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                                            <option value="Madu Hutan" {{ $product->category == 'Madu Hutan' ? 'selected' : '' }}>Madu Hutan</option>
+                                            <option value="Madu Budidaya" {{ $product->category == 'Madu Budidaya' ? 'selected' : '' }}>Madu Budidaya</option>
+                                            <option value="Madu Organik" {{ $product->category == 'Madu Organik' ? 'selected' : '' }}>Madu Organik</option>
+                                            <option value="Madu Spesial" {{ $product->category == 'Madu Spesial' ? 'selected' : '' }}>Madu Spesial</option>
+                                        </select>
+                                        @error('category')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <!-- Price & Stock -->
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="price" class="block text-sm font-medium text-gray-700 mb-2">Harga (Rp)</label>
+                                            <input type="number" 
+                                                name="price" 
+                                                id="price"
+                                                value="{{ old('price', $product->price) }}"
+                                                min="0"
+                                                step="1000"
+                                                required
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                                            @error('price')
+                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label for="stock" class="block text-sm font-medium text-gray-700 mb-2">Stok</label>
+                                            <input type="number" 
+                                                name="stock" 
+                                                id="stock"
+                                                value="{{ old('stock', $product->stock) }}"
+                                                min="0"
+                                                required
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                                            @error('stock')
+                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column -->
+                                <div class="space-y-6">
+                                    <!-- Image Upload -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Gambar Produk</label>
+                                        
+                                        <!-- Existing Image -->
+                                        @if($product->image)
+                                        <div id="existingImage" class="mb-4">
+                                            <div class="relative inline-block">
+                                                <img src="{{ asset('storage/' . $product->image) }}" 
+                                                    alt="{{ $product->name }}" 
+                                                    class="w-32 h-32 object-cover rounded-lg border-2 border-blue-200">
+                                                <div class="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs">
+                                                    <i class="fas fa-image"></i>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-gray-600 mt-2">Gambar saat ini</p>
+                                        </div>
+                                        @endif
+
+                                        <!-- Image Preview for New Upload -->
+                                        <div id="imagePreview" class="hidden mb-4">
+                                            <div class="relative inline-block">
+                                                <img id="previewImage" class="w-32 h-32 object-cover rounded-lg border-2 border-blue-200">
+                                                <button type="button" id="removeImage" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                            <p id="fileName" class="text-sm text-gray-600 mt-2"></p>
+                                        </div>
+
+                                        <!-- Upload Area -->
+                                        <div id="uploadArea" class="flex items-center justify-center w-full">
+                                            <label for="image" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
+                                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                    <i class="fas fa-cloud-upload-alt text-gray-400 text-xl mb-2"></i>
+                                                    <p class="text-sm text-gray-500">Klik untuk upload gambar baru</p>
+                                                    <p class="text-xs text-gray-400 mt-1">PNG, JPG, JPEG (Max 2MB)</p>
+                                                </div>
+                                                <input id="image" name="image" type="file" class="hidden" accept="image/*">
+                                            </label>
+                                        </div>
+                                        @error('image')
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Right Column -->
-                            <div class="space-y-6">
-                                <!-- Image Upload -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Gambar Produk</label>
-                                    
-                                    <!-- Existing Image -->
-                                    @if($product->image)
-                                    <div id="existingImage" class="mb-4">
-                                        <div class="relative inline-block">
-                                            <img src="{{ asset('storage/' . $product->image) }}" 
-                                                 alt="{{ $product->name }}" 
-                                                 class="w-32 h-32 object-cover rounded-lg border-2 border-blue-200">
-                                            <div class="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs">
-                                                <i class="fas fa-image"></i>
-                                            </div>
-                                        </div>
-                                        <p class="text-sm text-gray-600 mt-2">Gambar saat ini</p>
-                                    </div>
-                                    @endif
+                            <!-- Description -->
+                            <div>
+                                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
+                                <textarea name="description" 
+                                        id="description" 
+                                        rows="4"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none">{{ old('description', $product->description) }}</textarea>
+                                @error('description')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
 
-                                    <!-- Image Preview for New Upload -->
-                                    <div id="imagePreview" class="hidden mb-4">
-                                        <div class="relative inline-block">
-                                            <img id="previewImage" class="w-32 h-32 object-cover rounded-lg border-2 border-blue-200">
-                                            <button type="button" id="removeImage" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                        <p id="fileName" class="text-sm text-gray-600 mt-2"></p>
-                                    </div>
-
-                                    <!-- Upload Area -->
-                                    <div id="uploadArea" class="flex items-center justify-center w-full">
-                                        <label for="image" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
-                                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                                <i class="fas fa-cloud-upload-alt text-gray-400 text-xl mb-2"></i>
-                                                <p class="text-sm text-gray-500">Klik untuk upload gambar baru</p>
-                                                <p class="text-xs text-gray-400 mt-1">PNG, JPG, JPEG (Max 2MB)</p>
-                                            </div>
-                                            <input id="image" name="image" type="file" class="hidden" accept="image/*">
-                                        </label>
-                                    </div>
-                                    @error('image')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
+                            <!-- Action Buttons -->
+                            <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+                                <a href="{{ route('admin.products.index') }}" 
+                                class="px-6 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-all duration-200">
+                                    Batal
+                                </a>
+                                <button type="submit" 
+                                        id="submitBtn"
+                                        class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-all duration-200 flex items-center space-x-2">
+                                    <i class="fas fa-save"></i>
+                                    <span>Update Produk</span>
+                                </button>
                             </div>
                         </div>
-
-                        <!-- Description -->
-                        <div>
-                            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
-                            <textarea name="description" 
-                                      id="description" 
-                                      rows="4"
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none">{{ old('description', $product->description) }}</textarea>
-                            @error('description')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
-                            <a href="{{ route('admin.products.index') }}" 
-                               class="px-6 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-all duration-200">
-                                Batal
-                            </a>
-                            <button type="submit" 
-                                    id="submitBtn"
-                                    class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-all duration-200 flex items-center space-x-2">
-                                <i class="fas fa-save"></i>
-                                <span>Update Produk</span>
-                            </button>
-                        </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </main>
     </div>
@@ -239,6 +270,15 @@
         setInterval(updateClock, 1000);
         updateClock();
 
+        // Confirm logout
+        document.getElementById('logout-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (confirm('Apakah Anda yakin ingin logout?')) {
+                this.submit();
+            }
+        });
+
+        // Image upload functionality
         document.addEventListener('DOMContentLoaded', function() {
             const imageInput = document.getElementById('image');
             const imagePreview = document.getElementById('imagePreview');
@@ -296,6 +336,18 @@
                     existingImage.classList.remove('hidden');
                 }
             });
+
+            // Form submission handling
+            const productForm = document.getElementById('productForm');
+            if (productForm) {
+                productForm.addEventListener('submit', function(e) {
+                    const submitBtn = document.getElementById('submitBtn');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
+                    }
+                });
+            }
         });
     </script>
 </body>

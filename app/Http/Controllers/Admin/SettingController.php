@@ -26,17 +26,16 @@ class SettingController extends Controller
         $validated = $request->validate([
             'app_name' => 'required|string|max:255',
             'company_name' => 'nullable|string|max:255',
-            'company_address' => 'nullable|string|max:500',
+            'company_address' => 'nullable|string',
             'company_phone' => 'nullable|string|max:20',
             'company_email' => 'nullable|email|max:255',
-            'receipt_header' => 'nullable|string|max:500',
-            'receipt_footer' => 'nullable|string|max:500',
-            'receipt_printer_width' => 'required|integer|min:32|max:80',
-            'low_stock_threshold' => 'required|integer|min:1',
+            'receipt_header' => 'nullable|string',
+            'receipt_footer' => 'nullable|string',
+            'receipt_printer_width' => 'nullable|integer|min:32|max:80',
+            'print_automatically' => 'nullable|boolean',
+            'low_stock_threshold' => 'nullable|integer|min:1',
+            'enable_stock_notifications' => 'nullable|boolean',
         ]);
-
-        $validated['print_automatically'] = $request->has('print_automatically') ? 1 : 0;
-        $validated['enable_stock_notifications'] = $request->has('enable_stock_notifications') ? 1 : 0;
 
         foreach ($validated as $key => $value) {
             Setting::updateOrCreate(
@@ -45,7 +44,21 @@ class SettingController extends Controller
             );
         }
 
-        return redirect()->route('admin.settings.index')->with('success', 'Pengaturan berhasil diperbarui.');
+        return back()->with('success', 'Pengaturan berhasil disimpan!');
+    }
+
+    // Method untuk mengambil pengaturan struk
+    public function getReceiptSettings()
+    {
+        // Gunakan model Setting langsung untuk mengambil data
+        $settings = Setting::all()->pluck('value', 'key')->toArray();
+
+        return response()->json([
+            'header' => $settings['receipt_header'] ?? 'SMART CASHIER\nSistem Kasir Pintar',
+            'footer' => $settings['receipt_footer'] ?? 'Terima kasih atas kunjungan Anda\n*** Struk ini sebagai bukti pembayaran ***',
+            'printer_width' => $settings['receipt_printer_width'] ?? 42,
+            'print_automatically' => isset($settings['print_automatically']) ? (bool)$settings['print_automatically'] : false
+        ]);
     }
 
     public function backup()
@@ -91,5 +104,37 @@ class SettingController extends Controller
             DB::rollBack();
             return redirect()->route('admin.settings.index')->with('error', 'Gagal mereset data: ' . $e->getMessage());
         }
+    }
+
+    // Tambahkan method untuk proses backup, clear cache, optimize, dan reset data
+    public function processBackup(Request $request)
+    {
+        return $this->backup();
+    }
+
+    public function processClearCache(Request $request)
+    {
+        return $this->clearCache();
+    }
+
+    public function processOptimize(Request $request)
+    {
+        return $this->optimize();
+    }
+
+    public function processResetData(Request $request)
+    {
+        return $this->resetData();
+    }
+
+    public function downloadBackup($filename)
+    {
+        $path = storage_path('app/backups/' . $filename);
+        
+        if (file_exists($path)) {
+            return response()->download($path);
+        }
+        
+        return redirect()->route('admin.settings.index')->with('error', 'File backup tidak ditemukan.');
     }
 }

@@ -11,18 +11,7 @@
             <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Laporan Transaksi</h1>
             <p class="mt-2 text-sm text-gray-600">Analisis lengkap data transaksi dan penjualan</p>
         </div>
-        <div class="flex flex-wrap gap-3">
-            <button onclick="printReport()" 
-                    class="inline-flex items-center px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
-                <i class="fas fa-print mr-3 text-lg"></i>
-                <span class="font-semibold">Cetak Laporan</span>
-            </button>
-            <button onclick="exportToExcel()" 
-                    class="inline-flex items-center px-4 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
-                <i class="fas fa-file-excel mr-3 text-lg"></i>
-                <span class="font-semibold">Export Excel</span>
-            </button>
-        </div>
+        <!-- Tombol cetak di header dihapus -->
     </div>
 
     <!-- Filter Section -->
@@ -39,12 +28,12 @@
                        class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all duration-200">
             </div>
             <div class="space-y-3">
-                <label class="block text-sm font-semibold text-gray-700 tracking-wide">Produk</label>
-                <select name="product_id" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all duration-200">
-                    <option value="">Semua Produk</option>
-                    @foreach($products as $product)
-                        <option value="{{ $product->id }}" {{ request('product_id') == $product->id ? 'selected' : '' }}>
-                            {{ $product->name }}
+                <label class="block text-sm font-semibold text-gray-700 tracking-wide">Kategori</label>
+                <select name="category" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all duration-200">
+                    <option value="">Semua Kategori</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category }}" {{ request('category') == $category ? 'selected' : '' }}>
+                            {{ $category }}
                         </option>
                     @endforeach
                 </select>
@@ -83,6 +72,18 @@
 
         <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
             <div class="flex items-center">
+                <div class="p-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg">
+                    <i class="fas fa-cubes text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total Quantity</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ $totalQuantity ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
+            <div class="flex items-center">
                 <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg">
                     <i class="fas fa-shopping-cart text-2xl"></i>
                 </div>
@@ -104,25 +105,30 @@
                 </div>
             </div>
         </div>
-
-        <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
-            <div class="flex items-center">
-                <div class="p-4 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg">
-                    <i class="fas fa-cubes text-2xl"></i>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Total Quantity</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ $totalQuantity ?? 0 }}</p>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Reports Table -->
     <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/60 overflow-hidden">
         <div class="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-            <h2 class="text-xl font-bold text-gray-900">Detail Laporan Transaksi</h2>
-            <p class="text-sm text-gray-600 mt-1">Rincian lengkap semua transaksi dalam periode yang dipilih</p>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900">Detail Laporan Transaksi</h2>
+                    <p class="text-sm text-gray-600 mt-1">Rincian lengkap semua transaksi dalam periode yang dipilih</p>
+                </div>
+                <!-- Tombol cetak di bagian detail laporan -->
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="exportToWord()" 
+                            class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
+                        <i class="fas fa-file-word mr-2"></i>
+                        <span class="font-semibold">Cetak Word</span>
+                    </button>
+                    <button onclick="exportToExcel()" 
+                            class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
+                        <i class="fas fa-file-excel mr-2"></i>
+                        <span class="font-semibold">Cetak Excel</span>
+                    </button>
+                </div>
+            </div>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
@@ -208,49 +214,64 @@
 
 @push('scripts')
 <script>
-function printReport() {
-    const printContent = `
-        <!DOCTYPE html>
-        <html>
+function exportToWord() {
+    // Membuat konten untuk Word
+    const content = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
         <head>
+            <meta charset="UTF-8">
             <title>Laporan Transaksi - {{ config('app.name') }}</title>
             <style>
-                body { font-family: 'Segoe UI', Arial, sans-serif; margin: 30px; background: white; }
-                .header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #e5e7eb; }
-                .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-                .summary-card { border: 1px solid #e5e7eb; padding: 20px; border-radius: 12px; text-align: center; background: #f9fafb; }
-                table { width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 12px; }
-                th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; }
-                th { background-color: #f3f4f6; font-weight: 600; }
-                .total-row { font-weight: bold; background-color: #f9fafb; }
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .header { text-align: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #333; }
+                .summary { display: table; width: 100%; margin-bottom: 20px; border-collapse: collapse; }
+                .summary-card { display: table-cell; border: 1px solid #ddd; padding: 15px; text-align: center; vertical-align: middle; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; font-weight: bold; }
+                .total-row { font-weight: bold; background-color: #f9f9f9; }
+                .category-summary { margin: 15px 0; padding: 10px; background: #f8f9fa; border: 1px solid #ddd; }
+                .category-item { display: inline-block; margin: 3px 8px 3px 0; padding: 3px 8px; background: #e9ecef; border-radius: 3px; font-size: 10px; }
             </style>
         </head>
         <body>
             <div class="header">
-                <h1 style="font-size: 28px; font-weight: bold; color: #1f2937; margin-bottom: 10px;">Laporan Transaksi</h1>
-                <p style="color: #6b7280; margin: 5px 0;">Periode: {{ $startDate ? \Carbon\Carbon::parse($startDate)->format('d/m/Y') : 'Semua' }} - 
+                <h1 style="font-size: 24px; font-weight: bold; color: #1f2937; margin-bottom: 8px;">Laporan Transaksi</h1>
+                <p style="color: #6b7280; margin: 3px 0;">Periode: {{ $startDate ? \Carbon\Carbon::parse($startDate)->format('d/m/Y') : 'Semua' }} - 
                           {{ $endDate ? \Carbon\Carbon::parse($endDate)->format('d/m/Y') : 'Semua' }}</p>
-                <p style="color: #6b7280; margin: 5px 0;">Dicetak pada: {{ now()->format('d/m/Y H:i') }}</p>
+                <p style="color: #6b7280; margin: 3px 0;">Kategori: {{ request('category') ?: 'Semua Kategori' }}</p>
+                <p style="color: #6b7280; margin: 3px 0;">Dicetak pada: {{ now()->format('d/m/Y H:i') }}</p>
             </div>
 
             <div class="summary">
                 <div class="summary-card">
                     <strong style="color: #374151;">Total Produk Terjual</strong><br>
-                    <span style="font-size: 24px; font-weight: bold; color: #1f2937;">{{ $totalProductsSold }}</span>
+                    <span style="font-size: 20px; font-weight: bold; color: #1f2937;">{{ $totalProductsSold }}</span>
                 </div>
                 <div class="summary-card">
                     <strong style="color: #374151;">Total Transaksi</strong><br>
-                    <span style="font-size: 24px; font-weight: bold; color: #1f2937;">{{ $totalTransactions }}</span>
+                    <span style="font-size: 20px; font-weight: bold; color: #1f2937;">{{ $totalTransactions }}</span>
                 </div>
                 <div class="summary-card">
                     <strong style="color: #374151;">Total Pendapatan</strong><br>
-                    <span style="font-size: 24px; font-weight: bold; color: #1f2937;">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</span>
+                    <span style="font-size: 20px; font-weight: bold; color: #1f2937;">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</span>
                 </div>
                 <div class="summary-card">
                     <strong style="color: #374151;">Total Quantity</strong><br>
-                    <span style="font-size: 24px; font-weight: bold; color: #1f2937;">{{ $totalQuantity }}</span>
+                    <span style="font-size: 20px; font-weight: bold; color: #1f2937;">{{ $totalQuantity }}</span>
                 </div>
             </div>
+
+            @if($categorySummary->count() > 0)
+            <div class="category-summary">
+                <h3 style="font-size: 14px; font-weight: bold; margin-bottom: 8px;">Ringkasan per Kategori:</h3>
+                @foreach($categorySummary as $category)
+                <div class="category-item">
+                    {{ $category->category }}: {{ $category->total_quantity }} pcs (Rp {{ number_format($category->total_revenue, 0, ',', '.') }})
+                </div>
+                @endforeach
+            </div>
+            @endif
 
             <table>
                 <thead>
@@ -290,11 +311,18 @@ function printReport() {
         </body>
         </html>
     `;
+
+    // Membuat blob untuk Word
+    const blob = new Blob([content], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
     
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(printContent);
-    printWindow.document.close();
-    printWindow.print();
+    const link = document.createElement('a');
+    link.download = 'laporan-transaksi-{{ now()->format("Y-m-d") }}.doc';
+    link.href = url;
+    link.click();
+    
+    // Membersihkan URL
+    URL.revokeObjectURL(url);
 }
 
 function exportToExcel() {
@@ -307,16 +335,56 @@ function exportToExcel() {
             <title>Laporan Transaksi - {{ config('app.name') }}</title>
             <style>
                 body { font-family: Arial, sans-serif; margin: 20px; }
+                .header { text-align: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #333; }
+                .summary { display: table; width: 100%; margin-bottom: 20px; border-collapse: collapse; }
+                .summary-card { display: table-cell; border: 1px solid #ddd; padding: 15px; text-align: center; vertical-align: middle; }
                 table { border-collapse: collapse; width: 100%; }
                 th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
                 th { background-color: #f2f2f2; font-weight: bold; }
+                .total-row { font-weight: bold; background-color: #f9f9f9; }
+                .category-summary { margin: 15px 0; padding: 10px; background: #f8f9fa; border: 1px solid #ddd; }
+                .category-item { display: inline-block; margin: 3px 8px 3px 0; padding: 3px 8px; background: #e9ecef; border-radius: 3px; font-size: 10px; }
             </style>
         </head>
         <body>
-            <h1>Laporan Transaksi - {{ config('app.name') }}</h1>
-            <p>Periode: {{ $startDate ? \Carbon\Carbon::parse($startDate)->format('d/m/Y') : 'Semua' }} - 
+            <div class="header">
+                <h1>Laporan Transaksi - {{ config('app.name') }}</h1>
+                <p>Periode: {{ $startDate ? \Carbon\Carbon::parse($startDate)->format('d/m/Y') : 'Semua' }} - 
                       {{ $endDate ? \Carbon\Carbon::parse($endDate)->format('d/m/Y') : 'Semua' }}</p>
-            <p>Tanggal Export: {{ now()->format('d/m/Y H:i') }}</p>
+                <p>Kategori: {{ request('category') ?: 'Semua Kategori' }}</p>
+                <p>Tanggal Export: {{ now()->format('d/m/Y H:i') }}</p>
+            </div>
+
+            <div class="summary">
+                <div class="summary-card">
+                    <strong>Total Produk Terjual</strong><br>
+                    <span style="font-size: 18px; font-weight: bold;">{{ $totalProductsSold }}</span>
+                </div>
+                <div class="summary-card">
+                    <strong>Total Transaksi</strong><br>
+                    <span style="font-size: 18px; font-weight: bold;">{{ $totalTransactions }}</span>
+                </div>
+                <div class="summary-card">
+                    <strong>Total Pendapatan</strong><br>
+                    <span style="font-size: 18px; font-weight: bold;">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</span>
+                </div>
+                <div class="summary-card">
+                    <strong>Total Quantity</strong><br>
+                    <span style="font-size: 18px; font-weight: bold;">{{ $totalQuantity }}</span>
+                </div>
+            </div>
+
+            @if($categorySummary->count() > 0)
+            <div class="category-summary">
+                <h3 style="font-size: 14px; font-weight: bold;">Ringkasan per Kategori:</h3>
+                @foreach($categorySummary as $category)
+                <div class="category-item">
+                    {{ $category->category }}: {{ $category->total_quantity }} pcs (Rp {{ number_format($category->total_revenue, 0, ',', '.') }})
+                </div>
+                @endforeach
+            </div>
+            @endif
+
             ${html}
         </body>
         </html>

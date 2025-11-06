@@ -20,59 +20,58 @@ Route::get('/testimonial', [HomeController::class, 'testimonial'])->name('testim
 Route::get('/testimoni', [HomeController::class, 'testimonial'])->name('testimoni'); // alias
 
 // 🔒 Admin Routes (protected)
-Route::prefix('admin')->middleware(['auth'])->group(function () {
+Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () {
 
     // Dashboard
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Products
-    Route::resource('/products', ProductController::class)->names('admin.products');
+    Route::resource('/products', ProductController::class);
 
     // Transactions - Updated with new routes for smart cashier
-    Route::resource('/transactions', TransactionController::class)
-        ->names('admin.transactions');
+    Route::resource('/transactions', TransactionController::class);
     
     // Additional transaction routes for smart cashier features
-    Route::prefix('transactions')->name('admin.transactions.')->group(function () {
-        Route::get('/{id}/print', [TransactionController::class, 'printReceipt'])->name('print');
-        Route::get('/today/sales', [TransactionController::class, 'getTodaySales'])->name('today.sales');
-        Route::get('/product/{id}', [TransactionController::class, 'getProduct'])->name('product.get');
+    Route::prefix('transactions')->group(function () {
+        Route::get('/{id}/print', [TransactionController::class, 'printReceipt'])->name('transactions.print');
+        Route::get('/today/sales', [TransactionController::class, 'getTodaySales'])->name('transactions.today.sales');
+        Route::get('/product/{id}', [TransactionController::class, 'getProduct'])->name('transactions.product.get');
     });
 
     // Testimonials
-    Route::resource('/testimonials', TestimonialController::class)
-        ->names('admin.testimonials');
+    Route::resource('/testimonials', TestimonialController::class);
     Route::post('/testimonials/{testimonial}/toggle-status', [TestimonialController::class, 'toggleStatus'])
-        ->name('admin.testimonials.toggle-status');
+        ->name('testimonials.toggle-status');
 
-    Route::prefix('admin')->name('admin.')->group(function () {
-    // Reports Routes
+    // Reports Routes - DIPERBAIKI: Hapus prefix admin yang nested
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/monthly', [ReportController::class, 'monthly'])->name('reports.monthly');
     Route::get('/reports/daily', [ReportController::class, 'daily'])->name('reports.daily');
-});
 
-    // Settings
-    Route::prefix('settings')->name('admin.settings.')->group(function () {
-        Route::get('/', [SettingController::class, 'index'])->name('index');
-        Route::put('/', [SettingController::class, 'update'])->name('update');
+    // Settings - DIPERBAIKI: Sesuaikan dengan struktur yang benar
+    Route::prefix('settings')->group(function () {
+        Route::get('/', [SettingController::class, 'index'])->name('settings.index');
+        Route::put('/', [SettingController::class, 'update'])->name('settings.update');
+
+        // Receipt Settings - TAMBAHKAN ROUTE INI
+        Route::get('/receipt-settings', [SettingController::class, 'getReceiptSettings'])->name('settings.receipt-settings');
 
         // Backup
-        Route::get('/backup', [SettingController::class, 'backup'])->name('backup');
-        Route::post('/backup/process', [SettingController::class, 'processBackup'])->name('process-backup');
-        Route::get('/backup/download/{filename}', [SettingController::class, 'downloadBackup'])->name('download-backup');
+        Route::get('/backup', [SettingController::class, 'backup'])->name('settings.backup');
+        Route::post('/backup/process', [SettingController::class, 'processBackup'])->name('settings.process-backup');
+        Route::get('/backup/download/{filename}', [SettingController::class, 'downloadBackup'])->name('settings.download-backup');
 
         // Cache
-        Route::get('/clear-cache', [SettingController::class, 'clearCache'])->name('clear-cache');
-        Route::post('/clear-cache/process', [SettingController::class, 'processClearCache'])->name('process-clear-cache');
+        Route::get('/clear-cache', [SettingController::class, 'clearCache'])->name('settings.clear-cache');
+        Route::post('/clear-cache/process', [SettingController::class, 'processClearCache'])->name('settings.process-clear-cache');
 
         // Optimize
-        Route::get('/optimize', [SettingController::class, 'optimize'])->name('optimize');
-        Route::post('/optimize/process', [SettingController::class, 'processOptimize'])->name('process-optimize');
+        Route::get('/optimize', [SettingController::class, 'optimize'])->name('settings.optimize');
+        Route::post('/optimize/process', [SettingController::class, 'processOptimize'])->name('settings.process-optimize');
 
         // Reset Data
-        Route::get('/reset-data', [SettingController::class, 'resetData'])->name('reset-data');
-        Route::post('/reset-data/process', [SettingController::class, 'processResetData'])->name('process-reset-data');
+        Route::get('/reset-data', [SettingController::class, 'resetData'])->name('settings.reset-data');
+        Route::post('/reset-data/process', [SettingController::class, 'processResetData'])->name('settings.process-reset-data');
     });
 });
 

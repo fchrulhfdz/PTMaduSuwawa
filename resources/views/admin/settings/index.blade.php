@@ -143,8 +143,8 @@
                                 <textarea name="receipt_header" 
                                           id="receipt_header"
                                           rows="2"
-                                          class="block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors duration-200">{{ old('receipt_header', $settings['receipt_header'] ?? '') }}</textarea>
-                                <p class="mt-2 text-xs text-gray-500">Teks yang akan muncul di bagian atas struk</p>
+                                          class="block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors duration-200">{{ old('receipt_header', $settings['receipt_header'] ?? 'SMART CASHIER\nSistem Kasir Pintar') }}</textarea>
+                                <p class="mt-2 text-xs text-gray-500">Teks yang akan muncul di bagian atas struk. Gunakan \n untuk baris baru.</p>
                             </div>
 
                             <div>
@@ -154,8 +154,8 @@
                                 <textarea name="receipt_footer" 
                                           id="receipt_footer"
                                           rows="2"
-                                          class="block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors duration-200">{{ old('receipt_footer', $settings['receipt_footer'] ?? 'Terima kasih atas kunjungan Anda!') }}</textarea>
-                                <p class="mt-2 text-xs text-gray-500">Teks yang akan muncul di bagian bawah struk</p>
+                                          class="block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors duration-200">{{ old('receipt_footer', $settings['receipt_footer'] ?? 'Terima kasih atas kunjungan Anda\n*** Struk ini sebagai bukti pembayaran ***') }}</textarea>
+                                <p class="mt-2 text-xs text-gray-500">Teks yang akan muncul di bagian bawah struk. Gunakan \n untuk baris baru.</p>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -289,7 +289,6 @@
                             </a>
                             @endforeach
                         </div>
-                    </div>
                     </div>
                 </div>
             </div>

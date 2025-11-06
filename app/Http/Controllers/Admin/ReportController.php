@@ -16,6 +16,7 @@ class ReportController extends Controller
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
         $productId = $request->get('product_id');
+        $category = $request->get('category');
 
         // Query transactions dengan filter
         $transactionsQuery = Transaction::with([])
@@ -35,7 +36,12 @@ class ReportController extends Controller
         foreach ($transactions as $transaction) {
             $items = $transaction->getTransactionItems();
             foreach ($items as $item) {
-                // Jika ada filter product, hanya tampilkan product yang dipilih
+                // Filter by category
+                if ($category && $item->product_category != $category) {
+                    continue;
+                }
+                
+                // Filter by product
                 if ($productId && $item->product_id != $productId) {
                     continue;
                 }
@@ -66,6 +72,18 @@ class ReportController extends Controller
         $totalTransactions = $transactions->count();
         $totalRevenue = $transactions->sum('total');
 
+        // Get unique categories from products
+        $categories = Product::distinct()->pluck('category')->filter();
+
+        // Get category summary
+        $categorySummary = collect($reportData)->groupBy('product_category')->map(function ($items, $category) {
+            return (object) [
+                'category' => $category,
+                'total_quantity' => $items->sum('quantity'),
+                'total_revenue' => $items->sum('total_price')
+            ];
+        })->values();
+
         $products = Product::orderBy('name')->get();
 
         return view('admin.reports.index', compact(
@@ -76,15 +94,19 @@ class ReportController extends Controller
             'totalRevenue',
             'totalQuantity',
             'products',
+            'categories',
+            'categorySummary',
             'startDate',
             'endDate',
-            'productId'
+            'productId',
+            'category'
         ));
     }
 
     public function monthly(Request $request)
     {
         $month = $request->get('month', now()->format('Y-m'));
+        $category = $request->get('category');
         
         $startDate = Carbon::parse($month)->startOfMonth();
         $endDate = Carbon::parse($month)->endOfMonth();
@@ -113,6 +135,11 @@ class ReportController extends Controller
             $dailyRevenue[$day] += $transaction->total;
 
             foreach ($items as $item) {
+                // Filter by category
+                if ($category && $item->product_category != $category) {
+                    continue;
+                }
+                
                 // Report data untuk table
                 $reportData[] = (object) [
                     'date' => $transaction->created_at,
@@ -141,6 +168,7 @@ class ReportController extends Controller
                 if (!isset($productSales[$item->product_id])) {
                     $productSales[$item->product_id] = [
                         'product_name' => $item->product_name,
+                        'product_category' => $item->product_category,
                         'total_quantity' => 0,
                         'total_revenue' => 0
                     ];
@@ -160,6 +188,18 @@ class ReportController extends Controller
 
         $productSalesChart = collect($productSales)->sortByDesc('total_quantity')->take(10)->values();
 
+        // Get category summary
+        $categorySummary = collect($reportData)->groupBy('product_category')->map(function ($items, $category) {
+            return (object) [
+                'category' => $category,
+                'total_quantity' => $items->sum('quantity'),
+                'total_revenue' => $items->sum('total_price')
+            ];
+        })->values();
+
+        // Get unique categories from products
+        $categories = Product::distinct()->pluck('category')->filter();
+
         // Statistics
         $totalRevenue = $transactions->sum('total');
         $totalProducts = count(array_unique(array_column($reportData, 'product_id')));
@@ -169,16 +209,20 @@ class ReportController extends Controller
             'transactions',
             'dailyRevenueChart',
             'productSalesChart',
+            'categorySummary',
+            'categories',
             'totalRevenue',
             'totalQuantity',
             'totalProducts',
-            'month'
+            'month',
+            'category'
         ));
     }
 
     public function daily(Request $request)
     {
         $date = $request->get('date', now()->format('Y-m-d'));
+        $category = $request->get('category');
         
         $startDate = Carbon::parse($date)->startOfDay();
         $endDate = Carbon::parse($date)->endOfDay();
@@ -207,6 +251,11 @@ class ReportController extends Controller
             $salesByHour[$hour]++;
 
             foreach ($items as $item) {
+                // Filter by category
+                if ($category && $item->product_category != $category) {
+                    continue;
+                }
+                
                 // Report data untuk table
                 $reportData[] = (object) [
                     'created_at' => $transaction->created_at,
@@ -258,6 +307,18 @@ class ReportController extends Controller
             ];
         })->sortBy('hour')->values();
 
+        // Get category summary
+        $categorySummary = collect($reportData)->groupBy('product_category')->map(function ($items, $category) {
+            return (object) [
+                'category' => $category,
+                'total_quantity' => $items->sum('quantity'),
+                'total_revenue' => $items->sum('total_price')
+            ];
+        })->values();
+
+        // Get unique categories from products
+        $categories = Product::distinct()->pluck('category')->filter();
+
         // Statistics
         $totalRevenue = $transactions->sum('total');
         $totalProducts = count(array_unique(array_column($reportData, 'product_id')));
@@ -279,10 +340,13 @@ class ReportController extends Controller
             'transactions',
             'topProducts',
             'salesByHour',
+            'categorySummary',
+            'categories',
             'totalRevenue',
             'totalQuantity',
             'totalProducts',
             'date',
+            'category',
             'previousDayData'
         ));
     }

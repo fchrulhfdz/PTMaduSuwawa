@@ -472,6 +472,22 @@
             document.getElementById('change-amount').textContent = 'Rp ' + (change > 0 ? change : 0).toLocaleString('id-ID');
         }
 
+        // Get receipt settings
+        async function getReceiptSettings() {
+            try {
+                const response = await fetch('/admin/settings/receipt-settings');
+                const settings = await response.json();
+                return settings;
+            } catch (error) {
+                console.error('Error getting receipt settings:', error);
+                return {
+                    header: 'SMART CASHIER\nSistem Kasir Pintar',
+                    footer: 'Terima kasih atas kunjungan Anda\n*** Struk ini sebagai bukti pembayaran ***',
+                    print_automatically: false
+                };
+            }
+        }
+
         // Process Transaction
         async function processTransaction() {
             // Validasi tanpa customer name
@@ -530,9 +546,20 @@
 
                 if (result.success) {
                     currentTransactionId = result.transaction_id;
+                    
+                    // Get receipt settings
+                    const receiptSettings = await getReceiptSettings();
+                    
+                    // Set print button action
                     document.getElementById('print-receipt-btn').onclick = () => {
                         window.open(result.print_url, '_blank');
                     };
+                    
+                    // Auto print if enabled
+                    if (receiptSettings.print_automatically) {
+                        window.open(result.print_url, '_blank');
+                    }
+                    
                     showSuccessModal();
                 } else {
                     alert('Error: ' + result.message);

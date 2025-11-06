@@ -10,8 +10,19 @@
     <div class="max-w-xs mx-auto p-4">
         <!-- Header -->
         <div class="text-center border-b border-gray-300 pb-4 mb-4">
-            <h1 class="text-xl font-bold">SMART CASHIER</h1>
-            <p class="text-sm text-gray-600">Sistem Kasir Pintar</p>
+            @php
+                // Gunakan model Setting langsung
+                $settings = \App\Models\Setting::all()->pluck('value', 'key')->toArray();
+                $receiptHeader = $settings['receipt_header'] ?? 'SMART CASHIER\nSistem Kasir Pintar';
+                $headerLines = explode('\n', $receiptHeader);
+            @endphp
+            @foreach($headerLines as $line)
+                @if($loop->first)
+                    <h1 class="text-xl font-bold">{{ $line }}</h1>
+                @else
+                    <p class="text-sm text-gray-600">{{ $line }}</p>
+                @endif
+            @endforeach
             <p class="text-xs text-gray-500">{{ $transaction->created_at->format('d/m/Y H:i') }}</p>
         </div>
 
@@ -89,8 +100,13 @@
 
         <!-- Footer -->
         <div class="text-center border-t border-gray-300 pt-4">
-            <p class="text-xs text-gray-600">Terima kasih atas kunjungan Anda</p>
-            <p class="text-xs text-gray-500">*** Struk ini sebagai bukti pembayaran ***</p>
+            @php
+                $receiptFooter = $settings['receipt_footer'] ?? 'Terima kasih atas kunjungan Anda\n*** Struk ini sebagai bukti pembayaran ***';
+                $footerLines = explode('\n', $receiptFooter);
+            @endphp
+            @foreach($footerLines as $line)
+                <p class="text-xs text-gray-600">{{ $line }}</p>
+            @endforeach
         </div>
     </div>
 
