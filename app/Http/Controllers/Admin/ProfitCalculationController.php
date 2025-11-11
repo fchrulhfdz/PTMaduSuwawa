@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ProfitCalculation;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ProfitCalculationController extends Controller
 {
@@ -16,7 +17,7 @@ class ProfitCalculationController extends Controller
         // Hitung statistik dari database
         $today = Carbon::today();
         
-        // Laba Hari Ini
+        // Laba Hari Ini - berdasarkan created_at
         $todayCalculations = ProfitCalculation::whereDate('created_at', $today)->get();
         $todayProfit = $todayCalculations->sum('total_profit');
         $todayRevenue = $todayCalculations->sum('total_revenue');
@@ -137,4 +138,51 @@ class ProfitCalculationController extends Controller
                 ->with('error', 'Gagal menghapus data perhitungan laba: ' . $e->getMessage());
         }
     }
-}
+
+    // Method untuk AJAX quick stats (jika masih diperlukan)
+    public function getQuickStats(Request $request)
+    {
+        $period = $request->get('period', 'today');
+        
+        $today = Carbon::today();
+        
+        switch ($period) {
+            case 'week':
+                $startDate = $today->copy()->startOfWeek();
+                $endDate = $today->copy()->endOfWeek();
+                break;
+            case 'month':
+                $startDate = $today->copy()->startOfMonth();
+                $endDate = $today->copy()->endOfMonth();
+                break;
+            default:
+                $startDate = $today;
+                $endDate = $today;
+                break;
+        }
+
+        // Hitung statistik dari data perhitungan yang sudah disimpan
+        $calculations = ProfitCalculation::whereBetween('created_at', [$startDate, $endDate])->get();
+
+        $totalRevenue = $calculations->sum('total_revenue');
+        $totalCost = $calculations->sum('total_cost');
+        $totalProfit = $calculations->sum('total_profit');
+        $totalCalculations = $calculations->count();
+
+        $profitMargin = $totalRevenue > 0 ? ($totalProfit / $totalRevenue) * 100 : 0;
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'period' => $period,
+                'start_date' => $startDate->format('Y-m-d'),
+                'end_date' => $endDate->format('Y-m-d'),
+                'total_revenue' => number_format($totalRevenue, 2),
+                'total_cost' => number_format($totalCost, 2),
+                'total_profit' => number_format($totalProfit, 2),
+                'total_transactions' => $totalCalculations,
+                'profit_margin' => number_format($profitMargin, 2)
+            ]
+        ]);
+    }
+}   

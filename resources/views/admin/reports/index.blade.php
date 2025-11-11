@@ -11,12 +11,11 @@
             <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Laporan Transaksi</h1>
             <p class="mt-2 text-sm text-gray-600">Analisis lengkap data transaksi dan penjualan</p>
         </div>
-        <!-- Tombol cetak di header dihapus -->
     </div>
 
     <!-- Filter Section -->
     <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/60 p-8">
-        <form action="{{ route('admin.reports.index') }}" method="GET" class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <form action="{{ route('admin.reports.index') }}" method="GET" class="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <div class="space-y-3">
                 <label class="block text-sm font-semibold text-gray-700 tracking-wide">Tanggal Mulai</label>
                 <input type="date" name="start_date" value="{{ request('start_date') }}" 
@@ -26,6 +25,17 @@
                 <label class="block text-sm font-semibold text-gray-700 tracking-wide">Tanggal Akhir</label>
                 <input type="date" name="end_date" value="{{ request('end_date') }}" 
                        class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all duration-200">
+            </div>
+            <div class="space-y-3">
+                <label class="block text-sm font-semibold text-gray-700 tracking-wide">Produk</label>
+                <select name="product_id" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all duration-200">
+                    <option value="">Semua Produk</option>
+                    @foreach($products as $product)
+                        <option value="{{ $product->id }}" {{ request('product_id') == $product->id ? 'selected' : '' }}>
+                            {{ $product->name }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
             <div class="space-y-3">
                 <label class="block text-sm font-semibold text-gray-700 tracking-wide">Kategori</label>
@@ -115,7 +125,6 @@
                     <h2 class="text-xl font-bold text-gray-900">Detail Laporan Transaksi</h2>
                     <p class="text-sm text-gray-600 mt-1">Rincian lengkap semua transaksi dalam periode yang dipilih</p>
                 </div>
-                <!-- Tombol cetak di bagian detail laporan -->
                 <div class="flex flex-wrap gap-3">
                     <button onclick="exportToWord()" 
                             class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
@@ -142,56 +151,116 @@
                         <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Harga Satuan</th>
                         <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Total Harga</th>
                         <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Customer</th>
+                        <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Metode Bayar</th>
+                        <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
+                        <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Keterangan</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-100">
-                    @forelse($reportData as $item)
-                    <tr class="hover:bg-gray-50/80 transition-colors duration-150">
-                        <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ $item->date->format('d/m/Y H:i') }}
-                        </td>
-                        <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
-                            {{ $item->transaction_code }}
-                        </td>
-                        <td class="px-8 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10">
-                                    @if($item->product->image)
-                                        <img class="h-10 w-10 rounded-xl object-cover shadow-sm" 
-                                             src="{{ asset('storage/' . $item->product->image) }}" 
-                                             alt="{{ $item->product->name }}">
-                                    @else
-                                        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-sm">
-                                            <i class="fas fa-box text-gray-400"></i>
+                    @forelse($transactions as $transaction)
+                        @php
+                            // Gunakan items_array accessor dari model
+                            $items = $transaction->items_array;
+                        @endphp
+                        @if(is_array($items))
+                            @foreach($items as $item)
+                                @php
+                                    $product = \App\Models\Product::find($item['product_id'] ?? null);
+                                    // Skip jika produk tidak ditemukan
+                                    if (!$product) continue;
+                                    
+                                    // Filter by category and product if specified
+                                    $currentCategory = request('category');
+                                    $currentProductId = request('product_id');
+                                    
+                                    if ($currentCategory && $product->category != $currentCategory) continue;
+                                    if ($currentProductId && $product->id != $currentProductId) continue;
+
+                                    // Gunakan final_total jika ada, jika tidak gunakan total biasa
+                                    $itemTotal = $item['final_total'] ?? $item['total'] ?? (($item['quantity'] ?? 0) * ($item['price'] ?? $product->price));
+                                    $itemPrice = $item['price'] ?? $product->price;
+                                @endphp
+                                <tr class="hover:bg-gray-50/80 transition-colors duration-150">
+                                    <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        {{ $transaction->created_at->format('d/m/Y H:i') }}
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
+                                        {{ $transaction->transaction_code }}
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                @if($product->image)
+                                                    <img class="h-10 w-10 rounded-xl object-cover shadow-sm" 
+                                                         src="{{ asset('storage/' . $product->image) }}" 
+                                                         alt="{{ $product->name }}">
+                                                @else
+                                                    <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-sm">
+                                                        <i class="fas fa-box text-gray-400"></i>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-semibold text-gray-900">{{ $product->name }}</div>
+                                                @if(isset($item['discount_percentage']) && $item['discount_percentage'] > 0)
+                                                    <div class="text-xs text-purple-600 font-medium mt-1">
+                                                        Diskon {{ $item['discount_percentage'] }}%
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
-                                    @endif
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-semibold text-gray-900">{{ $item->product_name }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-8 py-4 whitespace-nowrap">
-                            <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-800 border border-amber-200">
-                                {{ $item->product_category }}
-                            </span>
-                        </td>
-                        <td class="px-8 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            {{ $item->quantity }}
-                        </td>
-                        <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            Rp {{ number_format($item->unit_price, 0, ',', '.') }}
-                        </td>
-                        <td class="px-8 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                            Rp {{ number_format($item->total_price, 0, ',', '.') }}
-                        </td>
-                        <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-700">
-                            {{ $item->customer_name ?? 'Walk-in Customer' }}
-                        </td>
-                    </tr>
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-800 border border-amber-200">
+                                            {{ $product->category }}
+                                        </span>
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                                        {{ $item['quantity'] ?? 0 }}
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        Rp {{ number_format($itemPrice, 0, ',', '.') }}
+                                        @if(isset($item['original_price']) && $item['original_price'] != $itemPrice)
+                                            <div class="text-xs text-yellow-600 line-through">
+                                                Rp {{ number_format($item['original_price'], 0, ',', '.') }}
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                                        Rp {{ number_format($itemTotal, 0, ',', '.') }}
+                                        @if(isset($item['discount_amount']) && $item['discount_amount'] > 0)
+                                            <div class="text-xs text-purple-600">
+                                                -Rp {{ number_format($item['discount_amount'], 0, ',', '.') }}
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-700">
+                                        {{ $transaction->customer_name ?? 'Walk-in Customer' }}
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full 
+                                            {{ $transaction->payment_method == 'cash' ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-800 border border-green-200' : 
+                                               'bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-800 border border-blue-200' }}">
+                                            {{ ucfirst($transaction->payment_method) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full 
+                                            {{ $transaction->status == 'completed' ? 'bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-800 border border-emerald-200' : 
+                                               ($transaction->status == 'pending' ? 'bg-gradient-to-r from-yellow-50 to-amber-50 text-yellow-800 border border-yellow-200' : 
+                                               'bg-gradient-to-r from-red-50 to-pink-50 text-red-800 border border-red-200') }}">
+                                            {{ ucfirst($transaction->status) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap text-sm text-gray-600 max-w-xs truncate">
+                                        {{ $transaction->notes ?? '-' }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endif
                     @empty
                     <tr>
-                        <td colspan="8" class="px-8 py-12 text-center">
+                        <td colspan="11" class="px-8 py-12 text-center">
                             <div class="flex flex-col items-center justify-center text-gray-400">
                                 <i class="fas fa-inbox text-4xl mb-3"></i>
                                 <p class="text-lg font-medium">Tidak ada data laporan</p>
@@ -230,8 +299,8 @@ function exportToWord() {
                 th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
                 th { background-color: #f2f2f2; font-weight: bold; }
                 .total-row { font-weight: bold; background-color: #f9f9f9; }
-                .category-summary { margin: 15px 0; padding: 10px; background: #f8f9fa; border: 1px solid #ddd; }
-                .category-item { display: inline-block; margin: 3px 8px 3px 0; padding: 3px 8px; background: #e9ecef; border-radius: 3px; font-size: 10px; }
+                .discount { color: #8b5cf6; font-size: 9px; }
+                .original-price { text-decoration: line-through; color: #d97706; font-size: 9px; }
             </style>
         </head>
         <body>
@@ -240,6 +309,7 @@ function exportToWord() {
                 <p style="color: #6b7280; margin: 3px 0;">Periode: {{ $startDate ? \Carbon\Carbon::parse($startDate)->format('d/m/Y') : 'Semua' }} - 
                           {{ $endDate ? \Carbon\Carbon::parse($endDate)->format('d/m/Y') : 'Semua' }}</p>
                 <p style="color: #6b7280; margin: 3px 0;">Kategori: {{ request('category') ?: 'Semua Kategori' }}</p>
+                <p style="color: #6b7280; margin: 3px 0;">Produk: {{ request('product_id') ? $products->where('id', request('product_id'))->first()->name ?? 'Semua' : 'Semua Produk' }}</p>
                 <p style="color: #6b7280; margin: 3px 0;">Dicetak pada: {{ now()->format('d/m/Y H:i') }}</p>
             </div>
 
@@ -262,17 +332,6 @@ function exportToWord() {
                 </div>
             </div>
 
-            @if($categorySummary->count() > 0)
-            <div class="category-summary">
-                <h3 style="font-size: 14px; font-weight: bold; margin-bottom: 8px;">Ringkasan per Kategori:</h3>
-                @foreach($categorySummary as $category)
-                <div class="category-item">
-                    {{ $category->category }}: {{ $category->total_quantity }} pcs (Rp {{ number_format($category->total_revenue, 0, ',', '.') }})
-                </div>
-                @endforeach
-            </div>
-            @endif
-
             <table>
                 <thead>
                     <tr>
@@ -284,27 +343,68 @@ function exportToWord() {
                         <th>Harga Satuan</th>
                         <th>Total Harga</th>
                         <th>Customer</th>
+                        <th>Metode Bayar</th>
+                        <th>Status</th>
+                        <th>Keterangan</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($reportData as $item)
-                    <tr>
-                        <td>{{ $item->date->format('d/m/Y H:i') }}</td>
-                        <td>{{ $item->transaction_code }}</td>
-                        <td>{{ $item->product_name }}</td>
-                        <td>{{ $item->product_category }}</td>
-                        <td>{{ $item->quantity }}</td>
-                        <td>Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
-                        <td>Rp {{ number_format($item->total_price, 0, ',', '.') }}</td>
-                        <td>{{ $item->customer_name ?? 'Walk-in Customer' }}</td>
-                    </tr>
+                    @foreach($transactions as $transaction)
+                        @php
+                            $items = $transaction->items_array;
+                        @endphp
+                        @if(is_array($items))
+                            @foreach($items as $item)
+                                @php
+                                    $product = \App\Models\Product::find($item['product_id'] ?? null);
+                                    if (!$product) continue;
+                                    
+                                    $currentCategory = request('category');
+                                    $currentProductId = request('product_id');
+                                    
+                                    if ($currentCategory && $product->category != $currentCategory) continue;
+                                    if ($currentProductId && $product->id != $currentProductId) continue;
+
+                                    $itemTotal = $item['final_total'] ?? $item['total'] ?? (($item['quantity'] ?? 0) * ($item['price'] ?? $product->price));
+                                    $itemPrice = $item['price'] ?? $product->price;
+                                @endphp
+                                <tr>
+                                    <td>{{ $transaction->created_at->format('d/m/Y H:i') }}</td>
+                                    <td>{{ $transaction->transaction_code }}</td>
+                                    <td>
+                                        {{ $product->name }}
+                                        @if(isset($item['discount_percentage']) && $item['discount_percentage'] > 0)
+                                            <div class="discount">Diskon {{ $item['discount_percentage'] }}%</div>
+                                        @endif
+                                    </td>
+                                    <td>{{ $product->category }}</td>
+                                    <td>{{ $item['quantity'] ?? 0 }}</td>
+                                    <td>
+                                        Rp {{ number_format($itemPrice, 0, ',', '.') }}
+                                        @if(isset($item['original_price']) && $item['original_price'] != $itemPrice)
+                                            <div class="original-price">Rp {{ number_format($item['original_price'], 0, ',', '.') }}</div>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        Rp {{ number_format($itemTotal, 0, ',', '.') }}
+                                        @if(isset($item['discount_amount']) && $item['discount_amount'] > 0)
+                                            <div class="discount">-Rp {{ number_format($item['discount_amount'], 0, ',', '.') }}</div>
+                                        @endif
+                                    </td>
+                                    <td>{{ $transaction->customer_name ?? 'Walk-in Customer' }}</td>
+                                    <td>{{ ucfirst($transaction->payment_method) }}</td>
+                                    <td>{{ ucfirst($transaction->status) }}</td>
+                                    <td>{{ $transaction->notes ?? '-' }}</td>
+                                </tr>
+                            @endforeach
+                        @endif
                     @endforeach
                     <tr class="total-row">
                         <td colspan="4"><strong>TOTAL</strong></td>
                         <td><strong>{{ $totalQuantity }}</strong></td>
                         <td></td>
                         <td><strong>Rp {{ number_format($totalRevenue, 0, ',', '.') }}</strong></td>
-                        <td></td>
+                        <td colspan="4"></td>
                     </tr>
                 </tbody>
             </table>
@@ -342,8 +442,6 @@ function exportToExcel() {
                 th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
                 th { background-color: #f2f2f2; font-weight: bold; }
                 .total-row { font-weight: bold; background-color: #f9f9f9; }
-                .category-summary { margin: 15px 0; padding: 10px; background: #f8f9fa; border: 1px solid #ddd; }
-                .category-item { display: inline-block; margin: 3px 8px 3px 0; padding: 3px 8px; background: #e9ecef; border-radius: 3px; font-size: 10px; }
             </style>
         </head>
         <body>
@@ -352,6 +450,7 @@ function exportToExcel() {
                 <p>Periode: {{ $startDate ? \Carbon\Carbon::parse($startDate)->format('d/m/Y') : 'Semua' }} - 
                       {{ $endDate ? \Carbon\Carbon::parse($endDate)->format('d/m/Y') : 'Semua' }}</p>
                 <p>Kategori: {{ request('category') ?: 'Semua Kategori' }}</p>
+                <p>Produk: {{ request('product_id') ? $products->where('id', request('product_id'))->first()->name ?? 'Semua' : 'Semua Produk' }}</p>
                 <p>Tanggal Export: {{ now()->format('d/m/Y H:i') }}</p>
             </div>
 
@@ -373,17 +472,6 @@ function exportToExcel() {
                     <span style="font-size: 18px; font-weight: bold;">{{ $totalQuantity }}</span>
                 </div>
             </div>
-
-            @if($categorySummary->count() > 0)
-            <div class="category-summary">
-                <h3 style="font-size: 14px; font-weight: bold;">Ringkasan per Kategori:</h3>
-                @foreach($categorySummary as $category)
-                <div class="category-item">
-                    {{ $category->category }}: {{ $category->total_quantity }} pcs (Rp {{ number_format($category->total_revenue, 0, ',', '.') }})
-                </div>
-                @endforeach
-            </div>
-            @endif
 
             ${html}
         </body>

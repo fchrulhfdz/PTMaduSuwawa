@@ -64,7 +64,7 @@
         <!-- Products Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8" id="products-container">
             @forelse($products as $product)
-            <div class="product-card group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden hover:-translate-y-2" data-category="{{ $product->category }}">
+            <div class="product-card group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden hover:-translate-y-2 flex flex-col h-full" data-category="{{ $product->category }}">
                 <!-- Product Image -->
                 <div class="relative h-80 bg-gradient-to-br from-amber-50 to-orange-100 overflow-hidden">
                     @if($product->image)
@@ -105,7 +105,7 @@
                 </div>
 
                 <!-- Product Info -->
-                <div class="p-8">
+                <div class="p-8 flex-1 flex flex-col">
                     <div class="flex items-start justify-between mb-4">
                         <h3 class="text-2xl font-bold text-gray-900 leading-tight">{{ $product->name }}</h3>
                         <div class="flex items-center text-amber-400 text-sm">
@@ -117,55 +117,64 @@
                         </div>
                     </div>
                     
-                    <p class="text-gray-600 mb-6 leading-relaxed line-clamp-2">{{ $product->description }}</p>
+                    <p class="text-gray-600 mb-6 leading-relaxed line-clamp-2 flex-1">{{ $product->description }}</p>
                     
-                    <!-- Price and Stock -->
-                    <div class="flex items-center justify-between mb-6">
-                        <div>
-                            <span class="text-3xl font-bold text-amber-600">
-                                Rp {{ number_format($product->price, 0, ',', '.') }}
-                            </span>
-                            <div class="text-sm text-gray-500 mt-1">per 500ml</div>
+                    <!-- Price and Stock - Sticky di bagian bawah -->
+                    <div class="mt-auto space-y-6">
+                        <!-- Price and Stock -->
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-3xl font-bold text-amber-600">
+                                    Rp {{ number_format($product->price, 0, ',', '.') }}
+                                </span>
+                                @if($product->berat_isi && $product->satuan_berat)
+                                <div class="text-sm text-gray-500 mt-1">per {{ $product->berat_isi }} {{ $product->satuan_berat }}</div>
+                                @else
+                                <div class="text-sm text-gray-500 mt-1">per botol</div>
+                                @endif
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-semibold text-gray-700">Stok</div>
+                                <div class="text-lg font-bold text-gray-900">{{ $product->stock }}</div>
+                            </div>
                         </div>
-                        <div class="text-right">
-                            <div class="text-sm font-semibold text-gray-700">Stok</div>
-                            <div class="text-lg font-bold text-gray-900">{{ $product->stock }}</div>
-                        </div>
-                    </div>
 
-                    <!-- Progress Bar -->
-                    <div class="mb-6">
-                        <div class="flex justify-between text-sm text-gray-600 mb-2">
-                            <span>Stok Tersedia</span>
-                            <span>{{ min(100, ($product->stock / 50) * 100) }}%</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-gradient-to-r from-amber-400 to-orange-500 h-2 rounded-full transition-all duration-1000" 
-                                 style="width: {{ min(100, ($product->stock / 50) * 100) }}%"></div>
+                        <!-- Progress Bar -->
+                        <div>
+                            <div class="flex justify-between text-sm text-gray-600 mb-2">
+                                <span>Stok Tersedia</span>
+                                <span>{{ min(100, ($product->stock / 50) * 100) }}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-amber-400 to-orange-500 h-2 rounded-full transition-all duration-1000" 
+                                     style="width: {{ min(100, ($product->stock / 50) * 100) }}%"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             @empty
-            <!-- Empty State -->
-            <div class="col-span-3 text-center py-20">
-                <div class="max-w-md mx-auto">
-                    <div class="w-32 h-32 bg-gradient-to-br from-amber-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-inbox text-5xl text-amber-400"></i>
+            <!-- Empty State - Full width dan stick di bawah -->
+            <div class="col-span-3 flex flex-col min-h-[400px]">
+                <div class="flex-1 flex items-center justify-center">
+                    <div class="max-w-md mx-auto text-center">
+                        <div class="w-32 h-32 bg-gradient-to-br from-amber-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-inbox text-5xl text-amber-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3">Belum ada produk tersedia</h3>
+                        <p class="text-gray-600 mb-6">Produk berkualitas akan segera hadir untuk Anda</p>
+                        <button class="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                            <i class="fas fa-bell mr-2"></i>Beritahu Saya
+                        </button>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Belum ada produk tersedia</h3>
-                    <p class="text-gray-600 mb-6">Produk berkualitas akan segera hadir untuk Anda</p>
-                    <button class="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                        <i class="fas fa-bell mr-2"></i>Beritahu Saya
-                    </button>
                 </div>
             </div>
             @endforelse
         </div>
 
         <!-- Empty State for Filter -->
-        <div id="no-products" class="hidden text-center py-20">
-            <div class="max-w-md mx-auto">
+        <div id="no-products" class="hidden min-h-[400px] flex items-center justify-center">
+            <div class="max-w-md mx-auto text-center">
                 <div class="w-32 h-32 bg-gradient-to-br from-amber-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <i class="fas fa-search text-5xl text-amber-400"></i>
                 </div>
@@ -307,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const cardCategory = card.getAttribute('data-category');
             
             if (category === 'all' || cardCategory === category) {
-                card.style.display = 'block';
+                card.style.display = 'flex';
                 card.style.opacity = '0';
                 card.style.transform = 'translateY(20px)';
                 

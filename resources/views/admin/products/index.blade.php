@@ -44,6 +44,7 @@
                         <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stok</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Berat</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
@@ -90,6 +91,15 @@
                             </div>
                         </td>
                         <td class="px-6 py-4">
+                            <div class="text-sm text-gray-900">
+                                @if($product->berat_isi && $product->satuan_berat)
+                                    {{ $product->berat_isi }} {{ $product->satuan_berat }}
+                                @else
+                                    <span class="text-gray-400">-</span>
+                                @endif
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
                             <div class="flex items-center space-x-2">
                                 <a href="{{ route('admin.products.edit', $product) }}" 
                                    class="inline-flex items-center justify-center p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-200 hover:scale-105">
@@ -110,7 +120,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-12 text-center">
+                        <td colspan="6" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center justify-center space-y-3">
                                 <div class="h-16 w-16 rounded-xl bg-gray-100 flex items-center justify-center">
                                     <i class="fas fa-inbox text-gray-400 text-xl"></i>
@@ -137,9 +147,7 @@
 
 @push('scripts')
 <script>
-    // Tambahan JavaScript khusus untuk halaman products index jika diperlukan
     document.addEventListener('DOMContentLoaded', function() {
-        // Contoh: Auto-hide alert setelah 5 detik
         const alert = document.querySelector('.bg-green-50');
         if (alert) {
             setTimeout(() => {

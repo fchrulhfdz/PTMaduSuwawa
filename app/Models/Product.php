@@ -14,6 +14,8 @@ class Product extends Model
         'description',
         'price',
         'stock',
+        'berat_isi',
+        'satuan_berat',
         'category',
         'barcode',
         'image',
@@ -49,5 +51,21 @@ class Product extends Model
             'low-stock' => 'yellow',
             'in-stock' => 'green'
         };
+    }
+
+    // PERBAIKAN: Accessor untuk items array
+    public function getItemsArrayAttribute()
+    {
+        $items = is_string($this->items) ? json_decode($this->items, true) : $this->items;
+        return is_array($items) ? $items : [];
+    }
+
+    // Accessor untuk format berat lengkap
+    public function getFormattedWeightAttribute()
+    {
+        if ($this->berat_isi && $this->satuan_berat) {
+            return $this->berat_isi . ' ' . $this->satuan_berat;
+        }
+        return '-';
     }
 }

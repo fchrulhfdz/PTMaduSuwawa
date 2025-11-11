@@ -131,10 +131,10 @@
                                                 id="category"
                                                 required
                                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
-                                            <option value="Madu Hutan" {{ $product->category == 'Madu Hutan' ? 'selected' : '' }}>Madu Hutan</option>
-                                            <option value="Madu Budidaya" {{ $product->category == 'Madu Budidaya' ? 'selected' : '' }}>Madu Budidaya</option>
-                                            <option value="Madu Organik" {{ $product->category == 'Madu Organik' ? 'selected' : '' }}>Madu Organik</option>
-                                            <option value="Madu Spesial" {{ $product->category == 'Madu Spesial' ? 'selected' : '' }}>Madu Spesial</option>
+                                            <option value="Madu Hutan" {{ old('category', $product->category) == 'Madu Hutan' ? 'selected' : '' }}>Madu Hutan</option>
+                                            <option value="Madu Budidaya" {{ old('category', $product->category) == 'Madu Budidaya' ? 'selected' : '' }}>Madu Budidaya</option>
+                                            <option value="Madu Organik" {{ old('category', $product->category) == 'Madu Organik' ? 'selected' : '' }}>Madu Organik</option>
+                                            <option value="Madu Spesial" {{ old('category', $product->category) == 'Madu Spesial' ? 'selected' : '' }}>Madu Spesial</option>
                                         </select>
                                         @error('category')
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -168,6 +168,40 @@
                                                 required
                                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                                             @error('stock')
+                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <!-- Berat & Satuan -->
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="berat_isi" class="block text-sm font-medium text-gray-700 mb-2">Berat Isi</label>
+                                            <input type="text" 
+                                                name="berat_isi" 
+                                                id="berat_isi"
+                                                value="{{ old('berat_isi', $product->berat_isi) }}"
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                                                placeholder="500">
+                                            @error('berat_isi')
+                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label for="satuan_berat" class="block text-sm font-medium text-gray-700 mb-2">Satuan</label>
+                                            <select name="satuan_berat" 
+                                                    id="satuan_berat"
+                                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                                                <option value="gram" {{ old('satuan_berat', $product->satuan_berat) == 'gram' ? 'selected' : '' }}>Gram</option>
+                                                <option value="kg" {{ old('satuan_berat', $product->satuan_berat) == 'kg' ? 'selected' : '' }}>Kilogram</option>
+                                                <option value="ml" {{ old('satuan_berat', $product->satuan_berat) == 'ml' ? 'selected' : '' }}>Mililiter</option>
+                                                <option value="liter" {{ old('satuan_berat', $product->satuan_berat) == 'liter' ? 'selected' : '' }}>Liter</option>
+                                                <option value="pcs" {{ old('satuan_berat', $product->satuan_berat) == 'pcs' ? 'selected' : '' }}>Pcs</option>
+                                                <option value="botol" {{ old('satuan_berat', $product->satuan_berat) == 'botol' ? 'selected' : '' }}>Botol</option>
+                                                <option value="pack" {{ old('satuan_berat', $product->satuan_berat) == 'pack' ? 'selected' : '' }}>Pack</option>
+                                            </select>
+                                            @error('satuan_berat')
                                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                             @enderror
                                         </div>

@@ -15,6 +15,12 @@
                 $settings = \App\Models\Setting::all()->pluck('value', 'key')->toArray();
                 $receiptHeader = $settings['receipt_header'] ?? 'SMART CASHIER\nSistem Kasir Pintar';
                 $headerLines = explode('\n', $receiptHeader);
+                
+                // PERBAIKAN: Decode items dari JSON string ke array
+                $items = is_string($transaction->items) ? json_decode($transaction->items, true) : $transaction->items;
+                if (!is_array($items)) {
+                    $items = [];
+                }
             @endphp
             @foreach($headerLines as $line)
                 @if($loop->first)
@@ -47,13 +53,13 @@
         <!-- Items -->
         <div class="border-t border-b border-gray-300 py-4 mb-4">
             <h2 class="font-bold text-sm mb-2">DAFTAR PRODUK:</h2>
-            @foreach($transaction->items as $item)
+            @foreach($items as $item)
             <div class="flex justify-between text-sm mb-1">
                 <div>
-                    <span>{{ $item['name'] }}</span>
-                    <span class="text-gray-600"> x {{ $item['quantity'] }}</span>
+                    <span>{{ $item['name'] ?? 'N/A' }}</span>
+                    <span class="text-gray-600"> x {{ $item['quantity'] ?? 0 }}</span>
                 </div>
-                <span>Rp {{ number_format($item['total'], 0, ',', '.') }}</span>
+                <span>Rp {{ number_format($item['total'] ?? 0, 0, ',', '.') }}</span>
             </div>
             @endforeach
         </div>
@@ -64,10 +70,12 @@
                 <span>Subtotal:</span>
                 <span>Rp {{ number_format($transaction->subtotal, 0, ',', '.') }}</span>
             </div>
+            @if($transaction->tax > 0)
             <div class="flex justify-between text-sm mb-1">
-                <span>Pajak (10%):</span>
+                <span>Pajak:</span>
                 <span>Rp {{ number_format($transaction->tax, 0, ',', '.') }}</span>
             </div>
+            @endif
             @if($transaction->discount > 0)
             <div class="flex justify-between text-sm mb-1">
                 <span>Diskon:</span>
@@ -84,7 +92,7 @@
         <div class="border-t border-gray-300 pt-4 mb-4">
             <div class="flex justify-between text-sm mb-1">
                 <span>Metode Bayar:</span>
-                <span class="font-medium">{{ strtoupper(str_replace('_', ' ', $transaction->payment_method)) }}</span>
+                <span class="font-medium">{{ strtoupper($transaction->payment_method) }}</span>
             </div>
             @if($transaction->payment_method === 'cash')
             <div class="flex justify-between text-sm mb-1">
@@ -113,7 +121,16 @@
     <script>
         // Auto print when page loads
         window.onload = function() {
-            window.print();
+            setTimeout(function() {
+                window.print();
+            }, 500);
+            
+            // Redirect back after print (optional)
+            window.onafterprint = function() {
+                setTimeout(function() {
+                    window.close();
+                }, 1000);
+            };
         }
     </script>
 </body>

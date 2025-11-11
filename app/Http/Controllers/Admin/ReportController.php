@@ -19,75 +19,100 @@ class ReportController extends Controller
         $category = $request->get('category');
 
         // Query transactions dengan filter
-        $transactionsQuery = Transaction::with([])
-            ->filterByDate($startDate, $endDate)
-            ->filterByProduct($productId)
-            ->where('status', 'completed')
+        $transactionsQuery = Transaction::where('status', 'completed')
             ->latest();
+
+        // Filter by date range
+        if ($startDate && $endDate) {
+            $transactionsQuery->whereBetween('created_at', [$startDate, $endDate]);
+        } elseif ($startDate) {
+            $transactionsQuery->whereDate('created_at', '>=', $startDate);
+        } elseif ($endDate) {
+            $transactionsQuery->whereDate('created_at', '<=', $endDate);
+        }
 
         // Get transactions untuk table
         $transactions = $transactionsQuery->paginate(50);
 
-        // Process transactions untuk display di table
-        $reportData = [];
-        $totalProductsSold = 0;
+        // Hitung statistics dari semua transaksi yang difilter
+        $totalTransactions = $transactions->total();
+        $totalRevenue = $transactions->sum('total');
+        
+        // Hitung total quantity dan total produk terjual
         $totalQuantity = 0;
-
+        $totalProductsSold = 0;
+        
         foreach ($transactions as $transaction) {
-            $items = $transaction->getTransactionItems();
-            foreach ($items as $item) {
-                // Filter by category
-                if ($category && $item->product_category != $category) {
-                    continue;
+            // Gunakan items_array accessor dari model
+            $items = $transaction->items_array;
+            
+            if (is_array($items)) {
+                foreach ($items as $item) {
+                    // Filter by product
+                    if ($productId && ($item['product_id'] ?? null) != $productId) {
+                        continue;
+                    }
+                    
+                    // Get product untuk filter category
+                    $product = Product::find($item['product_id'] ?? null);
+                    if ($category && $product && $product->category != $category) {
+                        continue;
+                    }
+                    
+                    $totalQuantity += $item['quantity'] ?? 0;
+                    $totalProductsSold++;
                 }
-                
-                // Filter by product
-                if ($productId && $item->product_id != $productId) {
-                    continue;
-                }
-                
-                $reportData[] = (object) [
-                    'date' => $transaction->created_at,
-                    'product_id' => $item->product_id,
-                    'product_name' => $item->product_name,
-                    'product_category' => $item->product_category,
-                    'quantity' => $item->quantity,
-                    'unit_price' => $item->product_price,
-                    'total_price' => $item->total_price,
-                    'customer_name' => $transaction->customer_name,
-                    'transaction_code' => $transaction->transaction_code,
-                    'product' => (object) [
-                        'name' => $item->product_name,
-                        'category' => $item->product_category,
-                        'price' => $item->product_price,
-                        'image' => $item->product->image ?? null
-                    ]
-                ];
-                $totalProductsSold++;
-                $totalQuantity += $item->quantity;
             }
         }
-
-        // Hitung statistics
-        $totalTransactions = $transactions->count();
-        $totalRevenue = $transactions->sum('total');
 
         // Get unique categories from products
         $categories = Product::distinct()->pluck('category')->filter();
 
         // Get category summary
-        $categorySummary = collect($reportData)->groupBy('product_category')->map(function ($items, $category) {
-            return (object) [
-                'category' => $category,
-                'total_quantity' => $items->sum('quantity'),
-                'total_revenue' => $items->sum('total_price')
-            ];
-        })->values();
+        $categorySummary = [];
+        foreach ($transactions as $transaction) {
+            // Gunakan items_array accessor dari model
+            $items = $transaction->items_array;
+            
+            if (is_array($items)) {
+                foreach ($items as $item) {
+                    $product = Product::find($item['product_id'] ?? null);
+                    if (!$product) continue;
+                    
+                    // Filter by product
+                    if ($productId && $product->id != $productId) {
+                        continue;
+                    }
+                    
+                    // Filter by category
+                    if ($category && $product->category != $category) {
+                        continue;
+                    }
+                    
+                    $categoryName = $product->category;
+                    $quantity = $item['quantity'] ?? 0;
+                    // Gunakan final_total jika ada, jika tidak gunakan total biasa
+                    $totalPrice = $item['final_total'] ?? $item['total'] ?? ($quantity * ($item['price'] ?? $product->price));
+                    
+                    if (!isset($categorySummary[$categoryName])) {
+                        $categorySummary[$categoryName] = [
+                            'category' => $categoryName,
+                            'total_quantity' => 0,
+                            'total_revenue' => 0
+                        ];
+                    }
+                    
+                    $categorySummary[$categoryName]['total_quantity'] += $quantity;
+                    $categorySummary[$categoryName]['total_revenue'] += $totalPrice;
+                }
+            }
+        }
+        
+        $categorySummary = collect($categorySummary)->values();
 
         $products = Product::orderBy('name')->get();
 
         return view('admin.reports.index', compact(
-            'reportData',
             'transactions',
             'totalProductsSold',
             'totalTransactions',
@@ -112,21 +137,18 @@ class ReportController extends Controller
         $endDate = Carbon::parse($month)->endOfMonth();
 
         // Get transactions for the month
-        $transactions = Transaction::with([])
-            ->whereBetween('created_at', [$startDate, $endDate])
+        $transactions = Transaction::whereBetween('created_at', [$startDate, $endDate])
             ->where('status', 'completed')
             ->latest()
             ->get();
 
         // Process data untuk chart dan table
-        $reportData = [];
         $dailyRevenue = [];
         $productSales = [];
         $totalQuantity = 0;
+        $totalProducts = 0;
 
         foreach ($transactions as $transaction) {
-            $items = $transaction->getTransactionItems();
-            
             // Daily revenue data
             $day = $transaction->created_at->format('Y-m-d');
             if (!isset($dailyRevenue[$day])) {
@@ -134,47 +156,42 @@ class ReportController extends Controller
             }
             $dailyRevenue[$day] += $transaction->total;
 
-            foreach ($items as $item) {
-                // Filter by category
-                if ($category && $item->product_category != $category) {
-                    continue;
-                }
-                
-                // Report data untuk table
-                $reportData[] = (object) [
-                    'date' => $transaction->created_at,
-                    'product_id' => $item->product_id,
-                    'product_name' => $item->product_name,
-                    'product_category' => $item->product_category,
-                    'quantity' => $item->quantity,
-                    'unit_price' => $item->product_price,
-                    'total_price' => $item->total_price,
-                    'customer_name' => $transaction->customer_name,
-                    'transaction_code' => $transaction->transaction_code,
-                    'product' => (object) [
-                        'name' => $item->product_name,
-                        'category' => $item->product_category,
-                        'price' => $item->product_price,
-                        'image' => $item->product->image ?? null
-                    ],
-                    'user' => (object) [
-                        'name' => 'System'
-                    ]
-                ];
+            // Gunakan items_array accessor dari model
+            $items = $transaction->items_array;
+            
+            if (is_array($items)) {
+                foreach($items as $item) {
+                    // Get product data
+                    $product = Product::find($item['product_id'] ?? null);
+                    
+                    if (!$product) {
+                        continue;
+                    }
+                    
+                    // Filter by category
+                    if ($category && $product->category != $category) {
+                        continue;
+                    }
+                    
+                    $quantity = $item['quantity'] ?? 0;
+                    // Gunakan final_total jika ada, jika tidak gunakan total biasa
+                    $totalPrice = $item['final_total'] ?? $item['total'] ?? ($quantity * ($item['price'] ?? $product->price));
+                    
+                    $totalQuantity += $quantity;
+                    $totalProducts++;
 
-                $totalQuantity += $item->quantity;
-
-                // Product sales data untuk chart
-                if (!isset($productSales[$item->product_id])) {
-                    $productSales[$item->product_id] = [
-                        'product_name' => $item->product_name,
-                        'product_category' => $item->product_category,
-                        'total_quantity' => 0,
-                        'total_revenue' => 0
-                    ];
+                    // Product sales data untuk chart
+                    if (!isset($productSales[$product->id])) {
+                        $productSales[$product->id] = [
+                            'product_name' => $product->name,
+                            'product_category' => $product->category,
+                            'total_quantity' => 0,
+                            'total_revenue' => 0
+                        ];
+                    }
+                    $productSales[$product->id]['total_quantity'] += $quantity;
+                    $productSales[$product->id]['total_revenue'] += $totalPrice;
                 }
-                $productSales[$item->product_id]['total_quantity'] += $item->quantity;
-                $productSales[$item->product_id]['total_revenue'] += $item->total_price;
             }
         }
 
@@ -189,23 +206,49 @@ class ReportController extends Controller
         $productSalesChart = collect($productSales)->sortByDesc('total_quantity')->take(10)->values();
 
         // Get category summary
-        $categorySummary = collect($reportData)->groupBy('product_category')->map(function ($items, $category) {
-            return (object) [
-                'category' => $category,
-                'total_quantity' => $items->sum('quantity'),
-                'total_revenue' => $items->sum('total_price')
-            ];
-        })->values();
+        $categorySummary = [];
+        foreach ($transactions as $transaction) {
+            // Gunakan items_array accessor dari model
+            $items = $transaction->items_array;
+            
+            if (is_array($items)) {
+                foreach($items as $item) {
+                    $product = Product::find($item['product_id'] ?? null);
+                    if (!$product) continue;
+                    
+                    // Filter by category
+                    if ($category && $product->category != $category) {
+                        continue;
+                    }
+                    
+                    $categoryName = $product->category;
+                    $quantity = $item['quantity'] ?? 0;
+                    // Gunakan final_total jika ada, jika tidak gunakan total biasa
+                    $totalPrice = $item['final_total'] ?? $item['total'] ?? ($quantity * ($item['price'] ?? $product->price));
+                    
+                    if (!isset($categorySummary[$categoryName])) {
+                        $categorySummary[$categoryName] = [
+                            'category' => $categoryName,
+                            'total_quantity' => 0,
+                            'total_revenue' => 0
+                        ];
+                    }
+                    
+                    $categorySummary[$categoryName]['total_quantity'] += $quantity;
+                    $categorySummary[$categoryName]['total_revenue'] += $totalPrice;
+                }
+            }
+        }
+        
+        $categorySummary = collect($categorySummary)->values();
 
         // Get unique categories from products
         $categories = Product::distinct()->pluck('category')->filter();
 
         // Statistics
         $totalRevenue = $transactions->sum('total');
-        $totalProducts = count(array_unique(array_column($reportData, 'product_id')));
 
         return view('admin.reports.monthly', compact(
-            'reportData',
             'transactions',
             'dailyRevenueChart',
             'productSalesChart',
@@ -228,21 +271,18 @@ class ReportController extends Controller
         $endDate = Carbon::parse($date)->endOfDay();
 
         // Get transactions for the day
-        $transactions = Transaction::with([])
-            ->whereBetween('created_at', [$startDate, $endDate])
+        $transactions = Transaction::whereBetween('created_at', [$startDate, $endDate])
             ->where('status', 'completed')
             ->latest()
             ->get();
 
         // Process data
-        $reportData = [];
         $topProducts = [];
         $salesByHour = [];
         $totalQuantity = 0;
+        $totalProducts = 0;
 
         foreach ($transactions as $transaction) {
-            $items = $transaction->getTransactionItems();
-            
             // Sales by hour data
             $hour = $transaction->created_at->format('H');
             if (!isset($salesByHour[$hour])) {
@@ -250,51 +290,41 @@ class ReportController extends Controller
             }
             $salesByHour[$hour]++;
 
-            foreach ($items as $item) {
-                // Filter by category
-                if ($category && $item->product_category != $category) {
-                    continue;
-                }
-                
-                // Report data untuk table
-                $reportData[] = (object) [
-                    'created_at' => $transaction->created_at,
-                    'date' => $transaction->created_at,
-                    'product_id' => $item->product_id,
-                    'product_name' => $item->product_name,
-                    'product_category' => $item->product_category,
-                    'quantity' => $item->quantity,
-                    'unit_price' => $item->product_price,
-                    'total_price' => $item->total_price,
-                    'customer_name' => $transaction->customer_name,
-                    'transaction_code' => $transaction->transaction_code,
-                    'product' => (object) [
-                        'name' => $item->product_name,
-                        'category' => $item->product_category,
-                        'price' => $item->product_price,
-                        'image' => $item->product->image ?? null
-                    ],
-                    'user' => (object) [
-                        'name' => 'System'
-                    ]
-                ];
+            // Gunakan items_array accessor dari model
+            $items = $transaction->items_array;
+            
+            if (is_array($items)) {
+                foreach($items as $item) {
+                    // Get product data
+                    $product = Product::find($item['product_id'] ?? null);
+                    
+                    if (!$product) {
+                        continue;
+                    }
+                    
+                    // Filter by category
+                    if ($category && $product->category != $category) {
+                        continue;
+                    }
+                    
+                    $quantity = $item['quantity'] ?? 0;
+                    // Gunakan final_total jika ada, jika tidak gunakan total biasa
+                    $totalPrice = $item['final_total'] ?? $item['total'] ?? ($quantity * ($item['price'] ?? $product->price));
+                    
+                    $totalQuantity += $quantity;
+                    $totalProducts++;
 
-                $totalQuantity += $item->quantity;
-
-                // Top products data
-                if (!isset($topProducts[$item->product_id])) {
-                    $topProducts[$item->product_id] = (object) [
-                        'product' => (object) [
-                            'name' => $item->product_name,
-                            'category' => $item->product_category,
-                            'image' => $item->product->image ?? null
-                        ],
-                        'total_quantity' => 0,
-                        'total_revenue' => 0
-                    ];
+                    // Top products data
+                    if (!isset($topProducts[$product->id])) {
+                        $topProducts[$product->id] = (object) [
+                            'product' => $product,
+                            'total_quantity' => 0,
+                            'total_revenue' => 0
+                        ];
+                    }
+                    $topProducts[$product->id]->total_quantity += $quantity;
+                    $topProducts[$product->id]->total_revenue += $totalPrice;
                 }
-                $topProducts[$item->product_id]->total_quantity += $item->quantity;
-                $topProducts[$item->product_id]->total_revenue += $item->total_price;
             }
         }
 
@@ -308,20 +338,47 @@ class ReportController extends Controller
         })->sortBy('hour')->values();
 
         // Get category summary
-        $categorySummary = collect($reportData)->groupBy('product_category')->map(function ($items, $category) {
-            return (object) [
-                'category' => $category,
-                'total_quantity' => $items->sum('quantity'),
-                'total_revenue' => $items->sum('total_price')
-            ];
-        })->values();
+        $categorySummary = [];
+        foreach ($transactions as $transaction) {
+            // Gunakan items_array accessor dari model
+            $items = $transaction->items_array;
+            
+            if (is_array($items)) {
+                foreach($items as $item) {
+                    $product = Product::find($item['product_id'] ?? null);
+                    if (!$product) continue;
+                    
+                    // Filter by category
+                    if ($category && $product->category != $category) {
+                        continue;
+                    }
+                    
+                    $categoryName = $product->category;
+                    $quantity = $item['quantity'] ?? 0;
+                    // Gunakan final_total jika ada, jika tidak gunakan total biasa
+                    $totalPrice = $item['final_total'] ?? $item['total'] ?? ($quantity * ($item['price'] ?? $product->price));
+                    
+                    if (!isset($categorySummary[$categoryName])) {
+                        $categorySummary[$categoryName] = [
+                            'category' => $categoryName,
+                            'total_quantity' => 0,
+                            'total_revenue' => 0
+                        ];
+                    }
+                    
+                    $categorySummary[$categoryName]['total_quantity'] += $quantity;
+                    $categorySummary[$categoryName]['total_revenue'] += $totalPrice;
+                }
+            }
+        }
+        
+        $categorySummary = collect($categorySummary)->values();
 
         // Get unique categories from products
         $categories = Product::distinct()->pluck('category')->filter();
 
         // Statistics
         $totalRevenue = $transactions->sum('total');
-        $totalProducts = count(array_unique(array_column($reportData, 'product_id')));
 
         // Previous day comparison
         $previousDate = Carbon::parse($date)->subDay();
@@ -332,11 +389,14 @@ class ReportController extends Controller
         $previousDayData = [
             'transaction_count' => $previousDayTransactions->count(),
             'revenue' => $previousDayTransactions->sum('total'),
-            'quantity' => $previousDayTransactions->sum('total_quantity')
+            'quantity' => $previousDayTransactions->sum(function($transaction) {
+                // Gunakan items_array accessor dari model
+                $items = $transaction->items_array;
+                return is_array($items) ? array_sum(array_column($items, 'quantity')) : 0;
+            })
         ];
 
         return view('admin.reports.daily', compact(
-            'reportData',
             'transactions',
             'topProducts',
             'salesByHour',

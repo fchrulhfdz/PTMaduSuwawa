@@ -54,7 +54,7 @@
         <!-- Main Content -->
         <main class="container mx-auto px-4 py-8">
             <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
                     <div class="flex items-center justify-between">
                         <div>
@@ -96,6 +96,27 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">Total Berat Hari Ini</p>
+                            <h3 class="text-2xl font-bold text-gray-800">
+                                @php
+                                    $totalBerat = $todayStats->total_berat ?? 0;
+                                    if ($totalBerat >= 1000) {
+                                        echo number_format($totalBerat / 1000, 2) . ' kg';
+                                    } else {
+                                        echo number_format($totalBerat, 0) . ' g';
+                                    }
+                                @endphp
+                            </h3>
+                        </div>
+                        <div class="bg-orange-100 p-3 rounded-full">
+                            <i class="fas fa-weight text-orange-500 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Transactions Table -->
@@ -110,8 +131,9 @@
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kode</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items & Berat</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pembayaran</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
@@ -132,51 +154,109 @@
                                 <td class="px-6 py-4">
                                     <div class="text-sm text-gray-900">
                                         @php
+                                            $items = $transaction->items_array;
                                             $itemCount = 0;
                                             $itemNames = [];
-                                            foreach($transaction->items as $item) {
-                                                $itemCount += $item['quantity'];
-                                                $itemNames[] = $item['name'];
+                                            
+                                            if (is_array($items) && count($items) > 0) {
+                                                foreach($items as $item) {
+                                                    $quantity = $item['quantity'] ?? 0;
+                                                    $name = $item['name'] ?? 'Produk';
+                                                    $itemCount += $quantity;
+                                                    $itemNames[] = $name;
+                                                }
+                                                
+                                                echo count($items) . ' item (' . $itemCount . ' pcs)';
+                                                echo '<div class="text-xs text-gray-500 mt-1">';
+                                                echo implode(', ', array_slice($itemNames, 0, 2));
+                                                if (count($itemNames) > 2) {
+                                                    echo ' ... dan ' . (count($itemNames) - 2) . ' lainnya';
+                                                }
+                                                echo '</div>';
+                                                
+                                                // Tampilkan total berat dengan konversi otomatis
+                                                if ($transaction->total_berat > 0) {
+                                                    echo '<div class="text-xs text-blue-600 mt-1">';
+                                                    echo '<i class="fas fa-weight mr-1"></i>';
+                                                    // Konversi otomatis gram ke kg jika >= 1000
+                                                    if ($transaction->total_berat >= 1000) {
+                                                        echo number_format($transaction->total_berat / 1000, 2) . ' kg';
+                                                    } else {
+                                                        echo number_format($transaction->total_berat, 0) . ' g';
+                                                    }
+                                                    echo '</div>';
+                                                }
+                                            } else {
+                                                echo '<span class="text-gray-400">Tidak ada item</span>';
                                             }
                                         @endphp
-                                        {{ count($transaction->items) }} item ({{ $itemCount }} pcs)
-                                        <div class="text-xs text-gray-500 mt-1">
-                                            {{ implode(', ', array_slice($itemNames, 0, 2)) }}
-                                            @if(count($itemNames) > 2)
-                                                ... dan {{ count($itemNames) - 2 }} lainnya
-                                            @endif
-                                        </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-bold text-green-600">{{ $transaction->formatted_total }}</div>
+                                    <div class="text-sm font-bold text-green-600">
+                                        Rp {{ number_format($transaction->total, 0, ',', '.') }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        {{ $transaction->status === 'completed' ? 'bg-green-100 text-green-800' : 
+                                           ($transaction->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                                           'bg-red-100 text-red-800') }}">
+                                        {{ strtoupper($transaction->status) }}
+                                    </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                         {{ $transaction->payment_method === 'cash' ? 'bg-green-100 text-green-800' : 
-                                           ($transaction->payment_method === 'qris' ? 'bg-blue-100 text-blue-800' : 
-                                           'bg-purple-100 text-purple-800') }}">
-                                        {{ strtoupper(str_replace('_', ' ', $transaction->payment_method)) }}
+                                           'bg-blue-100 text-blue-800' }}">
+                                        {{ strtoupper($transaction->payment_method) }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $transaction->created_at_formatted }}
+                                    {{ $transaction->created_at->format('d M Y H:i') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
+                                        <a href="{{ route('admin.transactions.edit', $transaction->id) }}" 
+                                           class="text-blue-600 hover:text-blue-900"
+                                           title="Edit Transaksi">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
                                         <a href="{{ route('admin.transactions.print', $transaction->id) }}" 
                                            target="_blank"
-                                           class="text-blue-600 hover:text-blue-900">
-                                            <i class="fas fa-print"></i> Print
+                                           class="text-green-600 hover:text-green-900"
+                                           title="Print Struk">
+                                            <i class="fas fa-print"></i>
                                         </a>
+                                        
+                                        <!-- Untuk Confirm Payment -->
+@if($transaction->payment_method == 'transfer' && $transaction->status == 'pending')
+<a href="{{ route('admin.transactions.confirm-payment', $transaction->id) }}" 
+   class="text-purple-600 hover:text-purple-900"
+   title="Konfirmasi Pembayaran"
+   onclick="return confirm('Konfirmasi pembayaran transfer?')">
+    <i class="fas fa-check-circle"></i>
+</a>
+@endif
+
+<!-- Untuk Cancel Transaction -->
+@if($transaction->status != 'cancelled')
+<a href="{{ route('admin.transactions.cancel', $transaction->id) }}" 
+   class="text-orange-600 hover:text-orange-900"
+   title="Batalkan Transaksi"
+   onclick="return confirm('Batalkan transaksi ini? Stok akan dikembalikan.')">
+    <i class="fas fa-times-circle"></i>
+</a>
+@endif
+                                        
                                         <form action="{{ route('admin.transactions.destroy', $transaction->id) }}" 
                                               method="POST" 
                                               class="inline"
-                                              onsubmit="return confirm('Hapus transaksi ini?')">
+                                              onsubmit="return confirm('Hapus transaksi ini secara permanen?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900">
-                                                <i class="fas fa-trash"></i> Hapus
+                                            <button type="submit" class="text-red-600 hover:text-red-900" title="Hapus Permanen">
+                                                <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
                                     </div>
@@ -184,7 +264,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                <td colspan="8" class="px-6 py-4 text-center text-gray-500">
                                     <i class="fas fa-inbox text-4xl mb-2 block"></i>
                                     Belum ada transaksi
                                 </td>
@@ -217,6 +297,15 @@
         }
         setInterval(updateClock, 1000);
         updateClock();
+
+        // Alert untuk success/error messages
+        @if(session('success'))
+            alert('{{ session('success') }}');
+        @endif
+
+        @if(session('error'))
+            alert('{{ session('error') }}');
+        @endif
     </script>
 </body>
 </html>

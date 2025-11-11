@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Dashboard - Smart Cashier')</title>
+    <!-- CSRF Token Meta Tag -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @stack('styles')
@@ -22,16 +24,19 @@
                         <div class="text-right">
                             <div class="text-sm opacity-90">{{ date('d F Y') }}</div>
                             <div id="live-clock" class="text-lg font-mono font-bold"></div>
+                            <!-- Display user role -->
+                            <div class="text-xs opacity-75 mt-1">
+                                Role: {{ Auth::user()->role ?? 'Admin' }}
+                            </div>
                         </div>
-                        <!-- Logout Button as Icon -->
-                        <form method="POST" action="{{ route('logout') }}" class="inline" id="logout-form">
-                            @csrf
-                            <button type="submit" 
-                                    class="flex items-center justify-center w-10 h-10 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg hover:shadow-xl"
-                                    title="Logout">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </button>
-                        </form>
+                        <form method="POST" action="{{ route('custom.logout') }}" class="inline" id="logout-form">
+    @csrf
+    <button type="submit" 
+            class="flex items-center justify-center w-10 h-10 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg hover:shadow-xl"
+            title="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+    </button>
+</form>
                     </div>
                 </div>
             </div>
@@ -41,52 +46,77 @@
         <nav class="bg-white shadow-sm border-b sticky top-[72px] z-40">
             <div class="container mx-auto px-4">
                 <div class="flex flex-wrap gap-3 py-3">
+                    <!-- Dashboard - Super Admin & Admin -->
+                    @if(Auth::user()->role === 'super admin' || Auth::user()->role === 'admin')
                     <a href="{{ route('admin.dashboard') }}" 
                        class="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
                         <i class="fas fa-chart-line"></i>
                         <span>Dashboard</span>
                     </a>
+                    @endif
+
+                    <!-- Kasir - Super Admin & Admin -->
+                    @if(Auth::user()->role === 'super admin' || Auth::user()->role === 'admin')
                     <a href="{{ route('admin.transactions.create') }}" 
                        class="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
                         <i class="fas fa-plus"></i>
                         <span>Kasir</span>
                     </a>
+                    @endif
+
+                    <!-- Daftar Transaksi - Super Admin & Admin -->
+                    @if(Auth::user()->role === 'super admin' || Auth::user()->role === 'admin')
                     <a href="{{ route('admin.transactions.index') }}" 
                        class="flex items-center space-x-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
                         <i class="fas fa-list"></i>
                         <span>Daftar Transaksi</span>
                     </a>
+                    @endif
+
+                    <!-- Produk - Super Admin Only -->
+                    @if(Auth::user()->role === 'super admin')
                     <a href="{{ route('admin.products.index') }}" 
                        class="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
                         <i class="fas fa-box"></i>
                         <span>Produk</span>
                     </a>
+                    @endif
+
+                    <!-- Testimonials - Super Admin Only -->
+                    @if(Auth::user()->role === 'super admin')
                     <a href="{{ route('admin.testimonials.index') }}" 
                        class="flex items-center space-x-2 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors">
                         <i class="fas fa-comment-alt"></i>
                         <span>Testimonials</span>
                     </a>
+                    @endif
                     
-                    <!-- Reports Button -->
+                    <!-- Laporan - Super Admin & Admin -->
+                    @if(Auth::user()->role === 'super admin' || Auth::user()->role === 'admin')
                     <a href="{{ route('admin.reports.index') }}" 
                        class="flex items-center space-x-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">
                         <i class="fas fa-chart-bar"></i>
                         <span>Laporan</span>
                     </a>
+                    @endif
 
-                    <!-- Profit Calculation Button -->
+                    <!-- Hitung Laba - Super Admin Only -->
+                    @if(Auth::user()->role === 'super admin')
                     <a href="{{ route('admin.profit.index') }}" 
                        class="flex items-center space-x-2 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors">
                         <i class="fas fa-calculator"></i>
                         <span>Hitung Laba</span>
                     </a>
+                    @endif
 
-                    <!-- Settings Button -->
+                    <!-- Pengaturan - Super Admin Only -->
+                    @if(Auth::user()->role === 'super admin')
                     <a href="{{ route('admin.settings.index') }}" 
                        class="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
                         <i class="fas fa-cog"></i>
                         <span>Pengaturan</span>
                     </a>
+                    @endif
                 </div>
             </div>
         </nav>
@@ -119,13 +149,39 @@
             setInterval(updateClock, 1000);
             updateClock();
 
-            // Confirm logout
+            // Setup CSRF token for AJAX requests
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if (csrfToken) {
+                const token = csrfToken.getAttribute('content');
+                
+                // Override fetch to include CSRF token
+                const originalFetch = window.fetch;
+                window.fetch = function(url, options = {}) {
+                    // Add CSRF token to all non-GET requests
+                    if (options.method && options.method.toUpperCase() !== 'GET') {
+                        options.headers = {
+                            ...options.headers,
+                            'X-CSRF-TOKEN': token,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        };
+                    }
+                    return originalFetch(url, options);
+                };
+            }
+
+            // Confirm logout dan redirect ke login
             const logoutForm = document.getElementById('logout-form');
             if (logoutForm) {
                 logoutForm.addEventListener('submit', function(e) {
                     e.preventDefault();
                     if (confirm('Apakah Anda yakin ingin logout?')) {
+                        // Submit form logout
                         this.submit();
+                        
+                        // Redirect ke halaman login setelah logout
+                        setTimeout(function() {
+                            window.location.href = "{{ route('login') }}";
+                        }, 1000);
                     }
                 });
             }

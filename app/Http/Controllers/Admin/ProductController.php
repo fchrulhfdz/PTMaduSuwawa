@@ -27,6 +27,8 @@ class ProductController extends Controller
             'category' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'berat_isi' => 'nullable|string|max:50',
+            'satuan_berat' => 'nullable|string|max:20',
             'description' => 'nullable|string',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
@@ -56,6 +58,8 @@ class ProductController extends Controller
             'category' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'berat_isi' => 'nullable|string|max:50',
+            'satuan_berat' => 'nullable|string|max:20',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);

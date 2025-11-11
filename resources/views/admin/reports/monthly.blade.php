@@ -155,56 +155,90 @@
                         <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Harga Satuan</th>
                         <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Total Harga</th>
                         <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Customer</th>
+                        <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Metode Bayar</th>
+                        <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
+                        <th class="px-8 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Keterangan</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-100">
-                    @forelse($reportData as $item)
-                    <tr class="hover:bg-gray-50/80 transition-colors duration-150">
-                        <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ $item->date->format('d/m/Y') }}
-                        </td>
-                        <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
-                            {{ $item->transaction_code }}
-                        </td>
-                        <td class="px-8 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10">
-                                    @if($item->product->image)
-                                        <img class="h-10 w-10 rounded-xl object-cover shadow-sm" 
-                                             src="{{ asset('storage/' . $item->product->image) }}" 
-                                             alt="{{ $item->product->name }}">
-                                    @else
-                                        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-sm">
-                                            <i class="fas fa-box text-gray-400"></i>
+                    @forelse($transactions as $transaction)
+                        @php
+                            // Decode items dari JSON
+                            $items = is_string($transaction->items) ? json_decode($transaction->items, true) : $transaction->items;
+                        @endphp
+                        @if(is_array($items))
+                            @foreach($items as $item)
+                                @php
+                                    $product = \App\Models\Product::find($item['product_id'] ?? null);
+                                    // Skip jika produk tidak ditemukan
+                                    if (!$product) continue;
+                                @endphp
+                                <tr class="hover:bg-gray-50/80 transition-colors duration-150">
+                                    <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        {{ $transaction->created_at->format('d/m/Y') }}
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
+                                        {{ $transaction->transaction_code }}
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                @if($product->image)
+                                                    <img class="h-10 w-10 rounded-xl object-cover shadow-sm" 
+                                                         src="{{ asset('storage/' . $product->image) }}" 
+                                                         alt="{{ $product->name }}">
+                                                @else
+                                                    <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-sm">
+                                                        <i class="fas fa-box text-gray-400"></i>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-semibold text-gray-900">{{ $product->name }}</div>
+                                            </div>
                                         </div>
-                                    @endif
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-semibold text-gray-900">{{ $item->product_name }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-8 py-4 whitespace-nowrap">
-                            <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-800 border border-amber-200">
-                                {{ $item->product_category }}
-                            </span>
-                        </td>
-                        <td class="px-8 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                            {{ $item->quantity }}
-                        </td>
-                        <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            Rp {{ number_format($item->unit_price, 0, ',', '.') }}
-                        </td>
-                        <td class="px-8 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                            Rp {{ number_format($item->total_price, 0, ',', '.') }}
-                        </td>
-                        <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-700">
-                            {{ $item->customer_name ?? 'Walk-in Customer' }}
-                        </td>
-                    </tr>
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-800 border border-amber-200">
+                                            {{ $product->category }}
+                                        </span>
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                                        {{ $item['quantity'] ?? 0 }}
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        Rp {{ number_format($item['price'] ?? $product->price, 0, ',', '.') }}
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                                        Rp {{ number_format(($item['quantity'] ?? 0) * ($item['price'] ?? $product->price), 0, ',', '.') }}
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-700">
+                                        {{ $transaction->customer_name ?? 'Walk-in Customer' }}
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full 
+                                            {{ $transaction->payment_method == 'cash' ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-800 border border-green-200' : 
+                                               'bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-800 border border-blue-200' }}">
+                                            {{ ucfirst($transaction->payment_method) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap">
+                                        <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full 
+                                            {{ $transaction->status == 'completed' ? 'bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-800 border border-emerald-200' : 
+                                               ($transaction->status == 'pending' ? 'bg-gradient-to-r from-yellow-50 to-amber-50 text-yellow-800 border border-yellow-200' : 
+                                               'bg-gradient-to-r from-red-50 to-pink-50 text-red-800 border border-red-200') }}">
+                                            {{ ucfirst($transaction->status) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-8 py-4 whitespace-nowrap text-sm text-gray-600 max-w-xs truncate">
+                                        {{ $transaction->notes ?? '-' }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endif
                     @empty
                     <tr>
-                        <td colspan="8" class="px-8 py-12 text-center">
+                        <td colspan="11" class="px-8 py-12 text-center">
                             <div class="flex flex-col items-center justify-center text-gray-400">
                                 <i class="fas fa-inbox text-4xl mb-3"></i>
                                 <p class="text-lg font-medium">Tidak ada transaksi</p>
@@ -214,7 +248,7 @@
                     </tr>
                     @endforelse
                 </tbody>
-                @if(count($reportData) > 0)
+                @if(count($transactions) > 0)
                 <tfoot class="bg-gradient-to-r from-gray-50 to-gray-100">
                     <tr>
                         <td colspan="4" class="px-8 py-4 text-sm font-bold text-gray-900 text-right">
@@ -227,7 +261,7 @@
                         <td class="px-8 py-4 text-sm font-bold text-gray-900">
                             Rp {{ number_format($totalRevenue, 0, ',', '.') }}
                         </td>
-                        <td class="px-8 py-4"></td>
+                        <td colspan="4" class="px-8 py-4"></td>
                     </tr>
                 </tfoot>
                 @endif
@@ -294,27 +328,44 @@ function printReport() {
                         <th>Harga Satuan</th>
                         <th>Total Harga</th>
                         <th>Customer</th>
+                        <th>Metode Bayar</th>
+                        <th>Status</th>
+                        <th>Keterangan</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($reportData as $item)
-                    <tr>
-                        <td>{{ $item->date->format('d/m/Y') }}</td>
-                        <td>{{ $item->transaction_code }}</td>
-                        <td>{{ $item->product_name }}</td>
-                        <td>{{ $item->product_category }}</td>
-                        <td>{{ $item->quantity }}</td>
-                        <td>Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
-                        <td>Rp {{ number_format($item->total_price, 0, ',', '.') }}</td>
-                        <td>{{ $item->customer_name ?? 'Walk-in Customer' }}</td>
-                    </tr>
+                    @foreach($transactions as $transaction)
+                        @php
+                            $items = is_string($transaction->items) ? json_decode($transaction->items, true) : $transaction->items;
+                        @endphp
+                        @if(is_array($items))
+                            @foreach($items as $item)
+                                @php
+                                    $product = \App\Models\Product::find($item['product_id'] ?? null);
+                                    if (!$product) continue;
+                                @endphp
+                                <tr>
+                                    <td>{{ $transaction->created_at->format('d/m/Y') }}</td>
+                                    <td>{{ $transaction->transaction_code }}</td>
+                                    <td>{{ $product->name }}</td>
+                                    <td>{{ $product->category }}</td>
+                                    <td>{{ $item['quantity'] ?? 0 }}</td>
+                                    <td>Rp {{ number_format($item['price'] ?? $product->price, 0, ',', '.') }}</td>
+                                    <td>Rp {{ number_format(($item['quantity'] ?? 0) * ($item['price'] ?? $product->price), 0, ',', '.') }}</td>
+                                    <td>{{ $transaction->customer_name ?? 'Walk-in Customer' }}</td>
+                                    <td>{{ ucfirst($transaction->payment_method) }}</td>
+                                    <td>{{ ucfirst($transaction->status) }}</td>
+                                    <td>{{ $transaction->notes ?? '-' }}</td>
+                                </tr>
+                            @endforeach
+                        @endif
                     @endforeach
                     <tr class="total-row">
                         <td colspan="4"><strong>TOTAL</strong></td>
                         <td><strong>{{ $totalQuantity }}</strong></td>
                         <td></td>
                         <td><strong>Rp {{ number_format($totalRevenue, 0, ',', '.') }}</strong></td>
-                        <td></td>
+                        <td colspan="4"></td>
                     </tr>
                 </tbody>
             </table>

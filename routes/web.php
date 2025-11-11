@@ -29,14 +29,20 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
     // Products
     Route::resource('/products', ProductController::class);
 
-    // Transactions - Updated with new routes for smart cashier
+    // Transactions - Main resource route
     Route::resource('/transactions', TransactionController::class);
     
     // Additional transaction routes for smart cashier features
-    Route::prefix('transactions')->group(function () {
-        Route::get('/{id}/print', [TransactionController::class, 'printReceipt'])->name('transactions.print');
-        Route::get('/today/sales', [TransactionController::class, 'getTodaySales'])->name('transactions.today.sales');
-        Route::get('/product/{id}', [TransactionController::class, 'getProduct'])->name('transactions.product.get');
+    Route::prefix('transactions')->name('transactions.')->group(function () {
+        Route::get('/{id}/print', [TransactionController::class, 'printReceipt'])->name('print');
+        Route::get('/today/sales', [TransactionController::class, 'getTodaySales'])->name('today.sales');
+        Route::get('/product/{id}', [TransactionController::class, 'getProduct'])->name('product.get');
+        
+        // Tambahkan route baru untuk fitur tambahan - menggunakan GET untuk memudahkan
+        Route::get('/{id}/confirm-payment', [TransactionController::class, 'confirmPayment'])->name('confirm-payment');
+        Route::get('/{id}/cancel', [TransactionController::class, 'cancelTransaction'])->name('cancel');
+        Route::get('/filter/berat', [TransactionController::class, 'filterByBerat'])->name('filter-berat');
+        Route::get('/berat/stats', [TransactionController::class, 'getBeratStats'])->name('berat-stats');
     });
 
     // Testimonials
@@ -50,14 +56,14 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
     Route::get('/reports/daily', [ReportController::class, 'daily'])->name('reports.daily');
 
     // Profit Calculation Routes
-Route::prefix('profit')->name('profit.')->group(function () {
-    Route::get('/', [ProfitCalculationController::class, 'index'])->name('index');
-    Route::post('/calculate', [ProfitCalculationController::class, 'calculate'])->name('calculate');
-    Route::post('/calculate-from-transactions', [ProfitCalculationController::class, 'calculateFromTransactions'])->name('calculate-from-transactions');
-    Route::get('/{profit}', [ProfitCalculationController::class, 'show'])->name('show');
-    Route::delete('/{profit}', [ProfitCalculationController::class, 'destroy'])->name('destroy');
-    Route::get('/quick-stats', [ProfitCalculationController::class, 'getQuickStats'])->name('quick-stats');
-});
+    Route::prefix('profit')->name('profit.')->group(function () {
+        Route::get('/', [ProfitCalculationController::class, 'index'])->name('index');
+        Route::post('/calculate', [ProfitCalculationController::class, 'calculate'])->name('calculate');
+        Route::post('/calculate-from-transactions', [ProfitCalculationController::class, 'calculateFromTransactions'])->name('calculate-from-transactions');
+        Route::get('/{profit}', [ProfitCalculationController::class, 'show'])->name('show');
+        Route::delete('/{profit}', [ProfitCalculationController::class, 'destroy'])->name('destroy');
+        Route::get('/quick-stats', [ProfitCalculationController::class, 'getQuickStats'])->name('quick-stats');
+    });
 
     // Settings
     Route::prefix('settings')->group(function () {
@@ -90,5 +96,11 @@ Route::prefix('profit')->name('profit.')->group(function () {
 Route::get('/dashboard', function () {
     return redirect()->route('admin.dashboard');
 })->middleware(['auth'])->name('dashboard');
+
+// Custom logout route
+Route::post('/custom-logout', function () {
+    Auth::logout();
+    return redirect()->route('login');
+})->name('custom.logout');
 
 require __DIR__.'/auth.php';

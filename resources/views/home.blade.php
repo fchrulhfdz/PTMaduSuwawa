@@ -78,82 +78,78 @@
         </div>
         
         <!-- Products Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            @foreach($products->take(3) as $product)
-            <div class="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden hover:-translate-y-2">
-                <!-- Product Image -->
-                <div class="relative h-80 bg-gradient-to-br from-amber-50 to-orange-100 overflow-hidden">
-                    @if($product->image)
-                        <img src="{{ asset('storage/' . $product->image) }}" 
-                             alt="{{ $product->name }}" 
-                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                    @else
-                        <div class="w-full h-full flex items-center justify-center">
-                            <div class="text-center">
-                                <i class="fas fa-honey-pot text-8xl text-amber-400 mb-4"></i>
-                                <p class="text-amber-600 font-bold text-lg">Madu Suwawa</p>
-                            </div>
-                        </div>
-                    @endif
-                    
-                    <!-- Stock Badge -->
-                    <div class="absolute top-6 right-6">
-                        @if($product->stock > 0)
-                            <span class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center">
-                                <i class="fas fa-check-circle mr-2"></i>
-                                Tersedia
-                            </span>
-                        @else
-                            <span class="bg-gradient-to-r from-red-500 to-pink-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center">
-                                <i class="fas fa-clock mr-2"></i>
-                                Habis
-                            </span>
-                        @endif
-                    </div>
-
-                    <!-- Hover Action -->
-                    <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+    @foreach($products->take(3) as $product)
+    <div class="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden hover:-translate-y-2 flex flex-col h-full">
+        <!-- Product Image -->
+        <div class="relative h-80 bg-gradient-to-br from-amber-50 to-orange-100 overflow-hidden">
+            @if($product->image)
+                <img src="{{ asset('storage/' . $product->image) }}" 
+                     alt="{{ $product->name }}" 
+                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+            @else
+                <div class="w-full h-full flex items-center justify-center">
+                    <div class="text-center">
+                        <i class="fas fa-honey-pot text-8xl text-amber-400 mb-4"></i>
+                        <p class="text-amber-600 font-bold text-lg">Madu Suwawa</p>
                     </div>
                 </div>
+            @endif
+            
+            <!-- Stock Badge -->
+            <div class="absolute top-6 right-6">
+                @if($product->stock > 0)
+                    <span class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        Tersedia
+                    </span>
+                @else
+                    <span class="bg-gradient-to-r from-red-500 to-pink-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center">
+                        <i class="fas fa-clock mr-2"></i>
+                        Habis
+                    </span>
+                @endif
+            </div>
 
-                <!-- Product Info -->
-                <div class="p-8">
-                    <div class="flex items-start justify-between mb-4">
-                        <h3 class="text-2xl font-bold text-gray-900 leading-tight">{{ $product->name }}</h3>
-                        <div class="flex items-center text-amber-400 text-sm">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                        </div>
-                    </div>
-                    
-                    <p class="text-gray-600 mb-6 leading-relaxed line-clamp-2">{{ $product->description }}</p>
-                    
-                    <!-- Price and Stock -->
-                    <div class="flex items-center justify-between mb-6">
-                        <div>
-                            <span class="text-3xl font-bold text-amber-600">
-                                Rp {{ number_format($product->price, 0, ',', '.') }}
-                            </span>
-                            <div class="text-sm text-gray-500 mt-1">per 500ml</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm font-semibold text-gray-700">Stok</div>
-                            <div class="text-lg font-bold text-gray-900">{{ $product->stock }}</div>
-                        </div>
-                    </div>
+            <!-- Hover Action -->
+            <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0">
+            </div>
+        </div>
 
-                    <!-- Action Button -->
-                    <button class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-4 px-6 rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3 group">
-                        <i class="fas fa-shopping-cart group-hover:scale-110 transition-transform"></i>
-                        Tambah ke Keranjang
-                    </button>
+        <!-- Product Info -->
+        <div class="p-8 flex-1 flex flex-col">
+            <div class="flex items-start justify-between mb-4">
+                <h3 class="text-2xl font-bold text-gray-900 leading-tight">{{ $product->name }}</h3>
+                <div class="flex items-center text-amber-400 text-sm">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
                 </div>
             </div>
-            @endforeach
+            
+            <p class="text-gray-600 mb-6 leading-relaxed line-clamp-2 flex-1">{{ $product->description }}</p>
+            
+            <!-- Price and Stock - Sticky di bagian bawah -->
+            <div class="mt-auto pt-6 border-t border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-3xl font-bold text-amber-600">
+                            Rp {{ number_format($product->price, 0, ',', '.') }}
+                        </span>
+                        <div class="text-sm text-gray-500 mt-1">per 500ml</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-semibold text-gray-700">Stok</div>
+                        <div class="text-lg font-bold text-gray-900">{{ $product->stock }}</div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+    @endforeach
+</div>
         
         <!-- View All Button -->
         <div class="text-center">

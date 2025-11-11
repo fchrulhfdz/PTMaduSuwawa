@@ -12,11 +12,13 @@
     <nav class="bg-white/95 backdrop-blur-sm shadow-2xl sticky top-0 z-50 border-b border-amber-100">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center py-4">
-                <!-- Logo -->
+                <!-- Logo dengan Gambar -->
                 <div class="flex items-center space-x-3 group">
                     <div class="relative">
-                        <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                            <i class="fas fa-honeycomb text-white text-lg"></i>
+                        <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+                            <img src="{{ asset('storage/logo/logo madu suwawa.jpg') }}" 
+                                 alt="Madu Suwawa Logo" 
+                                 class="w-full h-full object-cover">
                         </div>
                         <div class="absolute -inset-1 bg-gradient-to-r from-amber-400 to-orange-400 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
                     </div>
@@ -146,12 +148,14 @@
         <div class="absolute bottom-0 right-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
         
         <div class="relative max-w-7xl mx-auto px-4 py-16 z-10">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                 <!-- Brand Section -->
                 <div class="space-y-6">
                     <div class="flex items-center space-x-3 group">
-                        <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
-                            <i class="fas fa-honeycomb text-white text-xl"></i>
+                        <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300 overflow-hidden">
+                            <img src="{{ asset('storage/logo/logo madu suwawa.jpg') }}" 
+                                 alt="Madu Suwawa Logo" 
+                                 class="w-full h-full object-cover">
                         </div>
                         <span class="text-2xl font-bold text-white">Madu Suwawa</span>
                     </div>
@@ -174,40 +178,6 @@
                     </div>
                 </div>
                 
-                <!-- Contact Section -->
-                <div class="space-y-6">
-                    <h3 class="text-xl font-bold text-white mb-6">Kontak Kami</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center space-x-4 group">
-                            <div class="w-10 h-10 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                <i class="fas fa-map-marker-alt text-amber-400"></i>
-                            </div>
-                            <div>
-                                <p class="text-gray-300 font-medium">Alamat</p>
-                                <p class="text-gray-400 text-sm">Suwawa, Bone Bolango</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-4 group">
-                            <div class="w-10 h-10 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                <i class="fas fa-phone text-amber-400"></i>
-                            </div>
-                            <div>
-                                <p class="text-gray-300 font-medium">Telepon</p>
-                                <p class="text-gray-400 text-sm">+62 812-3456-7890</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-4 group">
-                            <div class="w-10 h-10 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                <i class="fas fa-envelope text-amber-400"></i>
-                            </div>
-                            <div>
-                                <p class="text-gray-300 font-medium">Email</p>
-                                <p class="text-gray-400 text-sm">info@madusuwawa.com</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
                 <!-- Quick Links -->
                 <div class="space-y-6">
                     <h3 class="text-xl font-bold text-white mb-6">Tautan Cepat</h3>
@@ -223,7 +193,6 @@
                         <a href="{{ route('about') }}" class="group flex items-center space-x-2 text-gray-300 hover:text-amber-400 transition-all duration-300">
                             <i class="fas fa-chevron-right text-xs text-amber-500 group-hover:translate-x-1 transition-transform duration-300"></i>
                             <span>Tentang Kami</span>
-                        </a>
                         </a>
                         <a href="{{ route('testimoni') }}" class="group flex items-center space-x-2 text-gray-300 hover:text-amber-400 transition-all duration-300">
                             <i class="fas fa-chevron-right text-xs text-amber-500 group-hover:translate-x-1 transition-transform duration-300"></i>
