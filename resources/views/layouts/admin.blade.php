@@ -44,82 +44,91 @@
 
         <!-- Navigation - Sticky -->
         <nav class="bg-white shadow-sm border-b sticky top-[72px] z-40">
-            <div class="container mx-auto px-4">
-                <div class="flex flex-wrap gap-3 py-3">
-                    <!-- Dashboard - Super Admin & Admin -->
-                    @if(Auth::user()->role === 'super admin' || Auth::user()->role === 'admin')
-                    <a href="{{ route('admin.dashboard') }}" 
-                       class="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Dashboard</span>
-                    </a>
-                    @endif
+    <div class="container mx-auto px-4">
+        <div class="flex flex-wrap gap-3 py-3">
+            <!-- Dashboard - Super Admin & Admin -->
+            @if(Auth::user()->role === 'super admin' || Auth::user()->role === 'admin')
+            <a href="{{ route('admin.dashboard') }}" 
+               class="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            @endif
 
-                    <!-- Kasir - Super Admin & Admin -->
-                    @if(Auth::user()->role === 'super admin' || Auth::user()->role === 'admin')
-                    <a href="{{ route('admin.transactions.create') }}" 
-                       class="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                        <i class="fas fa-plus"></i>
-                        <span>Kasir</span>
-                    </a>
-                    @endif
+            <!-- Kasir - Super Admin & Admin -->
+            @if(Auth::user()->role === 'super admin' || Auth::user()->role === 'admin')
+            <a href="{{ route('admin.transactions.create') }}" 
+               class="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                <i class="fas fa-plus"></i>
+                <span>Kasir</span>
+            </a>
+            @endif
 
-                    <!-- Daftar Transaksi - Super Admin & Admin -->
-                    @if(Auth::user()->role === 'super admin' || Auth::user()->role === 'admin')
-                    <a href="{{ route('admin.transactions.index') }}" 
-                       class="flex items-center space-x-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
-                        <i class="fas fa-list"></i>
-                        <span>Daftar Transaksi</span>
-                    </a>
-                    @endif
+            <!-- Daftar Transaksi - Super Admin & Admin -->
+            @if(Auth::user()->role === 'super admin' || Auth::user()->role === 'admin')
+            <a href="{{ route('admin.transactions.index') }}" 
+               class="flex items-center space-x-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
+                <i class="fas fa-list"></i>
+                <span>Daftar Transaksi</span>
+            </a>
+            @endif
 
-                    <!-- Produk - Super Admin Only -->
-                    @if(Auth::user()->role === 'super admin')
-                    <a href="{{ route('admin.products.index') }}" 
-                       class="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
-                        <i class="fas fa-box"></i>
-                        <span>Produk</span>
-                    </a>
-                    @endif
+            <!-- Produk - Super Admin Only -->
+            @if(Auth::user()->role === 'super admin')
+            <a href="{{ route('admin.products.index') }}" 
+               class="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+                <i class="fas fa-box"></i>
+                <span>Produk</span>
+            </a>
+            @endif
 
-                    <!-- Testimonials - Super Admin Only -->
-                    @if(Auth::user()->role === 'super admin')
-                    <a href="{{ route('admin.testimonials.index') }}" 
-                       class="flex items-center space-x-2 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors">
-                        <i class="fas fa-comment-alt"></i>
-                        <span>Testimonials</span>
-                    </a>
-                    @endif
-                    
-                    <!-- Laporan - Super Admin & Admin -->
-                    @if(Auth::user()->role === 'super admin' || Auth::user()->role === 'admin')
-                    <a href="{{ route('admin.reports.index') }}" 
-                       class="flex items-center space-x-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Laporan</span>
-                    </a>
-                    @endif
+            <!-- Testimonials - Super Admin Only -->
+            @if(Auth::user()->role === 'super admin')
+            <a href="{{ route('admin.testimonials.index') }}" 
+               class="flex items-center space-x-2 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors">
+                <i class="fas fa-comment-alt"></i>
+                <span>Testimonials</span>
+            </a>
+            @endif
 
-                    <!-- Hitung Laba - Super Admin Only -->
-                    @if(Auth::user()->role === 'super admin')
-                    <a href="{{ route('admin.profit.index') }}" 
-                       class="flex items-center space-x-2 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors">
-                        <i class="fas fa-calculator"></i>
-                        <span>Hitung Laba</span>
-                    </a>
-                    @endif
+            <!-- Contact/Keluhan - Super Admin Only -->
+            @if(Auth::user()->role === 'super admin')
+            <a href="{{ route('admin.contacts.index') }}" 
+               class="flex items-center space-x-2 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors">
+                <i class="fas fa-inbox"></i>
+                <span>Keluhan & Masukan</span>
+            </a>
+            @endif
+            
+            <!-- Laporan - Super Admin & Admin -->
+            @if(Auth::user()->role === 'super admin' || Auth::user()->role === 'admin')
+            <a href="{{ route('admin.reports.index') }}" 
+               class="flex items-center space-x-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">
+                <i class="fas fa-chart-bar"></i>
+                <span>Laporan</span>
+            </a>
+            @endif
 
-                    <!-- Pengaturan - Super Admin Only -->
-                    @if(Auth::user()->role === 'super admin')
-                    <a href="{{ route('admin.settings.index') }}" 
-                       class="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
-                        <i class="fas fa-cog"></i>
-                        <span>Pengaturan</span>
-                    </a>
-                    @endif
-                </div>
-            </div>
-        </nav>
+            <!-- Hitung Laba - Super Admin Only -->
+            @if(Auth::user()->role === 'super admin')
+            <a href="{{ route('admin.profit.index') }}" 
+               class="flex items-center space-x-2 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors">
+                <i class="fas fa-calculator"></i>
+                <span>Hitung Laba</span>
+            </a>
+            @endif
+
+            <!-- Pengaturan - Super Admin Only -->
+            @if(Auth::user()->role === 'super admin')
+            <a href="{{ route('admin.settings.index') }}" 
+               class="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                <i class="fas fa-cog"></i>
+                <span>Pengaturan</span>
+            </a>
+            @endif
+        </div>
+    </div>
+</nav>
 
         <!-- Main Content -->
         <main class="container mx-auto px-4 py-8">

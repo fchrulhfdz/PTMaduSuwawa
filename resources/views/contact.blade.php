@@ -134,92 +134,111 @@
                         <p class="text-gray-600">Sampaikan keluhan, kritik, atau saran Anda untuk perbaikan layanan kami</p>
                     </div>
                     
-                    <form id="contact-form" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Name -->
-                            <div class="group">
-                                <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
-                                    Nama Lengkap <span class="text-red-500">*</span>
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="name" 
-                                    name="name"
-                                    required
-                                    class="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 focus:bg-white transition-all duration-300 outline-none"
-                                    placeholder="Masukkan nama lengkap">
-                            </div>
+                    <form action="{{ route('contact.submit') }}" method="POST" id="contact-form" class="space-y-6">
+    @csrf
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Name -->
+        <div class="group">
+            <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
+                Nama Lengkap <span class="text-red-500">*</span>
+            </label>
+            <input 
+                type="text" 
+                id="name" 
+                name="name"
+                required
+                class="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 focus:bg-white transition-all duration-300 outline-none"
+                placeholder="Masukkan nama lengkap"
+                value="{{ old('name') }}">
+            @error('name')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
 
-                            <!-- Email -->
-                            <div class="group">
-                                <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
-                                    Email <span class="text-red-500">*</span>
-                                </label>
-                                <input 
-                                    type="email" 
-                                    id="email" 
-                                    name="email"
-                                    required
-                                    class="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 focus:bg-white transition-all duration-300 outline-none"
-                                    placeholder="nama@email.com">
-                            </div>
-                        </div>
+        <!-- Email -->
+        <div class="group">
+            <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
+                Email <span class="text-red-500">*</span>
+            </label>
+            <input 
+                type="email" 
+                id="email" 
+                name="email"
+                required
+                class="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 focus:bg-white transition-all duration-300 outline-none"
+                placeholder="nama@email.com"
+                value="{{ old('email') }}">
+            @error('email')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+    </div>
 
-                        <!-- Phone -->
-                        <div class="group">
-                            <label for="phone" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Nomor Telepon
-                            </label>
-                            <input 
-                                type="tel" 
-                                id="phone" 
-                                name="phone"
-                                class="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 focus:bg-white transition-all duration-300 outline-none"
-                                placeholder="+62 812-3456-7890">
-                        </div>
+    <!-- Phone -->
+    <div class="group">
+        <label for="phone" class="block text-sm font-semibold text-gray-700 mb-2">
+            Nomor Telepon
+        </label>
+        <input 
+            type="tel" 
+            id="phone" 
+            name="phone"
+            class="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 focus:bg-white transition-all duration-300 outline-none"
+            placeholder="+62 812-3456-7890"
+            value="{{ old('phone') }}">
+        @error('phone')
+            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+        @enderror
+    </div>
 
-                        <!-- Subject -->
-                        <div class="group">
-                            <label for="subject" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Jenis Masukan <span class="text-red-500">*</span>
-                            </label>
-                            <select 
-                                id="subject" 
-                                name="subject"
-                                required
-                                class="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 focus:bg-white transition-all duration-300 outline-none appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNCw2TDgsMTBMMTIsNiIgc3Ryb2tlPSIjOTk5IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==')] bg-no-repeat bg-[center_right_1rem]">
-                                <option value="">Pilih jenis masukan</option>
-                                <option value="keluhan">Keluhan Produk</option>
-                                <option value="pelayanan">Keluhan Pelayanan</option>
-                                <option value="saran">Saran Perbaikan</option>
-                                <option value="kritik">Kritik Konstruktif</option>
-                                <option value="pujian">Pujian & Apresiasi</option>
-                                <option value="lainnya">Lainnya</option>
-                            </select>
-                        </div>
+    <!-- Subject -->
+    <div class="group">
+        <label for="subject" class="block text-sm font-semibold text-gray-700 mb-2">
+            Jenis Masukan <span class="text-red-500">*</span>
+        </label>
+        <select 
+            id="subject" 
+            name="subject"
+            required
+            class="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 focus:bg-white transition-all duration-300 outline-none appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNCw2TDgsMTBMMTIsNiIgc3Ryb2tlPSIjOTk5IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==')] bg-no-repeat bg-[center_right_1rem]">
+            <option value="">Pilih jenis masukan</option>
+            <option value="keluhan" {{ old('subject') == 'keluhan' ? 'selected' : '' }}>Keluhan Produk</option>
+            <option value="pelayanan" {{ old('subject') == 'pelayanan' ? 'selected' : '' }}>Keluhan Pelayanan</option>
+            <option value="saran" {{ old('subject') == 'saran' ? 'selected' : '' }}>Saran Perbaikan</option>
+            <option value="kritik" {{ old('subject') == 'kritik' ? 'selected' : '' }}>Kritik Konstruktif</option>
+            <option value="pujian" {{ old('subject') == 'pujian' ? 'selected' : '' }}>Pujian & Apresiasi</option>
+            <option value="lainnya" {{ old('subject') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
+        </select>
+        @error('subject')
+            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+        @enderror
+    </div>
 
-                        <!-- Message -->
-                        <div class="group">
-                            <label for="message" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Detail Keluhan/Masukan <span class="text-red-500">*</span>
-                            </label>
-                            <textarea 
-                                id="message" 
-                                name="message"
-                                rows="6"
-                                required
-                                class="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 focus:bg-white transition-all duration-300 outline-none resize-none"
-                                placeholder="Jelaskan keluhan, kritik, atau saran Anda secara detail..."></textarea>
-                        </div>
+    <!-- Message -->
+    <div class="group">
+        <label for="message" class="block text-sm font-semibold text-gray-700 mb-2">
+            Detail Keluhan/Masukan <span class="text-red-500">*</span>
+        </label>
+        <textarea 
+            id="message" 
+            name="message"
+            rows="6"
+            required
+            class="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 focus:bg-white transition-all duration-300 outline-none resize-none"
+            placeholder="Jelaskan keluhan, kritik, atau saran Anda secara detail...">{{ old('message') }}</textarea>
+        @error('message')
+            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+        @enderror
+    </div>
 
-                        <!-- Submit Button -->
-                        <button 
-                            type="submit"
-                            class="group w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-4 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 hover:-translate-y-0.5">
-                            <i class="fas fa-paper-plane group-hover:translate-x-1 transition-transform duration-300"></i>
-                            <span>Kirim Keluhan & Masukan</span>
-                        </button>
-                    </form>
+    <!-- Submit Button -->
+    <button 
+        type="submit"
+        class="group w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-4 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 hover:-translate-y-0.5">
+        <i class="fas fa-paper-plane group-hover:translate-x-1 transition-transform duration-300"></i>
+        <span>Kirim Keluhan & Masukan</span>
+    </button>
+</form>
 
                     <!-- Success Message -->
                     <div id="success-message" class="hidden mt-6 p-5 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 text-green-800 rounded-xl shadow-sm animate-fade-in">
@@ -386,16 +405,14 @@ document.addEventListener('DOMContentLoaded', function() {
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Simulate form submission
-            setTimeout(() => {
-                contactForm.reset();
-                successMessage.classList.remove('hidden');
-                
-                // Hide success message after 5 seconds
-                setTimeout(() => {
-                    successMessage.classList.add('hidden');
-                }, 5000);
-            }, 1000);
+            // Show loading state
+            const submitBtn = contactForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+            submitBtn.disabled = true;
+            
+            // Submit form normally (not using AJAX)
+            contactForm.submit();
         });
     }
 

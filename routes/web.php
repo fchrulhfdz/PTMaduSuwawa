@@ -8,6 +8,8 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\ProfitCalculationController;
+use App\Http\Controllers\Admin\ContactController as AdminContactController;
+use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
 
 // 🌐 Public Routes
@@ -65,6 +67,15 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
         Route::get('/quick-stats', [ProfitCalculationController::class, 'getQuickStats'])->name('quick-stats');
     });
 
+    // Contact Management Routes
+    Route::prefix('contacts')->name('contacts.')->group(function () {
+        Route::get('/', [AdminContactController::class, 'index'])->name('index');
+        Route::get('/{contact}', [AdminContactController::class, 'show'])->name('show');
+        Route::put('/{contact}/status', [AdminContactController::class, 'updateStatus'])->name('update-status');
+        Route::delete('/{contact}', [AdminContactController::class, 'destroy'])->name('destroy');
+        Route::post('/bulk-action', [AdminContactController::class, 'bulkAction'])->name('bulk-action');
+    });
+
     // Settings
     Route::prefix('settings')->group(function () {
         Route::get('/', [SettingController::class, 'index'])->name('settings.index');
@@ -91,6 +102,10 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
         Route::post('/reset-data/process', [SettingController::class, 'processResetData'])->name('settings.process-reset-data');
     });
 });
+
+// Frontend Contact Routes
+Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 
 // Redirect user ke dashboard admin setelah login
 Route::get('/dashboard', function () {
