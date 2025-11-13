@@ -1,12 +1,14 @@
 <?php
+// app/Http/Controllers/Admin/SettingController.php
 
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
 use App\Models\Setting;
+use App\Models\Product;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
@@ -14,7 +16,7 @@ class SettingController extends Controller
 {
     public function index()
     {
-        $settings = Setting::all()->pluck('value', 'key')->toArray();
+        $settings = Setting::pluck('value', 'key')->toArray();
         $totalProducts = Product::count();
         $totalTransactions = Transaction::count();
 
@@ -50,8 +52,7 @@ class SettingController extends Controller
     // Method untuk mengambil pengaturan struk
     public function getReceiptSettings()
     {
-        // Gunakan model Setting langsung untuk mengambil data
-        $settings = Setting::all()->pluck('value', 'key')->toArray();
+        $settings = Setting::pluck('value', 'key')->toArray();
 
         return response()->json([
             'header' => $settings['receipt_header'] ?? 'SMART CASHIER\nSistem Kasir Pintar',

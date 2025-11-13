@@ -13,6 +13,7 @@ class Transaction extends Model
         'transaction_code',
         'customer_name',
         'customer_phone',
+        'quantity', // Tambahkan ini
         'items',
         'subtotal',
         'tax',
@@ -22,7 +23,7 @@ class Transaction extends Model
         'cash_paid',
         'change_amount',
         'status',
-        'total_berat', // Tambahkan kolom total berat
+        'total_berat',
         'notes'
     ];
 
@@ -34,7 +35,8 @@ class Transaction extends Model
         'total' => 'decimal:2',
         'cash_paid' => 'decimal:2',
         'change_amount' => 'decimal:2',
-        'total_berat' => 'decimal:2' // Cast untuk total berat
+        'total_berat' => 'decimal:2',
+        'quantity' => 'integer' // Tambahkan ini
     ];
 
     // Accessor untuk items yang aman
@@ -51,29 +53,28 @@ class Transaction extends Model
         return [];
     }
 
-    // Accessor untuk menghitung total berat dari items
-    public function getCalculatedTotalBeratAttribute()
+    // Accessor untuk menghitung total quantity dari items
+    public function getCalculatedQuantityAttribute()
     {
         $items = $this->items_array;
-        $totalBerat = 0;
+        $totalQuantity = 0;
         
         foreach ($items as $item) {
-            $beratItem = $item['berat_isi'] ?? 0;
             $quantity = $item['quantity'] ?? 0;
-            $totalBerat += $beratItem * $quantity;
+            $totalQuantity += $quantity;
         }
         
-        return $totalBerat;
+        return $totalQuantity;
     }
 
-    // Scope untuk transaksi dengan berat tertentu
-    public function scopeWithMinBerat($query, $minBerat)
+    // Scope untuk transaksi dengan quantity tertentu
+    public function scopeWithMinQuantity($query, $minQuantity)
     {
-        return $query->where('total_berat', '>=', $minBerat);
+        return $query->where('quantity', '>=', $minQuantity);
     }
 
-    public function scopeWithMaxBerat($query, $maxBerat)
+    public function scopeWithMaxQuantity($query, $maxQuantity)
     {
-        return $query->where('total_berat', '<=', $maxBerat);
+        return $query->where('quantity', '<=', $maxQuantity);
     }
 }

@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\ProfitCalculation;
 use App\Models\Transaction;
-use App\Models\Product;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
@@ -40,113 +41,120 @@ class TransactionController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'subtotal' => 'required|numeric|min:0',
-            'tax' => 'required|numeric|min:0',
-            'discount' => 'required|numeric|min:0',
-            'total' => 'required|numeric|min:0',
-            'payment_method' => 'required|string|in:cash,transfer',
-            'cash_paid' => 'required_if:payment_method,cash|numeric|min:0',
-            'change_amount' => 'required_if:payment_method,cash|numeric|min:0',
-            'notes' => 'nullable|string|max:500'
+{
+    $request->validate([
+        'customer_name' => 'required|string|max:255',
+        'items' => 'required|array|min:1',
+        'items.*.product_id' => 'required|exists:products,id',
+        'items.*.quantity' => 'required|integer|min:1',
+        'subtotal' => 'required|numeric|min:0',
+        'tax' => 'required|numeric|min:0',
+        'discount' => 'required|numeric|min:0',
+        'total' => 'required|numeric|min:0',
+        'payment_method' => 'required|string|in:cash,transfer',
+        'cash_paid' => 'required_if:payment_method,cash|numeric|min:0',
+        'change_amount' => 'required_if:payment_method,cash|numeric|min:0',
+        'notes' => 'nullable|string|max:500'
+    ]);
+
+    try {
+        DB::beginTransaction();
+
+        // Update product stock dan tambahkan nama produk ke items
+        $itemsWithNames = [];
+        $totalBerat = 0;
+        $totalQuantity = 0; // Tambahkan variabel untuk total quantity
+
+        foreach ($request->items as $item) {
+            $product = Product::find($item['product_id']);
+            if (!$product) {
+                throw new \Exception("Produk tidak ditemukan");
+            }
+            
+            if ($product->stock < $item['quantity']) {
+                throw new \Exception("Stok produk {$product->name} tidak mencukupi. Stok tersedia: {$product->stock}");
+            }
+            
+            $product->decrement('stock', $item['quantity']);
+            
+            // Hitung total quantity
+            $totalQuantity += $item['quantity'];
+            
+            // Hitung berat untuk item ini
+            $beratItem = $item['berat_isi'] ?? $product->berat_isi ?? 0;
+            $satuanBerat = $item['satuan_berat'] ?? $product->satuan_berat ?? 'kg';
+            $totalBeratItem = $beratItem * $item['quantity'];
+            $totalBerat += $totalBeratItem;
+            
+            // Tambahkan nama produk ke items dengan struktur yang konsisten
+            $itemsWithNames[] = [
+                'product_id' => $item['product_id'],
+                'name' => $product->name,
+                'price' => $item['price'] ?? $product->price,
+                'quantity' => $item['quantity'],
+                'total' => ($item['price'] ?? $product->price) * $item['quantity'],
+                'discount_percentage' => $item['discount_percentage'] ?? 0,
+                'discount_amount' => $item['discount_amount'] ?? 0,
+                'final_total' => $item['final_total'] ?? (($item['price'] ?? $product->price) * $item['quantity']),
+                'original_price' => $product->price,
+                'berat_isi' => $beratItem,
+                'satuan_berat' => $satuanBerat,
+                'total_berat_item' => $totalBeratItem
+            ];
+        }
+
+        // Tentukan status berdasarkan metode pembayaran
+        $status = $request->payment_method === 'cash' ? 'completed' : 'pending';
+
+        $transaction = Transaction::create([
+            'transaction_code' => $request->transaction_code,
+            'customer_name' => $request->customer_name,
+            'quantity' => $totalQuantity, // Simpan total quantity
+            'items' => json_encode($itemsWithNames),
+            'subtotal' => $request->subtotal,
+            'tax' => $request->tax,
+            'discount' => $request->discount,
+            'total' => $request->total,
+            'payment_method' => $request->payment_method,
+            'cash_paid' => $request->cash_paid ?? 0,
+            'change_amount' => $request->change_amount ?? 0,
+            'status' => $status,
+            'total_berat' => $totalBerat,
+            'notes' => $request->notes
         ]);
 
-        try {
-            DB::beginTransaction();
+        DB::commit();
 
-            // Update product stock dan tambahkan nama produk ke items
-            $itemsWithNames = [];
-            $totalBerat = 0; // Hitung total berat
+        // Pesan sukses berbeda berdasarkan metode pembayaran
+        $message = $request->payment_method === 'cash' 
+            ? 'Transaksi berhasil disimpan!' 
+            : 'Transaksi berhasil! Silakan lakukan transfer pembayaran.';
 
-            foreach ($request->items as $item) {
-                $product = Product::find($item['product_id']);
-                if (!$product) {
-                    throw new \Exception("Produk tidak ditemukan");
-                }
-                
-                if ($product->stock < $item['quantity']) {
-                    throw new \Exception("Stok produk {$product->name} tidak mencukupi. Stok tersedia: {$product->stock}");
-                }
-                
-                $product->decrement('stock', $item['quantity']);
-                
-                // Hitung berat untuk item ini
-                $beratItem = $item['berat_isi'] ?? $product->berat_isi ?? 0;
-                $satuanBerat = $item['satuan_berat'] ?? $product->satuan_berat ?? 'kg';
-                $totalBeratItem = $beratItem * $item['quantity'];
-                $totalBerat += $totalBeratItem;
-                
-                // Tambahkan nama produk ke items dengan struktur yang konsisten
-                $itemsWithNames[] = [
-                    'product_id' => $item['product_id'],
-                    'name' => $product->name,
-                    'price' => $item['price'] ?? $product->price,
-                    'quantity' => $item['quantity'],
-                    'total' => ($item['price'] ?? $product->price) * $item['quantity'],
-                    'discount_percentage' => $item['discount_percentage'] ?? 0,
-                    'discount_amount' => $item['discount_amount'] ?? 0,
-                    'final_total' => $item['final_total'] ?? (($item['price'] ?? $product->price) * $item['quantity']),
-                    'original_price' => $product->price,
-                    'berat_isi' => $beratItem, // Simpan berat isi per item
-                    'satuan_berat' => $satuanBerat, // Simpan satuan berat
-                    'total_berat_item' => $totalBeratItem // Simpan total berat untuk item ini
-                ];
-            }
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'transaction_id' => $transaction->id,
+            'print_url' => route('admin.transactions.print', $transaction->id),
+            'total_quantity' => $totalQuantity, // Kirim juga total quantity
+            'total_berat' => $totalBerat
+        ]);
 
-            // Tentukan status berdasarkan metode pembayaran
-            $status = $request->payment_method === 'cash' ? 'completed' : 'pending';
-
-            $transaction = Transaction::create([
-                'transaction_code' => $request->transaction_code,
-                'customer_name' => $request->customer_name,
-                'items' => json_encode($itemsWithNames),
-                'subtotal' => $request->subtotal,
-                'tax' => $request->tax,
-                'discount' => $request->discount,
-                'total' => $request->total,
-                'payment_method' => $request->payment_method,
-                'cash_paid' => $request->cash_paid ?? 0,
-                'change_amount' => $request->change_amount ?? 0,
-                'status' => $status,
-                'total_berat' => $totalBerat, // Simpan total berat
-                'notes' => $request->notes
-            ]);
-
-            DB::commit();
-
-            // Pesan sukses berbeda berdasarkan metode pembayaran
-            $message = $request->payment_method === 'cash' 
-                ? 'Transaksi berhasil disimpan!' 
-                : 'Transaksi berhasil! Silakan lakukan transfer pembayaran.';
-
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'transaction_id' => $transaction->id,
-                'print_url' => route('admin.transactions.print', $transaction->id),
-                'total_berat' => $totalBerat // Kirim juga total berat untuk keperluan frontend
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
-        }
+    } catch (\Exception $e) {
+        DB::rollBack();
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+        ], 500);
     }
+}
 
     public function edit($id)
     {
         $transaction = Transaction::findOrFail($id);
         return view('admin.transactions.edit', compact('transaction'));
     }
+
 
     public function update(Request $request, $id)
     {

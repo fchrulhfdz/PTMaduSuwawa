@@ -373,7 +373,7 @@
         </div>
     </div>
 
-    <script>
+<script>
     let cart = [];
     let selectedPaymentMethod = '';
     let currentTransactionId = null;
@@ -712,10 +712,10 @@
         }
     }
 
-    // Add to Cart - FIXED VERSION
+    // PERBAIKAN BESAR: Add to Cart - Sekarang menambahkan dengan quantity 0
     async function addToCart(productId) {
         try {
-            // Dapatkan data produk dari elemen HTML langsung (fallback jika API gagal)
+            // Dapatkan data produk dari elemen HTML langsung
             const productElement = document.querySelector(`[data-product-id="${productId}"]`);
             if (!productElement) {
                 showAlert('Produk tidak ditemukan!', 'error');
@@ -733,44 +733,34 @@
 
             const finalPrice = priceOverrides[productId] || productData.price;
 
-            // Cek stok
-            if (productData.stock <= 0) {
-                showAlert('Stok produk habis!', 'warning');
-                return;
-            }
-
+            // Cek apakah produk sudah ada di cart
             const existingItem = cart.find(item => item.product_id === productId);
             
             if (existingItem) {
-                const newTotalQuantity = existingItem.quantity + 1;
-                if (newTotalQuantity > productData.stock) {
-                    showAlert('Stok tidak mencukupi!', 'warning');
-                    return;
-                }
-                existingItem.quantity = newTotalQuantity;
-                existingItem.price = finalPrice;
-                existingItem.total = finalPrice * newTotalQuantity;
-                existingItem.berat_isi = productData.berat_isi;
-                existingItem.satuan_berat = productData.satuan_berat;
-                applyQuantityDiscountToItem(existingItem);
+                // Jika sudah ada, langsung buka modal edit
+                showDetailModal(productId);
             } else {
+                // PERUBAHAN: Tambahkan dengan quantity 0, bukan 1
                 const newItem = {
                     product_id: productId,
                     name: productData.name,
                     price: finalPrice,
-                    quantity: 1,
-                    total: finalPrice,
+                    quantity: 0, // Quantity awal 0
+                    total: 0, // Total awal 0
                     stock: productData.stock,
                     berat_isi: productData.berat_isi,
                     satuan_berat: productData.satuan_berat
                 };
-                applyQuantityDiscountToItem(newItem);
                 cart.push(newItem);
+                
+                // Langsung buka modal untuk mengatur quantity
+                showDetailModal(productId);
+                
+                showAlert('Produk ditambahkan ke keranjang. Silakan atur quantity.', 'info');
             }
 
             updateCartDisplay();
             updateSummary();
-            showAlert('Produk ditambahkan ke keranjang', 'success');
             
         } catch (error) {
             console.error('Error adding to cart:', error);
@@ -778,7 +768,7 @@
         }
     }
 
-    // Show Detail Modal - MODIFIED untuk format berat
+    // PERBAIKAN: Show Detail Modal - Sekarang menampilkan quantity dari cart
     function showDetailModal(productId) {
         const productElement = document.querySelector(`[data-product-id="${productId}"]`);
         if (!productElement) {
@@ -786,6 +776,9 @@
             return;
         }
 
+        // Cari item di cart
+        const existingItem = cart.find(item => item.product_id === productId);
+        
         document.getElementById('detail-product-name').textContent = productElement.getAttribute('data-product-name');
         document.getElementById('detail-product-price').textContent = 'Rp ' + parseInt(productElement.getAttribute('data-product-price')).toLocaleString('id-ID');
         document.getElementById('detail-product-stock').textContent = productElement.getAttribute('data-product-stock');
@@ -797,7 +790,14 @@
         document.getElementById('detail-product-berat').textContent = displayBerat;
         
         currentDetailProduct = productId;
-        detailQuantity = 1;
+        
+        // PERUBAHAN: Set detailQuantity dari quantity yang ada di cart, default 1 jika belum ada
+        if (existingItem) {
+            detailQuantity = existingItem.quantity;
+        } else {
+            detailQuantity = 1;
+        }
+        
         document.getElementById('detail-quantity').textContent = detailQuantity;
         
         // Reset form fields
@@ -831,13 +831,13 @@
 
     // Decrease Detail Quantity
     function decreaseDetailQuantity() {
-        if (detailQuantity > 1) {
+        if (detailQuantity > 0) { // PERUBAHAN: Bisa sampai 0
             detailQuantity--;
             document.getElementById('detail-quantity').textContent = detailQuantity;
         }
     }
 
-    // Add from Detail Modal - FIXED VERSION
+    // PERBAIKAN BESAR: Add from Detail Modal - Update quantity dari modal
     async function addFromDetailModal() {
         if (!currentDetailProduct) return;
 
@@ -860,57 +860,78 @@
 
             const finalPrice = priceOverrides[currentDetailProduct] || productData.price;
 
-            if (detailQuantity > productData.stock) {
-                showAlert('Stok tidak mencukupi!', 'warning');
-                return;
-            }
-
+            // Cari item di cart
             const existingItem = cart.find(item => item.product_id === currentDetailProduct);
             
             if (existingItem) {
-                const newTotalQuantity = existingItem.quantity + detailQuantity;
-                if (newTotalQuantity > productData.stock) {
+                // PERUBAHAN: Update quantity dengan value dari modal
+                if (detailQuantity > productData.stock) {
                     showAlert('Stok tidak mencukupi!', 'warning');
                     return;
                 }
-                existingItem.quantity = newTotalQuantity;
+                
+                existingItem.quantity = detailQuantity;
                 existingItem.price = finalPrice;
-                existingItem.total = finalPrice * newTotalQuantity;
+                existingItem.total = finalPrice * detailQuantity;
                 existingItem.berat_isi = productData.berat_isi;
                 existingItem.satuan_berat = productData.satuan_berat;
                 applyQuantityDiscountToItem(existingItem);
+                
+                // Jika quantity 0, hapus dari cart
+                if (detailQuantity === 0) {
+                    const index = cart.findIndex(item => item.product_id === currentDetailProduct);
+                    if (index !== -1) {
+                        cart.splice(index, 1);
+                    }
+                }
             } else {
-                const newItem = {
-                    product_id: currentDetailProduct,
-                    name: productData.name,
-                    price: finalPrice,
-                    quantity: detailQuantity,
-                    total: finalPrice * detailQuantity,
-                    stock: productData.stock,
-                    berat_isi: productData.berat_isi,
-                    satuan_berat: productData.satuan_berat
-                };
-                applyQuantityDiscountToItem(newItem);
-                cart.push(newItem);
+                // Tambah item baru hanya jika quantity > 0
+                if (detailQuantity > 0) {
+                    if (detailQuantity > productData.stock) {
+                        showAlert('Stok tidak mencukupi!', 'warning');
+                        return;
+                    }
+                    
+                    const newItem = {
+                        product_id: currentDetailProduct,
+                        name: productData.name,
+                        price: finalPrice,
+                        quantity: detailQuantity,
+                        total: finalPrice * detailQuantity,
+                        stock: productData.stock,
+                        berat_isi: productData.berat_isi,
+                        satuan_berat: productData.satuan_berat
+                    };
+                    applyQuantityDiscountToItem(newItem);
+                    cart.push(newItem);
+                }
             }
 
             closeDetailModal();
             updateCartDisplay();
             updateSummary();
-            showAlert('Produk ditambahkan ke keranjang', 'success');
+            
+            if (detailQuantity > 0) {
+                showAlert(`Quantity produk diupdate menjadi ${detailQuantity}`, 'success');
+            } else {
+                showAlert('Produk dihapus dari keranjang', 'info');
+            }
             
         } catch (error) {
             console.error('Error adding from detail modal:', error);
-            showAlert('Gagal menambahkan produk', 'error');
+            showAlert('Gagal mengupdate produk', 'error');
         }
     }
 
-    // Update Cart Display - MODIFIED untuk format berat
+    // Update Cart Display - Tampilkan item dengan quantity > 0 saja
     function updateCartDisplay() {
         const cartItems = document.getElementById('cart-items');
         const emptyCart = document.getElementById('empty-cart');
         
-        if (cart.length === 0) {
+        // Filter hanya item dengan quantity > 0
+        const visibleCart = cart.filter(item => item.quantity > 0);
+        
+        if (visibleCart.length === 0) {
             cartItems.innerHTML = '';
             emptyCart.style.display = 'block';
             return;
@@ -919,15 +940,16 @@
         emptyCart.style.display = 'none';
         
         let cartHTML = '';
-        cart.forEach((item, index) => {
+        visibleCart.forEach((item, index) => {
             const hasOverride = priceOverrides[item.product_id];
             const hasDiscount = item.discount_percentage;
             const displayTotal = hasDiscount ? item.final_total : item.total;
             
-            // Hitung berat per item dengan konversi otomatis
             const beratPerItem = item.berat_isi || 0;
             const satuan = item.satuan_berat || 'g';
             const totalBeratItem = beratPerItem * item.quantity;
+            
+            // Format display berat
             const displayBeratPerItem = formatBerat(beratPerItem, satuan);
             const displayTotalBerat = formatBerat(totalBeratItem, satuan);
             
@@ -1001,10 +1023,22 @@
         }
     }
 
-    // Update Summary Calculation - MODIFIED untuk format berat
+    // Update Summary Calculation
     function updateSummary() {
-        let subtotal = cart.reduce((sum, item) => sum + (item.final_total || item.total), 0);
-        const totalDiscount = cart.reduce((sum, item) => sum + (item.discount_amount || 0), 0);
+        let subtotal = 0;
+        let totalDiscount = 0;
+
+        // Hanya hitung item dengan quantity > 0
+        cart.forEach(item => {
+            if (item.quantity > 0) {
+                const itemTotal = item.price * item.quantity;
+                const itemDiscount = item.discount_amount || 0;
+                
+                subtotal += itemTotal;
+                totalDiscount += itemDiscount;
+            }
+        });
+
         const total = subtotal - totalDiscount;
         
         // Update total berat dengan format otomatis
@@ -1065,100 +1099,107 @@
         document.getElementById('change-amount').textContent = formatRupiah(Math.max(0, change));
     }
 
-    // Process Transaction
-    async function processTransaction() {
-        if (cart.length === 0) {
-            showAlert('Keranjang belanja kosong!', 'warning');
+    // Process Transaction - Hanya proses item dengan quantity > 0
+async function processTransaction() {
+    // Filter hanya item dengan quantity > 0
+    const validCartItems = cart.filter(item => item.quantity > 0);
+    
+    if (validCartItems.length === 0) {
+        showAlert('Keranjang belanja kosong!', 'warning');
+        return;
+    }
+
+    if (!selectedPaymentMethod) {
+        showAlert('Pilih metode pembayaran!', 'warning');
+        return;
+    }
+
+    const subtotal = cleanNumber(document.getElementById('subtotal').textContent);
+    const total = cleanNumber(document.getElementById('total').textContent);
+    
+    // Hitung total quantity dari semua item
+    const totalQuantity = validCartItems.reduce((sum, item) => sum + item.quantity, 0);
+    
+    let cashPaid = 0;
+    let changeAmount = 0;
+    
+    if (selectedPaymentMethod === 'cash') {
+        cashPaid = cleanNumber(document.getElementById('cash-paid').value);
+        changeAmount = Math.max(0, cashPaid - total);
+        
+        if (cashPaid < total) {
+            showAlert('Uang yang dibayarkan kurang!', 'error');
             return;
         }
-
-        if (!selectedPaymentMethod) {
-            showAlert('Pilih metode pembayaran!', 'warning');
+        
+        if (cashPaid <= 0) {
+            showAlert('Masukkan jumlah uang yang dibayarkan!', 'error');
             return;
-        }
-
-        const subtotal = cleanNumber(document.getElementById('subtotal').textContent);
-        const total = cleanNumber(document.getElementById('total').textContent);
-        
-        let cashPaid = 0;
-        let changeAmount = 0;
-        
-        if (selectedPaymentMethod === 'cash') {
-            cashPaid = cleanNumber(document.getElementById('cash-paid').value);
-            changeAmount = Math.max(0, cashPaid - total);
-            
-            if (cashPaid < total) {
-                showAlert('Uang yang dibayarkan kurang!', 'error');
-                return;
-            }
-            
-            if (cashPaid <= 0) {
-                showAlert('Masukkan jumlah uang yang dibayarkan!', 'error');
-                return;
-            }
-        }
-
-        const customerName = document.getElementById('customer-name').value || 'Customer';
-        const notes = document.getElementById('notes').value;
-
-        const transactionData = {
-            transaction_code: '{{ $transactionCode }}',
-            customer_name: customerName,
-            items: cart.map(item => ({
-                product_id: item.product_id,
-                name: item.name,
-                price: item.price,
-                quantity: item.quantity,
-                total: item.final_total || item.total,
-                discount_percentage: item.discount_percentage || 0,
-                discount_amount: item.discount_amount || 0,
-                final_total: item.final_total || item.total,
-                original_price: item.original_price || item.price,
-                berat_isi: item.berat_isi || 0,
-                satuan_berat: item.satuan_berat || 'kg'
-            })),
-            subtotal: subtotal,
-            tax: 0,
-            discount: cart.reduce((sum, item) => sum + (item.discount_amount || 0), 0),
-            total: total,
-            payment_method: selectedPaymentMethod,
-            cash_paid: cashPaid,
-            change_amount: changeAmount,
-            notes: notes
-        };
-
-        try {
-            showAlert('Memproses transaksi...', 'info');
-            
-            const result = await apiFetch('{{ route("admin.transactions.store") }}', {
-                method: 'POST',
-                body: JSON.stringify(transactionData)
-            });
-
-            if (result.success) {
-                currentTransactionId = result.transaction_id;
-                
-                document.getElementById('print-receipt-btn').onclick = () => {
-                    if (result.print_url) {
-                        window.open(result.print_url, '_blank');
-                    }
-                };
-                
-                if (result.print_url) {
-                    setTimeout(() => window.open(result.print_url, '_blank'), 500);
-                }
-                
-                showSuccessModal();
-                showAlert(result.message || 'Transaksi berhasil diproses!', 'success');
-            } else {
-                showAlert(result.message || 'Terjadi kesalahan', 'error');
-            }
-        } catch (error) {
-            if (!error.message.includes('Session expired')) {
-                showAlert('Gagal memproses transaksi: ' + error.message, 'error');
-            }
         }
     }
+
+    const customerName = document.getElementById('customer-name').value || 'Customer';
+    const notes = document.getElementById('notes').value;
+
+    const transactionData = {
+        transaction_code: '{{ $transactionCode }}',
+        customer_name: customerName,
+        quantity: totalQuantity, // Kirim total quantity
+        items: validCartItems.map(item => ({
+            product_id: item.product_id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            total: item.final_total || item.total,
+            discount_percentage: item.discount_percentage || 0,
+            discount_amount: item.discount_amount || 0,
+            final_total: item.final_total || item.total,
+            original_price: item.original_price || item.price,
+            berat_isi: item.berat_isi || 0,
+            satuan_berat: item.satuan_berat || 'kg'
+        })),
+        subtotal: subtotal,
+        tax: 0,
+        discount: validCartItems.reduce((sum, item) => sum + (item.discount_amount || 0), 0),
+        total: total,
+        payment_method: selectedPaymentMethod,
+        cash_paid: cashPaid,
+        change_amount: changeAmount,
+        notes: notes
+    };
+
+    try {
+        showAlert('Memproses transaksi...', 'info');
+        
+        const result = await apiFetch('{{ route("admin.transactions.store") }}', {
+            method: 'POST',
+            body: JSON.stringify(transactionData)
+        });
+
+        if (result.success) {
+            currentTransactionId = result.transaction_id;
+            
+            document.getElementById('print-receipt-btn').onclick = () => {
+                if (result.print_url) {
+                    window.open(result.print_url, '_blank');
+                }
+            };
+            
+            if (result.print_url) {
+                setTimeout(() => window.open(result.print_url, '_blank'), 500);
+            }
+            
+            showSuccessModal();
+            showAlert(result.message || 'Transaksi berhasil diproses!', 'success');
+        } else {
+            showAlert(result.message || 'Terjadi kesalahan', 'error');
+        }
+    } catch (error) {
+        if (!error.message.includes('Session expired')) {
+            showAlert('Gagal memproses transaksi: ' + error.message, 'error');
+        }
+    }
+}
 
     // Show Success Modal
     function showSuccessModal() {

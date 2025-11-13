@@ -7,10 +7,12 @@ use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TestimonialController;
-use App\Http\Controllers\Admin\ProfitCalculationController;
+use App\Http\Controllers\ProfitCalculationController; // ← Diimport tanpa Admin
 use App\Http\Controllers\Admin\ContactController as AdminContactController;
+use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\ContactController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 // 🌐 Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -47,6 +49,11 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
         Route::get('/berat/stats', [TransactionController::class, 'getBeratStats'])->name('berat-stats');
     });
 
+    // Gallery Routes
+    Route::resource('/gallery', GalleryController::class);
+    Route::post('/gallery/update-order', [GalleryController::class, 'updateOrder'])
+         ->name('gallery.update-order');
+
     // Testimonials
     Route::resource('/testimonials', TestimonialController::class);
     Route::post('/testimonials/{testimonial}/toggle-status', [TestimonialController::class, 'toggleStatus'])
@@ -57,7 +64,7 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
     Route::get('/reports/monthly', [ReportController::class, 'monthly'])->name('reports.monthly');
     Route::get('/reports/daily', [ReportController::class, 'daily'])->name('reports.daily');
 
-    // Profit Calculation Routes
+    // Profit Calculation Routes - TANPA Admin namespace
     Route::prefix('profit')->name('profit.')->group(function () {
         Route::get('/', [ProfitCalculationController::class, 'index'])->name('index');
         Route::post('/calculate', [ProfitCalculationController::class, 'calculate'])->name('calculate');
@@ -65,6 +72,14 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
         Route::get('/{profit}', [ProfitCalculationController::class, 'show'])->name('show');
         Route::delete('/{profit}', [ProfitCalculationController::class, 'destroy'])->name('destroy');
         Route::get('/quick-stats', [ProfitCalculationController::class, 'getQuickStats'])->name('quick-stats');
+        
+        // AJAX Routes untuk profit calculation
+        Route::get('/get-revenue-data', [ProfitCalculationController::class, 'getRevenueData'])->name('get-revenue-data');
+        Route::get('/get-expenses-data', [ProfitCalculationController::class, 'getExpensesData'])->name('get-expenses-data');
+        Route::post('/add-expense', [ProfitCalculationController::class, 'addExpense'])->name('add-expense');
+        Route::get('/get-expense/{id}', [ProfitCalculationController::class, 'getExpense'])->name('get-expense');
+        Route::put('/update-expense/{id}', [ProfitCalculationController::class, 'updateExpense'])->name('update-expense');
+        Route::delete('/delete-expense/{id}', [ProfitCalculationController::class, 'deleteExpense'])->name('delete-expense');
     });
 
     // Contact Management Routes
@@ -76,30 +91,26 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
         Route::post('/bulk-action', [AdminContactController::class, 'bulkAction'])->name('bulk-action');
     });
 
-    // Settings
-    Route::prefix('settings')->group(function () {
-        Route::get('/', [SettingController::class, 'index'])->name('settings.index');
-        Route::put('/', [SettingController::class, 'update'])->name('settings.update');
+    // Settings Routes
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/', [SettingController::class, 'index'])->name('index');
+        Route::put('/', [SettingController::class, 'update'])->name('update');
 
         // Receipt Settings
-        Route::get('/receipt-settings', [SettingController::class, 'getReceiptSettings'])->name('settings.receipt-settings');
+        Route::get('/receipt-settings', [SettingController::class, 'getReceiptSettings'])->name('receipt-settings');
 
         // Backup
-        Route::get('/backup', [SettingController::class, 'backup'])->name('settings.backup');
-        Route::post('/backup/process', [SettingController::class, 'processBackup'])->name('settings.process-backup');
-        Route::get('/backup/download/{filename}', [SettingController::class, 'downloadBackup'])->name('settings.download-backup');
+        Route::post('/backup', [SettingController::class, 'backup'])->name('backup');
+        Route::get('/backup/download/{filename}', [SettingController::class, 'downloadBackup'])->name('download-backup');
 
         // Cache
-        Route::get('/clear-cache', [SettingController::class, 'clearCache'])->name('settings.clear-cache');
-        Route::post('/clear-cache/process', [SettingController::class, 'processClearCache'])->name('settings.process-clear-cache');
+        Route::post('/clear-cache', [SettingController::class, 'clearCache'])->name('clear-cache');
 
         // Optimize
-        Route::get('/optimize', [SettingController::class, 'optimize'])->name('settings.optimize');
-        Route::post('/optimize/process', [SettingController::class, 'processOptimize'])->name('settings.process-optimize');
+        Route::post('/optimize', [SettingController::class, 'optimize'])->name('optimize');
 
         // Reset Data
-        Route::get('/reset-data', [SettingController::class, 'resetData'])->name('settings.reset-data');
-        Route::post('/reset-data/process', [SettingController::class, 'processResetData'])->name('settings.process-reset-data');
+        Route::post('/reset-data', [SettingController::class, 'resetData'])->name('reset-data');
     });
 });
 

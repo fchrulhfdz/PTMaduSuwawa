@@ -1,3 +1,4 @@
+{{-- resources/views/admin/settings/index.blade.php --}}
 @extends('layouts.admin')
 
 @section('content')
@@ -10,10 +11,17 @@
                     <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Pengaturan Sistem</h1>
                     <p class="mt-2 text-sm text-gray-600">Kelola pengaturan aplikasi dan sistem</p>
                 </div>
-                <button type="submit" form="settings-form"
-                        class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-200">
-                    <i class="fas fa-save mr-2"></i>Simpan Pengaturan
-                </button>
+                <div class="flex items-center gap-3">
+                    <!-- Tombol Kelola Gallery -->
+                    <a href="{{ route('admin.gallery.index') }}"
+                       class="inline-flex items-center px-5 py-2.5 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-200">
+                        <i class="fas fa-images mr-2"></i>Kelola Gallery
+                    </a>
+                    <button type="submit" form="settings-form"
+                            class="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-200">
+                        <i class="fas fa-save mr-2"></i>Simpan Pengaturan
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -278,7 +286,7 @@
                                 ['route' => 'admin.settings.optimize', 'color' => 'from-emerald-500 to-green-600', 'icon' => 'fas fa-tachometer-alt', 'label' => 'Optimasi Aplikasi']
                             ] as $action)
                             <a href="{{ route($action['route']) }}" 
-                               class="group flex items-center justify-between w-full px-4 py-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 hover:border-{{ explode(' ', $action['color'])[0] }}-200">
+                               class="group flex items-center justify-between w-full px-4 py-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 hover:border-amber-200">
                                 <div class="flex items-center">
                                     <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-r {{ $action['color'] }} shadow-sm">
                                         <i class="{{ $action['icon'] }} text-white text-xs"></i>

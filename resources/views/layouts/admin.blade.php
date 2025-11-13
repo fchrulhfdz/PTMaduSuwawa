@@ -109,14 +109,14 @@
             </a>
             @endif
 
-            <!-- Hitung Laba - Super Admin Only -->
-            @if(Auth::user()->role === 'super admin')
-            <a href="{{ route('admin.profit.index') }}" 
-               class="flex items-center space-x-2 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors">
-                <i class="fas fa-calculator"></i>
-                <span>Hitung Laba</span>
-            </a>
-            @endif
+            <!-- Hitung Laba - Super Admin & Admin -->
+@if(Auth::user()->role === 'super admin' || Auth::user()->role === 'admin')
+<a href="{{ route('admin.profit.index') }}" 
+   class="flex items-center space-x-2 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors">
+    <i class="fas fa-calculator"></i>
+    <span>Hitung Laba</span>
+</a>
+@endif
 
             <!-- Pengaturan - Super Admin Only -->
             @if(Auth::user()->role === 'super admin')
