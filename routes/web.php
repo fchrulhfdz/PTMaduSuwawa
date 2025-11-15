@@ -7,7 +7,7 @@ use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TestimonialController;
-use App\Http\Controllers\ProfitCalculationController; // ← Diimport tanpa Admin
+use App\Http\Controllers\ProfitCalculationController;
 use App\Http\Controllers\Admin\ContactController as AdminContactController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\ContactController;
@@ -64,22 +64,21 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
     Route::get('/reports/monthly', [ReportController::class, 'monthly'])->name('reports.monthly');
     Route::get('/reports/daily', [ReportController::class, 'daily'])->name('reports.daily');
 
-    // Profit Calculation Routes - TANPA Admin namespace
-    Route::prefix('profit')->name('profit.')->group(function () {
-        Route::get('/', [ProfitCalculationController::class, 'index'])->name('index');
-        Route::post('/calculate', [ProfitCalculationController::class, 'calculate'])->name('calculate');
-        Route::post('/calculate-from-transactions', [ProfitCalculationController::class, 'calculateFromTransactions'])->name('calculate-from-transactions');
-        Route::get('/{profit}', [ProfitCalculationController::class, 'show'])->name('show');
-        Route::delete('/{profit}', [ProfitCalculationController::class, 'destroy'])->name('destroy');
-        Route::get('/quick-stats', [ProfitCalculationController::class, 'getQuickStats'])->name('quick-stats');
+    // Profit Calculation Routes - SESUAI dengan struktur yang diberikan
+    Route::prefix('profit')->group(function () {
+        Route::get('/', [ProfitCalculationController::class, 'index'])->name('profit.index');
+        Route::get('/get-revenue-data', [ProfitCalculationController::class, 'getRevenueData'])->name('profit.get-revenue-data');
+        Route::get('/get-expenses-data', [ProfitCalculationController::class, 'getExpensesData'])->name('profit.get-expenses-data');
+        Route::post('/add-expense', [ProfitCalculationController::class, 'addExpense'])->name('profit.add-expense');
+        Route::get('/get-expense/{id}', [ProfitCalculationController::class, 'getExpense'])->name('profit.get-expense');
+        Route::put('/update-expense/{id}', [ProfitCalculationController::class, 'updateExpense'])->name('profit.update-expense');
+        Route::delete('/delete-expense/{id}', [ProfitCalculationController::class, 'deleteExpense'])->name('profit.delete-expense');
+        Route::post('/calculate', [ProfitCalculationController::class, 'calculate'])->name('profit.calculate');
+        Route::get('/{profit}', [ProfitCalculationController::class, 'show'])->name('profit.show');
+        Route::delete('/{profit}', [ProfitCalculationController::class, 'destroy'])->name('profit.destroy');
         
-        // AJAX Routes untuk profit calculation
-        Route::get('/get-revenue-data', [ProfitCalculationController::class, 'getRevenueData'])->name('get-revenue-data');
-        Route::get('/get-expenses-data', [ProfitCalculationController::class, 'getExpensesData'])->name('get-expenses-data');
-        Route::post('/add-expense', [ProfitCalculationController::class, 'addExpense'])->name('add-expense');
-        Route::get('/get-expense/{id}', [ProfitCalculationController::class, 'getExpense'])->name('get-expense');
-        Route::put('/update-expense/{id}', [ProfitCalculationController::class, 'updateExpense'])->name('update-expense');
-        Route::delete('/delete-expense/{id}', [ProfitCalculationController::class, 'deleteExpense'])->name('delete-expense');
+        // Tambahan routes yang ada di kode asli
+        Route::get('/quick-stats', [ProfitCalculationController::class, 'getQuickStats'])->name('profit.quick-stats');
     });
 
     // Contact Management Routes

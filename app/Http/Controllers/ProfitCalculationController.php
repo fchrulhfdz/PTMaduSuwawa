@@ -8,99 +8,119 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProfitCalculationController extends Controller
 {
     public function index()
     {
-        $calculations = ProfitCalculation::profitCalculations()->latest()->paginate(10);
-        
-        // Hitung statistik dari transaksi
-        $today = Carbon::today();
-        
-        // Laba Hari Ini - berdasarkan transaksi hari ini
-        $todayTransactions = Transaction::whereDate('created_at', $today)->get();
-        $todayRevenue = $todayTransactions->sum('total');
-        $todayExpenses = ProfitCalculation::expenses()
-                        ->whereDate('expense_date', $today)
-                        ->sum('expense_amount');
-        $todayProfit = $todayRevenue - $todayExpenses;
-        $todayMargin = $todayRevenue > 0 ? ($todayProfit / $todayRevenue) * 100 : 0;
-        
-        // Laba Minggu Ini
-        $weekStart = $today->copy()->startOfWeek();
-        $weekEnd = $today->copy()->endOfWeek();
-        $weekTransactions = Transaction::whereBetween('created_at', [$weekStart, $weekEnd])->get();
-        $weekRevenue = $weekTransactions->sum('total');
-        $weekExpenses = ProfitCalculation::expenses()
-                        ->whereBetween('expense_date', [$weekStart, $weekEnd])
-                        ->sum('expense_amount');
-        $weekProfit = $weekRevenue - $weekExpenses;
-        $weekMargin = $weekRevenue > 0 ? ($weekProfit / $weekRevenue) * 100 : 0;
-        
-        // Laba Bulan Ini
-        $monthStart = $today->copy()->startOfMonth();
-        $monthEnd = $today->copy()->endOfMonth();
-        $monthTransactions = Transaction::whereBetween('created_at', [$monthStart, $monthEnd])->get();
-        $monthRevenue = $monthTransactions->sum('total');
-        $monthExpenses = ProfitCalculation::expenses()
-                        ->whereBetween('expense_date', [$monthStart, $monthEnd])
-                        ->sum('expense_amount');
-        $monthProfit = $monthRevenue - $monthExpenses;
-        $monthMargin = $monthRevenue > 0 ? ($monthProfit / $monthRevenue) * 100 : 0;
-        
-        // Total Perhitungan (hanya yang profit calculation)
-        $totalCalculations = ProfitCalculation::profitCalculations()->count();
+        try {
+            $calculations = ProfitCalculation::profitCalculations()->latest()->paginate(10);
+            
+            $today = Carbon::today();
+            
+            // Hitung statistik dengan method reusable
+            $todayStats = $this->calculatePeriodStats($today, $today);
+            $weekStats = $this->calculatePeriodStats($today->copy()->startOfWeek(), $today->copy()->endOfWeek());
+            $monthStats = $this->calculatePeriodStats($today->copy()->startOfMonth(), $today->copy()->endOfMonth());
+            
+            // Map stats ke variabel individual untuk kompatibilitas dengan view
+            $todayProfit = $todayStats['profit'] ?? 0;
+            $todayMargin = $todayStats['margin'] ?? 0;
+            $weekProfit = $weekStats['profit'] ?? 0;
+            $weekMargin = $weekStats['margin'] ?? 0;
+            $monthProfit = $monthStats['profit'] ?? 0;
+            $monthMargin = $monthStats['margin'] ?? 0;
+            
+            $totalCalculations = ProfitCalculation::profitCalculations()->count();
 
-        return view('admin.profit.index', compact(
-            'calculations',
-            'todayProfit',
-            'todayMargin',
-            'weekProfit',
-            'weekMargin',
-            'monthProfit',
-            'monthMargin',
-            'totalCalculations'
-        ));
+            return view('admin.profit.index', compact(
+                'calculations',
+                'todayProfit',
+                'todayMargin',
+                'weekProfit',
+                'weekMargin',
+                'monthProfit',
+                'monthMargin',
+                'totalCalculations'
+            ));
+
+        } catch (\Exception $e) {
+            Log::error('Error in ProfitCalculationController@index: ' . $e->getMessage());
+            
+            // Return default values in case of error
+            return view('admin.profit.index', [
+                'calculations' => [],
+                'todayProfit' => 0,
+                'todayMargin' => 0,
+                'weekProfit' => 0,
+                'weekMargin' => 0,
+                'monthProfit' => 0,
+                'monthMargin' => 0,
+                'totalCalculations' => 0
+            ]);
+        }
+    }
+
+    // Method reusable untuk menghitung statistik periode
+    private function calculatePeriodStats($startDate, $endDate)
+    {
+        try {
+            $transactions = Transaction::whereBetween('created_at', [$startDate, $endDate])->get();
+            $revenue = $transactions->sum('total');
+            
+            $expenses = ProfitCalculation::expenses()
+                        ->whereBetween('expense_date', [$startDate, $endDate])
+                        ->sum('expense_amount');
+                        
+            $profit = $revenue - $expenses;
+            $margin = $revenue > 0 ? ($profit / $revenue) * 100 : 0;
+
+            return [
+                'revenue' => $revenue,
+                'expenses' => $expenses,
+                'profit' => $profit,
+                'margin' => $margin,
+                'transaction_count' => $transactions->count()
+            ];
+        } catch (\Exception $e) {
+            Log::error('Error in calculatePeriodStats: ' . $e->getMessage());
+            return [
+                'revenue' => 0,
+                'expenses' => 0,
+                'profit' => 0,
+                'margin' => 0,
+                'transaction_count' => 0
+            ];
+        }
     }
 
     // Method untuk mendapatkan data pendapatan berdasarkan periode (AJAX)
     public function getRevenueData(Request $request)
     {
-        $startDate = $request->query('start_date');
-        $endDate = $request->query('end_date');
-        // Validasi
-        if (!$startDate || !$endDate) {
-            return response()->json(['error' => 'Start date and end date are required'], 400);
-        }
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date'
+        ]);
 
         try {
-            // Convert dates to Carbon instances
-            $start = Carbon::parse($startDate)->startOfDay();
-            $end = Carbon::parse($endDate)->endOfDay();
+            $start = Carbon::parse($request->start_date)->startOfDay();
+            $end = Carbon::parse($request->end_date)->endOfDay();
 
-            // Debug: log the dates
-            \Log::info("Fetching revenue data from {$start} to {$end}");
+            Log::info("Fetching revenue data from {$start} to {$end}");
 
-            // Ambil data transaksi dalam periode
             $transactions = Transaction::whereBetween('created_at', [$start, $end])->get();
+            Log::info("Found {$transactions->count()} transactions in period");
 
-            // Debug: log transaction count
-            \Log::info("Found {$transactions->count()} transactions in period");
-
-            // Format data untuk ditampilkan di tabel
             $revenueData = [];
             $totalRevenue = 0;
 
             foreach ($transactions as $transaction) {
-                // Debug: log each transaction
-                \Log::info("Processing transaction: {$transaction->id}, Total: {$transaction->total}");
+                Log::info("Processing transaction: {$transaction->id}, Total: {$transaction->total}");
                 
-                // Karena satu transaksi bisa memiliki multiple items, kita akan loop items
                 $items = $transaction->items_array;
                 
                 if (empty($items)) {
-                    // Jika items kosong, tambahkan transaksi sebagai satu item
                     $revenueData[] = [
                         'date' => $transaction->created_at->format('d M Y'),
                         'product_name' => 'Transaksi #' . $transaction->transaction_code,
@@ -124,11 +144,10 @@ class ProfitCalculationController extends Controller
             }
 
             // Hitung pendapatan kemarin
-            $yesterday = Carbon::parse($startDate)->subDay();
+            $yesterday = Carbon::parse($request->start_date)->subDay();
             $yesterdayRevenue = Transaction::whereDate('created_at', $yesterday)->sum('total');
 
-            // Debug: log final results
-            \Log::info("Total Revenue: {$totalRevenue}, Yesterday Revenue: {$yesterdayRevenue}");
+            Log::info("Total Revenue: {$totalRevenue}, Yesterday Revenue: {$yesterdayRevenue}");
 
             return response()->json([
                 'success' => true,
@@ -139,7 +158,7 @@ class ProfitCalculationController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error("Error in getRevenueData: " . $e->getMessage());
+            Log::error("Error in getRevenueData: " . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'error' => 'Terjadi kesalahan: ' . $e->getMessage()
@@ -150,18 +169,14 @@ class ProfitCalculationController extends Controller
     // Method untuk mendapatkan data pengeluaran berdasarkan periode (AJAX)
     public function getExpensesData(Request $request)
     {
-        $startDate = $request->query('start_date');
-        $endDate = $request->query('end_date');
-
-        // Validasi
-        if (!$startDate || !$endDate) {
-            return response()->json(['error' => 'Start date and end date are required'], 400);
-        }
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date'
+        ]);
 
         try {
-            // Ambil data pengeluaran dalam periode
             $expenses = ProfitCalculation::expenses()
-                        ->whereBetween('expense_date', [$startDate, $endDate])
+                        ->whereBetween('expense_date', [$request->start_date, $request->end_date])
                         ->get();
 
             $expensesData = [];
@@ -184,7 +199,7 @@ class ProfitCalculationController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error("Error in getExpensesData: " . $e->getMessage());
+            Log::error("Error in getExpensesData: " . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'error' => 'Terjadi kesalahan: ' . $e->getMessage()
@@ -217,7 +232,7 @@ class ProfitCalculationController extends Controller
 
             return response()->json(['success' => true, 'expense' => $expense]);
         } catch (\Exception $e) {
-            \Log::error("Error in addExpense: " . $e->getMessage());
+            Log::error("Error in addExpense: " . $e->getMessage());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
@@ -242,7 +257,7 @@ class ProfitCalculationController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
-            \Log::error("Error in getExpense: " . $e->getMessage());
+            Log::error("Error in getExpense: " . $e->getMessage());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
@@ -273,7 +288,7 @@ class ProfitCalculationController extends Controller
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            \Log::error("Error in updateExpense: " . $e->getMessage());
+            Log::error("Error in updateExpense: " . $e->getMessage());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
@@ -291,7 +306,7 @@ class ProfitCalculationController extends Controller
             $expense->delete();
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            \Log::error("Error in deleteExpense: " . $e->getMessage());
+            Log::error("Error in deleteExpense: " . $e->getMessage());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
@@ -360,7 +375,7 @@ class ProfitCalculationController extends Controller
                 ->with('success', 'Perhitungan laba berhasil disimpan!');
                 
         } catch (\Exception $e) {
-            \Log::error("Error in calculate: " . $e->getMessage());
+            Log::error("Error in calculate: " . $e->getMessage());
             return redirect()->route('admin.profit.index')
                 ->with('error', 'Gagal menyimpan perhitungan laba: ' . $e->getMessage());
         }
@@ -368,15 +383,21 @@ class ProfitCalculationController extends Controller
 
     public function show(ProfitCalculation $profit)
     {
-        // Pastikan hanya menampilkan profit calculation
-        if ($profit->type !== 'profit_calculation') {
-            abort(404);
+        try {
+            // Pastikan hanya menampilkan profit calculation
+            if ($profit->type !== 'profit_calculation') {
+                abort(404);
+            }
+
+            $marginPercentage = $profit->total_revenue > 0 ? ($profit->total_profit / $profit->total_revenue) * 100 : 0;
+            $width = min(max($marginPercentage, 0), 100);
+
+            return view('admin.profit.show', compact('profit', 'marginPercentage', 'width'));
+        } catch (\Exception $e) {
+            Log::error("Error in show: " . $e->getMessage());
+            return redirect()->route('admin.profit.index')
+                ->with('error', 'Gagal menampilkan detail perhitungan laba: ' . $e->getMessage());
         }
-
-        $marginPercentage = $profit->total_revenue > 0 ? ($profit->total_profit / $profit->total_revenue) * 100 : 0;
-        $width = min(max($marginPercentage, 0), 100);
-
-        return view('admin.profit.show', compact('profit', 'marginPercentage', 'width'));
     }
 
     public function destroy(ProfitCalculation $profit)
@@ -388,13 +409,13 @@ class ProfitCalculationController extends Controller
                 ->with('success', 'Data perhitungan laba berhasil dihapus!');
                 
         } catch (\Exception $e) {
-            \Log::error("Error in destroy: " . $e->getMessage());
+            Log::error("Error in destroy: " . $e->getMessage());
             return redirect()->route('admin.profit.index')
                 ->with('error', 'Gagal menghapus data perhitungan laba: ' . $e->getMessage());
         }
     }
 
-    // Method untuk quick stats (jika masih diperlukan)
+    // Method untuk quick stats
     public function getQuickStats(Request $request)
     {
         try {
@@ -417,14 +438,7 @@ class ProfitCalculationController extends Controller
                     break;
             }
 
-            // Hitung statistik dari data transaksi dan pengeluaran
-            $transactions = Transaction::whereBetween('created_at', [$startDate, $endDate])->get();
-            $revenue = $transactions->sum('total');
-            $expenses = ProfitCalculation::expenses()
-                        ->whereBetween('expense_date', [$startDate, $endDate])
-                        ->sum('expense_amount');
-            $profit = $revenue - $expenses;
-            $margin = $revenue > 0 ? ($profit / $revenue) * 100 : 0;
+            $stats = $this->calculatePeriodStats($startDate, $endDate);
 
             return response()->json([
                 'success' => true,
@@ -432,14 +446,14 @@ class ProfitCalculationController extends Controller
                     'period' => $period,
                     'start_date' => $startDate->format('Y-m-d'),
                     'end_date' => $endDate->format('Y-m-d'),
-                    'total_revenue' => number_format($revenue, 2),
-                    'total_expenses' => number_format($expenses, 2),
-                    'total_profit' => number_format($profit, 2),
-                    'profit_margin' => number_format($margin, 2)
+                    'total_revenue' => number_format($stats['revenue'], 2),
+                    'total_expenses' => number_format($stats['expenses'], 2),
+                    'total_profit' => number_format($stats['profit'], 2),
+                    'profit_margin' => number_format($stats['margin'], 2)
                 ]
             ]);
         } catch (\Exception $e) {
-            \Log::error("Error in getQuickStats: " . $e->getMessage());
+            Log::error("Error in getQuickStats: " . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage()

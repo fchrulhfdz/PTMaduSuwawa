@@ -308,37 +308,104 @@
 let currentEditingExpenseId = null;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize date change listeners
-    document.getElementById('start_date').addEventListener('change', function() {
-        // Clear revenue data when date changes
-        clearRevenueDisplay();
-    });
+    console.log('DOM Content Loaded - Initializing profit calculation...');
     
-    document.getElementById('end_date').addEventListener('change', function() {
-        // Clear revenue data when date changes
-        clearRevenueDisplay();
-    });
+    // Initialize date change listeners
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+    
+    if (startDateInput) {
+        startDateInput.addEventListener('change', function() {
+            console.log('Start date changed:', this.value);
+            clearRevenueDisplay();
+        });
+    }
+    
+    if (endDateInput) {
+        endDateInput.addEventListener('change', function() {
+            console.log('End date changed:', this.value);
+            clearRevenueDisplay();
+        });
+    }
     
     // Initialize button listeners
-    document.getElementById('showRevenue').addEventListener('click', showRevenueSection);
-    document.getElementById('showExpenses').addEventListener('click', showExpensesSection);
+    const showRevenueBtn = document.getElementById('showRevenue');
+    const showExpensesBtn = document.getElementById('showExpenses');
+    
+    if (showRevenueBtn) {
+        showRevenueBtn.addEventListener('click', showRevenueSection);
+    }
+    
+    if (showExpensesBtn) {
+        showExpensesBtn.addEventListener('click', showExpensesSection);
+    }
     
     // Expense form listeners
-    document.getElementById('addExpenseBtn').addEventListener('click', showExpenseForm);
-    document.getElementById('cancelExpenseBtn').addEventListener('click', hideExpenseForm);
-    document.getElementById('saveExpenseBtn').addEventListener('click', saveExpense);
+    const addExpenseBtn = document.getElementById('addExpenseBtn');
+    const cancelExpenseBtn = document.getElementById('cancelExpenseBtn');
+    const saveExpenseBtn = document.getElementById('saveExpenseBtn');
+    
+    if (addExpenseBtn) {
+        addExpenseBtn.addEventListener('click', showExpenseForm);
+    }
+    
+    if (cancelExpenseBtn) {
+        cancelExpenseBtn.addEventListener('click', hideExpenseForm);
+    }
+    
+    if (saveExpenseBtn) {
+        saveExpenseBtn.addEventListener('click', saveExpense);
+    }
+    
+    console.log('Profit calculation initialized successfully');
 });
 
 // Function to clear revenue display
 function clearRevenueDisplay() {
-    document.getElementById('total_revenue_display').value = 'Rp 0';
-    document.getElementById('total_revenue').value = '0';
+    const revenueDisplay = document.getElementById('total_revenue_display');
+    const revenueInput = document.getElementById('total_revenue');
+    
+    if (revenueDisplay) revenueDisplay.value = 'Rp 0';
+    if (revenueInput) revenueInput.value = '0';
+    
+    console.log('Revenue display cleared');
+}
+
+// Function to show revenue section
+function showRevenueSection() {
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+    
+    console.log('Show Revenue Section called with dates:', startDate, endDate);
+    
+    // Validate dates before showing section
+    if (!startDate || !endDate) {
+        alert('Harap pilih tanggal mulai dan tanggal akhir terlebih dahulu.');
+        return;
+    }
+    
+    if (new Date(startDate) > new Date(endDate)) {
+        alert('Tanggal mulai tidak boleh lebih besar dari tanggal akhir.');
+        return;
+    }
+    
+    // Show revenue section and hide expenses section
+    const revenueSection = document.getElementById('revenueSection');
+    const expensesSection = document.getElementById('expensesSection');
+    
+    if (revenueSection) revenueSection.classList.remove('hidden');
+    if (expensesSection) expensesSection.classList.add('hidden');
+    
+    // Update revenue data for the current period
+    updateRevenueData();
 }
 
 // Function to update revenue data based on selected period
 function updateRevenueData() {
     const startDate = document.getElementById('start_date').value;
     const endDate = document.getElementById('end_date').value;
+    
+    console.log('Update Revenue Data called:', startDate, endDate);
     
     // Validate dates
     if (!startDate || !endDate) {
@@ -352,10 +419,13 @@ function updateRevenueData() {
         return;
     }
     
-    console.log('Fetching revenue data for:', startDate, 'to', endDate);
-    
     // Show loading state
-    document.getElementById('total_revenue_display').value = 'Loading...';
+    const revenueDisplay = document.getElementById('total_revenue_display');
+    const revenueInput = document.getElementById('total_revenue');
+    
+    if (revenueDisplay) revenueDisplay.value = 'Loading...';
+    if (revenueInput) revenueInput.value = '0';
+    
     const revenueTableBody = document.getElementById('revenueTableBody');
     if (revenueTableBody) {
         revenueTableBody.innerHTML = `
@@ -390,8 +460,12 @@ function updateRevenueData() {
             const totalRevenue = parseFloat(data.totalRevenue) || 0;
             
             // Update total revenue display
-            document.getElementById('total_revenue_display').value = 'Rp ' + formatCurrency(totalRevenue);
-            document.getElementById('total_revenue').value = totalRevenue;
+            if (revenueDisplay) {
+                revenueDisplay.value = 'Rp ' + formatCurrency(totalRevenue);
+            }
+            if (revenueInput) {
+                revenueInput.value = totalRevenue;
+            }
             
             // Update revenue table
             populateRevenueTable(data.revenueData || []);
@@ -406,8 +480,10 @@ function updateRevenueData() {
             console.log('Total revenue updated to:', totalRevenue);
         } else {
             console.error('Error in response:', data.error || data.message);
-            document.getElementById('total_revenue_display').value = 'Rp 0';
-            document.getElementById('total_revenue').value = '0';
+            alert('Error: ' + (data.error || data.message || 'Gagal memuat data'));
+            
+            if (revenueDisplay) revenueDisplay.value = 'Rp 0';
+            if (revenueInput) revenueInput.value = '0';
             
             if (revenueTableBody) {
                 revenueTableBody.innerHTML = `
@@ -422,8 +498,10 @@ function updateRevenueData() {
     })
     .catch(error => {
         console.error('Error fetching revenue data:', error);
-        document.getElementById('total_revenue_display').value = 'Rp 0';
-        document.getElementById('total_revenue').value = '0';
+        alert('Terjadi kesalahan saat mengambil data. Silakan coba lagi.');
+        
+        if (revenueDisplay) revenueDisplay.value = 'Rp 0';
+        if (revenueInput) revenueInput.value = '0';
         
         if (revenueTableBody) {
             revenueTableBody.innerHTML = `
@@ -440,6 +518,8 @@ function updateRevenueData() {
 // Function to populate revenue table
 function populateRevenueTable(revenueData) {
     const tbody = document.getElementById('revenueTableBody');
+    if (!tbody) return;
+    
     tbody.innerHTML = '';
     
     if (!revenueData || revenueData.length === 0) {
@@ -488,9 +568,13 @@ function updateRevenueSummary(data) {
     const yesterdayRevenue = parseFloat(data.yesterdayRevenue) || 0;
     const overallRevenue = parseFloat(data.overallRevenue) || totalRevenue;
     
-    document.getElementById('periodRevenueTotal').textContent = 'Rp ' + formatCurrency(totalRevenue);
-    document.getElementById('yesterdayRevenue').textContent = 'Rp ' + formatCurrency(yesterdayRevenue);
-    document.getElementById('overallRevenue').textContent = 'Rp ' + formatCurrency(overallRevenue);
+    const periodRevenueElement = document.getElementById('periodRevenueTotal');
+    const yesterdayRevenueElement = document.getElementById('yesterdayRevenue');
+    const overallRevenueElement = document.getElementById('overallRevenue');
+    
+    if (periodRevenueElement) periodRevenueElement.textContent = 'Rp ' + formatCurrency(totalRevenue);
+    if (yesterdayRevenueElement) yesterdayRevenueElement.textContent = 'Rp ' + formatCurrency(yesterdayRevenue);
+    if (overallRevenueElement) overallRevenueElement.textContent = 'Rp ' + formatCurrency(overallRevenue);
     
     console.log('Revenue summary updated:', {
         periodTotal: totalRevenue,
@@ -499,34 +583,12 @@ function updateRevenueSummary(data) {
     });
 }
 
-// Function to show revenue section
-function showRevenueSection() {
-    const startDate = document.getElementById('start_date').value;
-    const endDate = document.getElementById('end_date').value;
-    
-    // Validate dates before showing section
-    if (!startDate || !endDate) {
-        alert('Harap pilih tanggal mulai dan tanggal akhir terlebih dahulu.');
-        return;
-    }
-    
-    if (new Date(startDate) > new Date(endDate)) {
-        alert('Tanggal mulai tidak boleh lebih besar dari tanggal akhir.');
-        return;
-    }
-    
-    // Show revenue section and hide expenses section
-    document.getElementById('revenueSection').classList.remove('hidden');
-    document.getElementById('expensesSection').classList.add('hidden');
-    
-    // Update revenue data for the current period
-    updateRevenueData();
-}
-
 // Function to show expenses section
 function showExpensesSection() {
     const startDate = document.getElementById('start_date').value;
     const endDate = document.getElementById('end_date').value;
+    
+    console.log('Show Expenses Section called with dates:', startDate, endDate);
     
     // Validate dates before showing section
     if (!startDate || !endDate) {
@@ -540,8 +602,11 @@ function showExpensesSection() {
     }
     
     // Show expenses section and hide revenue section
-    document.getElementById('expensesSection').classList.remove('hidden');
-    document.getElementById('revenueSection').classList.add('hidden');
+    const expensesSection = document.getElementById('expensesSection');
+    const revenueSection = document.getElementById('revenueSection');
+    
+    if (expensesSection) expensesSection.classList.remove('hidden');
+    if (revenueSection) revenueSection.classList.add('hidden');
     
     // Fetch expenses data for the current period
     fetchExpensesData(startDate, endDate);
@@ -549,16 +614,19 @@ function showExpensesSection() {
 
 // Function to fetch expenses data
 function fetchExpensesData(startDate, endDate) {
-    // Show loading state
-    document.getElementById('expensesTableBody').innerHTML = `
-        <tr>
-            <td colspan="4" class="px-4 py-4 text-center text-gray-500">
-                <i class="fas fa-spinner fa-spin mr-2"></i>Memuat data...
-            </td>
-        </tr>
-    `;
-    
     console.log('Fetching expenses data for:', startDate, 'to', endDate);
+    
+    // Show loading state
+    const expensesTableBody = document.getElementById('expensesTableBody');
+    if (expensesTableBody) {
+        expensesTableBody.innerHTML = `
+            <tr>
+                <td colspan="4" class="px-4 py-4 text-center text-gray-500">
+                    <i class="fas fa-spinner fa-spin mr-2"></i>Memuat data...
+                </td>
+            </tr>
+        `;
+    }
     
     // AJAX request to fetch expenses data
     fetch(`/admin/profit/get-expenses-data?start_date=${startDate}&end_date=${endDate}`, {
@@ -585,30 +653,40 @@ function fetchExpensesData(startDate, endDate) {
             });
         } else {
             console.error('Error in expenses response:', data.error || data.message);
-            document.getElementById('expensesTableBody').innerHTML = `
-                <tr>
-                    <td colspan="4" class="px-4 py-4 text-center text-red-500">
-                        <i class="fas fa-exclamation-circle mr-2"></i>Error: ${data.error || data.message || 'Gagal memuat data'}
-                    </td>
-                </tr>
-            `;
+            alert('Error: ' + (data.error || data.message || 'Gagal memuat data pengeluaran'));
+            
+            if (expensesTableBody) {
+                expensesTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-4 py-4 text-center text-red-500">
+                            <i class="fas fa-exclamation-circle mr-2"></i>Error: ${data.error || data.message || 'Gagal memuat data'}
+                        </td>
+                    </tr>
+                `;
+            }
         }
     })
     .catch(error => {
         console.error('Error fetching expenses data:', error);
-        document.getElementById('expensesTableBody').innerHTML = `
-            <tr>
-                <td colspan="4" class="px-4 py-4 text-center text-red-500">
-                    <i class="fas fa-exclamation-circle mr-2"></i>Gagal memuat data. Silakan coba lagi.
-                </td>
-            </tr>
-        `;
+        alert('Terjadi kesalahan saat mengambil data pengeluaran. Silakan coba lagi.');
+        
+        if (expensesTableBody) {
+            expensesTableBody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="px-4 py-4 text-center text-red-500">
+                        <i class="fas fa-exclamation-circle mr-2"></i>Gagal memuat data. Silakan coba lagi.
+                    </td>
+                </tr>
+            `;
+        }
     });
 }
 
 // Function to populate expenses table
 function populateExpensesTable(expensesData) {
     const tbody = document.getElementById('expensesTableBody');
+    if (!tbody) return;
+    
     tbody.innerHTML = '';
     
     if (!expensesData || expensesData.length === 0) {
@@ -658,21 +736,28 @@ function updateExpensesSummary(data) {
     }
     
     const totalExpenses = parseFloat(data.totalExpenses) || 0;
-    document.getElementById('periodExpensesTotal').textContent = 'Rp ' + formatCurrency(totalExpenses);
+    const periodExpensesElement = document.getElementById('periodExpensesTotal');
+    const netProfitElement = document.getElementById('netProfit');
+    
+    if (periodExpensesElement) {
+        periodExpensesElement.textContent = 'Rp ' + formatCurrency(totalExpenses);
+    }
     
     // Calculate net profit
     const revenue = parseFloat(document.getElementById('total_revenue').value) || 0;
     const netProfit = revenue - totalExpenses;
-    document.getElementById('netProfit').textContent = 'Rp ' + formatCurrency(netProfit);
     
-    // Update color based on profit/loss
-    const netProfitElement = document.getElementById('netProfit');
-    if (netProfit >= 0) {
-        netProfitElement.classList.remove('text-red-600');
-        netProfitElement.classList.add('text-green-600');
-    } else {
-        netProfitElement.classList.remove('text-green-600');
-        netProfitElement.classList.add('text-red-600');
+    if (netProfitElement) {
+        netProfitElement.textContent = 'Rp ' + formatCurrency(netProfit);
+        
+        // Update color based on profit/loss
+        if (netProfit >= 0) {
+            netProfitElement.classList.remove('text-red-600');
+            netProfitElement.classList.add('text-green-600');
+        } else {
+            netProfitElement.classList.remove('text-green-600');
+            netProfitElement.classList.add('text-red-600');
+        }
     }
     
     console.log('Expenses summary updated:', {
@@ -684,21 +769,37 @@ function updateExpensesSummary(data) {
 
 // Function to show expense form
 function showExpenseForm() {
-    document.getElementById('addExpenseForm').classList.remove('hidden');
-    document.getElementById('addExpenseBtn').classList.add('hidden');
+    const expenseForm = document.getElementById('addExpenseForm');
+    const addExpenseBtn = document.getElementById('addExpenseBtn');
+    
+    if (expenseForm) expenseForm.classList.remove('hidden');
+    if (addExpenseBtn) addExpenseBtn.classList.add('hidden');
     
     // Reset form
-    document.getElementById('expense_date').value = new Date().toISOString().split('T')[0];
-    document.getElementById('expense_amount').value = '';
-    document.getElementById('expense_description').value = '';
+    const expenseDate = document.getElementById('expense_date');
+    const expenseAmount = document.getElementById('expense_amount');
+    const expenseDescription = document.getElementById('expense_description');
+    
+    if (expenseDate) expenseDate.value = new Date().toISOString().split('T')[0];
+    if (expenseAmount) expenseAmount.value = '';
+    if (expenseDescription) expenseDescription.value = '';
+    
     currentEditingExpenseId = null;
+    
+    console.log('Expense form shown');
 }
 
 // Function to hide expense form
 function hideExpenseForm() {
-    document.getElementById('addExpenseForm').classList.add('hidden');
-    document.getElementById('addExpenseBtn').classList.remove('hidden');
+    const expenseForm = document.getElementById('addExpenseForm');
+    const addExpenseBtn = document.getElementById('addExpenseBtn');
+    
+    if (expenseForm) expenseForm.classList.add('hidden');
+    if (addExpenseBtn) addExpenseBtn.classList.remove('hidden');
+    
     currentEditingExpenseId = null;
+    
+    console.log('Expense form hidden');
 }
 
 // Function to save expense
@@ -707,24 +808,25 @@ function saveExpense() {
     const amount = document.getElementById('expense_amount').value;
     const description = document.getElementById('expense_description').value;
     
+    console.log('Saving expense:', { date, amount, description });
+    
     // Validation
     if (!date || !amount || !description) {
         alert('Harap isi semua field yang diperlukan.');
         return;
     }
     
-    if (parseFloat(amount) <= 0) {
+    const amountValue = parseFloat(amount);
+    if (isNaN(amountValue) || amountValue <= 0) {
         alert('Jumlah pengeluaran harus lebih dari 0.');
         return;
     }
     
     const data = {
         date: date,
-        amount: parseFloat(amount),
+        amount: amountValue,
         description: description
     };
-    
-    console.log('Saving expense:', data);
     
     // Determine if we're creating or updating
     const url = currentEditingExpenseId 
@@ -732,6 +834,8 @@ function saveExpense() {
         : '/admin/profit/add-expense';
     
     const method = currentEditingExpenseId ? 'PUT' : 'POST';
+    
+    console.log(`Making ${method} request to: ${url}`);
     
     // AJAX request to save expense
     fetch(url, {
@@ -796,14 +900,22 @@ function editExpense(expenseId) {
         console.log('Get expense result:', result);
         if (result.success && result.expense) {
             // Populate form with expense data
-            document.getElementById('expense_date').value = result.expense.date;
-            document.getElementById('expense_amount').value = result.expense.amount;
-            document.getElementById('expense_description').value = result.expense.description;
+            const expenseDate = document.getElementById('expense_date');
+            const expenseAmount = document.getElementById('expense_amount');
+            const expenseDescription = document.getElementById('expense_description');
+            
+            if (expenseDate) expenseDate.value = result.expense.date;
+            if (expenseAmount) expenseAmount.value = result.expense.amount;
+            if (expenseDescription) expenseDescription.value = result.expense.description;
             
             // Set current editing ID and show form
             currentEditingExpenseId = expenseId;
-            document.getElementById('addExpenseForm').classList.remove('hidden');
-            document.getElementById('addExpenseBtn').classList.add('hidden');
+            
+            const expenseForm = document.getElementById('addExpenseForm');
+            const addExpenseBtn = document.getElementById('addExpenseBtn');
+            
+            if (expenseForm) expenseForm.classList.remove('hidden');
+            if (addExpenseBtn) addExpenseBtn.classList.add('hidden');
         } else {
             alert('Terjadi kesalahan: ' + (result.message || 'Data tidak ditemukan'));
         }
@@ -870,10 +982,16 @@ function formatCurrency(amount) {
 
 // Function to load quick stats
 function loadQuickStats() {
+    console.log('Loading quick stats...');
+    
     // Show loading state
-    document.getElementById('today-profit').textContent = 'Loading...';
-    document.getElementById('week-profit').textContent = 'Loading...';
-    document.getElementById('month-profit').textContent = 'Loading...';
+    const todayProfit = document.getElementById('today-profit');
+    const weekProfit = document.getElementById('week-profit');
+    const monthProfit = document.getElementById('month-profit');
+    
+    if (todayProfit) todayProfit.textContent = 'Loading...';
+    if (weekProfit) weekProfit.textContent = 'Loading...';
+    if (monthProfit) monthProfit.textContent = 'Loading...';
     
     // Reload the page to get fresh data
     window.location.reload();

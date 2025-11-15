@@ -1,10 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+
+namespace App\Http\Controllers\Admin;
+
 
 use App\Http\Controllers\Controller;
 use App\Models\ProfitCalculation;
 use App\Models\Transaction;
+use App\Models\Product; // FIXED: import Product model
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;

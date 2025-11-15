@@ -6,127 +6,155 @@ use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
     public function index(Request $request)
-    {
-        $startDate = $request->get('start_date');
-        $endDate = $request->get('end_date');
-        $productId = $request->get('product_id');
-        $category = $request->get('category');
+{
+    try {
+        // Ambil parameter filter
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        $productId = $request->input('product_id');
+        $category = $request->input('category');
 
-        // Query transactions dengan filter
-        $transactionsQuery = Transaction::where('status', 'completed')
-            ->latest();
+        // Query dasar untuk transaksi completed
+        $query = Transaction::where('status', 'completed');
 
-        // Filter by date range
-        if ($startDate && $endDate) {
-            $transactionsQuery->whereBetween('created_at', [$startDate, $endDate]);
-        } elseif ($startDate) {
-            $transactionsQuery->whereDate('created_at', '>=', $startDate);
-        } elseif ($endDate) {
-            $transactionsQuery->whereDate('created_at', '<=', $endDate);
+        // Filter tanggal
+        if ($startDate) {
+            $query->whereDate('created_at', '>=', $startDate);
         }
 
-        // Get transactions untuk table
-        $transactions = $transactionsQuery->paginate(50);
+        if ($endDate) {
+            $query->whereDate('created_at', '<=', $endDate);
+        }
 
-        // Hitung statistics dari semua transaksi yang difilter
-        $totalTransactions = $transactions->total();
-        $totalRevenue = $transactions->sum('total');
-        
-        // Hitung total quantity dan total produk terjual
-        $totalQuantity = 0;
+        // Filter produk dan kategori akan diproses di loop
+        $transactions = $query->with('product')->orderBy('created_at', 'desc')->get();
+        // Inisialisasi variabel
+        $filteredItems = collect();
         $totalProductsSold = 0;
-        
-        foreach ($transactions as $transaction) {
-            // Gunakan items_array accessor dari model
-            $items = $transaction->items_array;
-            
-            if (is_array($items)) {
-                foreach ($items as $item) {
-                    // Filter by product
-                    if ($productId && ($item['product_id'] ?? null) != $productId) {
-                        continue;
-                    }
-                    
-                    // Get product untuk filter category
-                    $product = Product::find($item['product_id'] ?? null);
-                    if ($category && $product && $product->category != $category) {
-                        continue;
-                    }
-                    
-                    $totalQuantity += $item['quantity'] ?? 0;
-                    $totalProductsSold++;
-                }
-            }
-        }
+        $totalQuantity = 0;
+        $totalRevenue = 0;
 
-        // Get unique categories from products
-        $categories = Product::distinct()->pluck('category')->filter();
-
-        // Get category summary
-        $categorySummary = [];
+        // Proses setiap transaksi untuk filtering yang lebih kompleks
         foreach ($transactions as $transaction) {
-            // Gunakan items_array accessor dari model
-            $items = $transaction->items_array;
-            
-            if (is_array($items)) {
+            $items = json_decode($transaction->items,true) ?? $transaction->items_array;
+            if (is_array($items) && !empty($items)) {
+                // Transaksi dengan multiple items
                 foreach ($items as $item) {
                     $product = Product::find($item['product_id'] ?? null);
+                    
                     if (!$product) continue;
+
+                    // Filter berdasarkan kategori
+                    if ($category && $product->category != $category) continue;
                     
-                    // Filter by product
-                    if ($productId && $product->id != $productId) {
-                        continue;
-                    }
-                    
-                    // Filter by category
-                    if ($category && $product->category != $category) {
-                        continue;
-                    }
-                    
-                    $categoryName = $product->category;
+                    // Filter berdasarkan produk
+                    if ($productId && $product->id != $productId) continue;
+
                     $quantity = $item['quantity'] ?? 0;
-                    // Gunakan final_total jika ada, jika tidak gunakan total biasa
-                    $totalPrice = $item['final_total'] ?? $item['total'] ?? ($quantity * ($item['price'] ?? $product->price));
-                    
-                    if (!isset($categorySummary[$categoryName])) {
-                        $categorySummary[$categoryName] = [
-                            'category' => $categoryName,
-                            'total_quantity' => 0,
-                            'total_revenue' => 0
-                        ];
-                    }
-                    
-                    $categorySummary[$categoryName]['total_quantity'] += $quantity;
-                    $categorySummary[$categoryName]['total_revenue'] += $totalPrice;
+                    $itemTotal = $item['final_total'] ?? $item['total'] ?? (($item['quantity'] ?? 0) * ($item['price'] ?? $product->price));
+
+                    $totalProductsSold++;
+                    $totalQuantity += $quantity;
+                    $totalRevenue += $itemTotal;
+
+                    $filteredItems->push([
+                        'transaction' => $transaction,
+                        'item' => $item,
+                        'product' => $product,
+                        'quantity' => $quantity,
+                        'total' => $itemTotal,
+                        'item_price' => $item['price'] ?? $product->price,
+                        'original_price' => $item['original_price'] ?? $item['price'] ?? $product->price,
+                        'discount_percentage' => $item['discount_percentage'] ?? 0,
+                        'discount_amount' => $item['discount_amount'] ?? 0
+                    ]);
                 }
+            } else {
+                // Transaksi lama (single product)
+                $product = $transaction->product;
+                
+                if (!$product) continue;
+
+                // Filter berdasarkan kategori
+                if ($category && $product->category != $category) continue;
+                
+                // Filter berdasarkan produk
+                if ($productId && $product->id != $productId) continue;
+
+                $quantity = $transaction->quantity ?? 1;
+                $itemTotal = $transaction->total;
+
+                $totalProductsSold++;
+                $totalQuantity += $quantity;
+                $totalRevenue += $itemTotal;
+
+                $filteredItems->push([
+                    'transaction' => $transaction,
+                    'item' => [
+                        'product_id' => $product->id,
+                        'quantity' => $quantity,
+                        'price' => $transaction->total / $quantity,
+                        'total' => $transaction->total
+                    ],
+                    'product' => $product,
+                    'quantity' => $quantity,
+                    'total' => $itemTotal,
+                    'item_price' => $transaction->total / $quantity,
+                    'original_price' => $transaction->total / $quantity,
+                    'discount_percentage' => 0,
+                    'discount_amount' => 0
+                ]);
+
             }
         }
+
+        // Total transaksi (unik)
+        $totalTransactions = $filteredItems->pluck('transaction.id')->unique()->count();
+
+        // Pagination
+        $perPage = 15;
+        $currentPage = \Illuminate\Pagination\Paginator::resolveCurrentPage();
+        $currentItems = $filteredItems->slice(($currentPage - 1) * $perPage, $perPage)->all();
         
-        $categorySummary = collect($categorySummary)->values();
+        $transactionsPaginated = new \Illuminate\Pagination\LengthAwarePaginator(
+            $currentItems, 
+            $filteredItems->count(), 
+            $perPage, 
+            $currentPage,
+            [
+                'path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(),
+                'query' => $request->query()
+            ]
+        );
 
+        // Data untuk dropdown
         $products = Product::orderBy('name')->get();
-
+        $categories = Product::whereNotNull('category')->distinct()->pluck('category');
         return view('admin.reports.index', compact(
-            'transactions',
-            'totalProductsSold',
-            'totalTransactions',
-            'totalRevenue',
-            'totalQuantity',
+            'transactionsPaginated',
             'products',
             'categories',
-            'categorySummary',
+            'totalProductsSold',
+            'totalQuantity',
+            'totalRevenue',
+            'totalTransactions',
             'startDate',
-            'endDate',
-            'productId',
-            'category'
+            'endDate'
         ));
+
+    } catch (\Exception $e) {
+        \Log::error('Error in ReportController@index: ' . $e->getMessage());
+        
+        return back()->with('error', 'Terjadi kesalahan saat memuat laporan: ' . $e->getMessage());
     }
+}
+
 
     public function monthly(Request $request)
     {
