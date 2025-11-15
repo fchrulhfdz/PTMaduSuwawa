@@ -36,9 +36,9 @@
                                 <div class="flex-1">
                                     <h3 class="font-bold text-gray-900 mb-2">Alamat</h3>
                                     <p class="text-gray-600 text-sm leading-relaxed">
-                                        Jl. Raya Suwawa No. 123<br>
-                                        Kec. Suwawa, Bone Bolango<br>
-                                        Gorontalo 96562
+                                        Jl. Tribrata, Ipilo, 
+                                        Kec. Kota Timur, <br>
+                                        Kota Gorontalo, Gorontalo
                                     </p>
                                 </div>
                             </div>
@@ -54,10 +54,10 @@
                                     <h3 class="font-bold text-gray-900 mb-2">Telepon</h3>
                                     <div class="space-y-1">
                                         <a href="tel:+6281234567890" class="block text-gray-600 hover:text-amber-600 transition text-sm font-medium">
-                                            +62 812-3456-7890
+                                            +62 823-9620-0375
                                         </a>
                                         <a href="tel:+6289876543210" class="block text-gray-600 hover:text-amber-600 transition text-sm font-medium">
-                                            +62 898-7654-3210
+                                            +62 856-9679-8342
                                         </a>
                                     </div>
                                 </div>
@@ -74,10 +74,7 @@
                                     <h3 class="font-bold text-gray-900 mb-2">Email</h3>
                                     <div class="space-y-1">
                                         <a href="mailto:info@madusuwawa.com" class="block text-gray-600 hover:text-amber-600 transition text-sm font-medium">
-                                            info@madusuwawa.com
-                                        </a>
-                                        <a href="mailto:order@madusuwawa.com" class="block text-gray-600 hover:text-amber-600 transition text-sm font-medium">
-                                            order@madusuwawa.com
+                                            madusuwawa@gmail.com
                                         </a>
                                     </div>
                                 </div>
@@ -93,9 +90,9 @@
                                 <div class="flex-1">
                                     <h3 class="font-bold text-gray-900 mb-2">Jam Operasional</h3>
                                     <p class="text-gray-600 text-sm leading-relaxed">
-                                        Senin - Jumat: 08:00 - 17:00 WITA<br>
-                                        Sabtu: 08:00 - 15:00 WITA<br>
-                                        Minggu: Tutup
+                                        Senin - Sabtu : 09.00 - 19.00 WITA<br>
+                                        Minggu: Tutup<br>
+                                        
                                     </p>
                                 </div>
                             </div>
@@ -108,16 +105,13 @@
                                 Media Sosial
                             </h3>
                             <div class="flex gap-3">
-                                <a href="#" class="group flex-1 bg-white p-3 rounded-xl text-gray-600 hover:bg-blue-600 hover:text-white transition-all duration-300 text-center shadow-sm hover:shadow-md hover:-translate-y-1">
+                                <a href="https://www.facebook.com/share/17N2RcZf4n/" class="group flex-1 bg-white p-3 rounded-xl text-gray-600 hover:bg-blue-600 hover:text-white transition-all duration-300 text-center shadow-sm hover:shadow-md hover:-translate-y-1">
                                     <i class="fab fa-facebook-f text-lg"></i>
                                 </a>
-                                <a href="#" class="group flex-1 bg-white p-3 rounded-xl text-gray-600 hover:bg-pink-600 hover:text-white transition-all duration-300 text-center shadow-sm hover:shadow-md hover:-translate-y-1">
+                                <a href="https://www.instagram.com/madusuwawa?igsh=d25ia3lnbXIyMmFx" class="group flex-1 bg-white p-3 rounded-xl text-gray-600 hover:bg-pink-600 hover:text-white transition-all duration-300 text-center shadow-sm hover:shadow-md hover:-translate-y-1">
                                     <i class="fab fa-instagram text-lg"></i>
                                 </a>
-                                <a href="#" class="group flex-1 bg-white p-3 rounded-xl text-gray-600 hover:bg-green-600 hover:text-white transition-all duration-300 text-center shadow-sm hover:shadow-md hover:-translate-y-1">
-                                    <i class="fab fa-whatsapp text-lg"></i>
-                                </a>
-                                <a href="#" class="group flex-1 bg-white p-3 rounded-xl text-gray-600 hover:bg-gray-900 hover:text-white transition-all duration-300 text-center shadow-sm hover:shadow-md hover:-translate-y-1">
+                                <a href="https://www.tiktok.com/@sehat_1.com?_r=1&_t=ZS-91QLOBeNmQJ" class="group flex-1 bg-white p-3 rounded-xl text-gray-600 hover:bg-gray-900 hover:text-white transition-all duration-300 text-center shadow-sm hover:shadow-md hover:-translate-y-1">
                                     <i class="fab fa-tiktok text-lg"></i>
                                 </a>
                             </div>
@@ -328,72 +322,209 @@
     </div>
 </section>
 
-<!-- FAQ Section -->
+<!-- Distributors Section -->
 <section class="py-20 bg-gradient-to-b from-white to-amber-50">
-    <div class="max-w-4xl mx-auto px-4">
+    <div class="max-w-7xl mx-auto px-4">
         <div class="text-center mb-12">
             <div class="inline-block mb-4 px-4 py-2 bg-amber-100 rounded-full text-amber-700 font-medium text-sm">
-                FAQ
+                Distributor
             </div>
-            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Pertanyaan Umum</h2>
-            <p class="text-gray-600">Temukan jawaban untuk pertanyaan yang sering diajukan</p>
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Distributor Madu Suwawa</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">Temukan distributor resmi Madu Suwawa di berbagai daerah untuk kemudahan pembelian</p>
         </div>
-        
-        <div class="space-y-4">
-            <!-- FAQ Item 1 -->
-            <div class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
-                <button class="faq-question w-full px-6 py-5 text-left font-bold text-gray-900 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 transition-all duration-300 flex justify-between items-center gap-4">
-                    <span class="flex-1">Bagaimana cara memesan produk Madu Suwawa?</span>
-                    <div class="flex-shrink-0 bg-amber-100 group-hover:bg-amber-200 p-2 rounded-lg transition-colors duration-300">
+
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+            <!-- Gorontalo Kota -->
+            <div class="border-b border-gray-100 last:border-b-0">
+                <button class="distributor-toggle w-full px-8 py-6 text-left bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 transition-all duration-300 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">Gorontalo</h3>
+                        <p class="text-gray-600 text-sm">Kota Gorontalo</p>
+                    </div>
+                    <div class="flex-shrink-0 bg-amber-500 text-white p-2 rounded-lg">
                         <i class="fas fa-chevron-down transition-transform duration-300"></i>
                     </div>
                 </button>
-                <div class="faq-answer px-6 pb-5 text-gray-600 leading-relaxed hidden">
-                    Anda dapat memesan melalui WhatsApp kami di +62 812-3456-7890, email order@madusuwawa.com, atau datang langsung ke lokasi kami. Kami melayani pengiriman ke seluruh Indonesia.
+                <div class="distributor-content px-8 pb-6 hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <h4 class="font-bold text-gray-900 mb-2">Rumah Terapi Gorontalo</h4>
+                            <p class="text-gray-600 text-sm mb-2">Jl Taman Surya</p>
+                            <a href="tel:+6281393013465" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                                <i class="fas fa-phone mr-2"></i>+62 813-9301-3465
+                            </a>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <h4 class="font-bold text-gray-900 mb-2">Pustakah Sunnah</h4>
+                            <a href="tel:+6285298111424" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                                <i class="fas fa-phone mr-2"></i>+62 852-9811-1424
+                            </a>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <h4 class="font-bold text-gray-900 mb-2">Lapak Azwa/Azwaexpress</h4>
+                            <p class="text-gray-600 text-sm mb-2">Jl Poigar</p>
+                            <a href="tel:+6282290571023" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                                <i class="fas fa-phone mr-2"></i>+62 822-9057-1023
+                            </a>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <h4 class="font-bold text-gray-900 mb-2">Rumah Dinas Imigrasi Gorontalo</h4>
+                            <a href="tel:+6281356070019" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                                <i class="fas fa-phone mr-2"></i>+62 813-5607-0019
+                            </a>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <h4 class="font-bold text-gray-900 mb-2">Bele Li Umi Afwan</h4>
+                            <a href="tel:+6281356668824" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                                <i class="fas fa-phone mr-2"></i>+62 813-5666-8824
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- FAQ Item 2 -->
-            <div class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
-                <button class="faq-question w-full px-6 py-5 text-left font-bold text-gray-900 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 transition-all duration-300 flex justify-between items-center gap-4">
-                    <span class="flex-1">Apakah madu yang dijual benar-benar asli?</span>
-                    <div class="flex-shrink-0 bg-amber-100 group-hover:bg-amber-200 p-2 rounded-lg transition-colors duration-300">
+            <!-- Kabupaten Gorontalo -->
+            <div class="border-b border-gray-100 last:border-b-0">
+                <button class="distributor-toggle w-full px-8 py-6 text-left bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 transition-all duration-300 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">Kabupaten Gorontalo</h3>
+                        <p class="text-gray-600 text-sm">Telaga & Telaga Biru</p>
+                    </div>
+                    <div class="flex-shrink-0 bg-amber-500 text-white p-2 rounded-lg">
                         <i class="fas fa-chevron-down transition-transform duration-300"></i>
                     </div>
                 </button>
-                <div class="faq-answer px-6 pb-5 text-gray-600 leading-relaxed hidden">
-                    Ya, kami menjamin 100% madu asli tanpa campuran gula atau bahan kimia. Madu kami langsung dari petani Suwawa dengan proses tradisional yang menjaga kemurniannya.
+                <div class="distributor-content px-8 pb-6 hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <h4 class="font-bold text-gray-900 mb-2">Distributor Madu Suwawa</h4>
+                            <p class="text-gray-600 text-sm mb-2">Jl. Ahmad A. Wahab, samping Ice Cream Xiyue, TELAGA</p>
+                            <a href="tel:+6285255388228" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                                <i class="fas fa-phone mr-2"></i>+62 852-5538-8228
+                            </a>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <h4 class="font-bold text-gray-900 mb-2">Al Barokah Outlet</h4>
+                            <p class="text-gray-600 text-sm mb-2">Pentadio Timur, Telaga Biru</p>
+                            <a href="tel:+6282190215275" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                                <i class="fas fa-phone mr-2"></i>+62 821-9021-5275
+                            </a>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <h4 class="font-bold text-gray-900 mb-2">MHIJRAH TOKO KURMA, MADU & HERBAL</h4>
+                            <a href="tel:+6285395653396" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                                <i class="fas fa-phone mr-2"></i>+62 853-9565-3396
+                            </a>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <h4 class="font-bold text-gray-900 mb-2">SARANG HERBAL 1SIMU</h4>
+                            <a href="tel:+6282188760094" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                                <i class="fas fa-phone mr-2"></i>+62 821-8876-0094
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- FAQ Item 3 -->
-            <div class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
-                <button class="faq-question w-full px-6 py-5 text-left font-bold text-gray-900 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 transition-all duration-300 flex justify-between items-center gap-4">
-                    <span class="flex-1">Berapa lama masa penyimpanan madu?</span>
-                    <div class="flex-shrink-0 bg-amber-100 group-hover:bg-amber-200 p-2 rounded-lg transition-colors duration-300">
+            <!-- Boalemo -->
+            <div class="border-b border-gray-100 last:border-b-0">
+                <button class="distributor-toggle w-full px-8 py-6 text-left bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 transition-all duration-300 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">Boalemo</h3>
+                        <p class="text-gray-600 text-sm">Tilamuta</p>
+                    </div>
+                    <div class="flex-shrink-0 bg-amber-500 text-white p-2 rounded-lg">
                         <i class="fas fa-chevron-down transition-transform duration-300"></i>
                     </div>
                 </button>
-                <div class="faq-answer px-6 pb-5 text-gray-600 leading-relaxed hidden">
-                    Madu asli dapat bertahan hingga 2 tahun jika disimpan dengan benar. Simpan di tempat sejuk dan kering, hindari sinar matahari langsung, dan tutup rapat setelah digunakan.
+                <div class="distributor-content px-8 pb-6 hidden">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <h4 class="font-bold text-gray-900 mb-2">Distributor Madu Suwawa</h4>
+                            <p class="text-gray-600 text-sm mb-2">Desa Limbato, Jln. Ahmad Yani Kecamatan Tilamuta, 200M dari Kantor Bupati Boalemo</p>
+                            <a href="tel:+6282156730354" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                                <i class="fas fa-phone mr-2"></i>+62 821-5673-0354
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- FAQ Item 4 -->
-            <div class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
-                <button class="faq-question w-full px-6 py-5 text-left font-bold text-gray-900 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 transition-all duration-300 flex justify-between items-center gap-4">
-                    <span class="flex-1">Apakah ada minimal pemesanan?</span>
-                    <div class="flex-shrink-0 bg-amber-100 group-hover:bg-amber-200 p-2 rounded-lg transition-colors duration-300">
+            <!-- Bone Bolango -->
+            <div class="border-b border-gray-100 last:border-b-0">
+                <button class="distributor-toggle w-full px-8 py-6 text-left bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 transition-all duration-300 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">Bone Bolango</h3>
+                        <p class="text-gray-600 text-sm">Suwawa & Tapa</p>
+                    </div>
+                    <div class="flex-shrink-0 bg-amber-500 text-white p-2 rounded-lg">
                         <i class="fas fa-chevron-down transition-transform duration-300"></i>
                     </div>
                 </button>
-                <div class="faq-answer px-6 pb-5 text-gray-600 leading-relaxed hidden">
-                    Untuk retail, tidak ada minimal pemesanan. Namun untuk grosir atau reseller, minimal pemesanan 12 botol dengan harga khusus.
+                <div class="distributor-content px-8 pb-6 hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <h4 class="font-bold text-gray-900 mb-2">Alsin Mart</h4>
+                            <a href="tel:+6281242693084" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                                <i class="fas fa-phone mr-2"></i>+62 812-4269-3084
+                            </a>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <h4 class="font-bold text-gray-900 mb-2">Belle Li Lidya Ayu</h4>
+                            <p class="text-gray-600 text-sm mb-2">Jl KH Abas Rauf Samping Ktr Desa Toluwaya Kompleks Rumah Adat Gobel Tapa</p>
+                            <a href="tel:+6285298801649" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                                <i class="fas fa-phone mr-2"></i>+62 852-9880-1649
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kotamobagu -->
+            <div class="border-b border-gray-100 last:border-b-0">
+                <button class="distributor-toggle w-full px-8 py-6 text-left bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 transition-all duration-300 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">Kotamobagu</h3>
+                    </div>
+                    <div class="flex-shrink-0 bg-amber-500 text-white p-2 rounded-lg">
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </div>
+                </button>
+                <div class="distributor-content px-8 pb-6 hidden">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <h4 class="font-bold text-gray-900 mb-2">Toko Hawwaril Herbal KTG</h4>
+                            <a href="tel:+6285657229375" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                                <i class="fas fa-phone mr-2"></i>+62 856-5722-9375
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Makassar -->
+            <div class="border-b border-gray-100 last:border-b-0">
+                <button class="distributor-toggle w-full px-8 py-6 text-left bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 transition-all duration-300 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">Makassar</h3>
+                    </div>
+                    <div class="flex-shrink-0 bg-amber-500 text-white p-2 rounded-lg">
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                    </div>
+                </button>
+                <div class="distributor-content px-8 pb-6 hidden">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <h4 class="font-bold text-gray-900 mb-2">MY ZO (Handmade Bag)</h4>
+                            <a href="tel:+62895341302149" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                                <i class="fas fa-phone mr-2"></i>+62 895-3413-02149
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -459,6 +590,26 @@ document.addEventListener('DOMContentLoaded', function() {
             e.target.value = value;
         });
     }
+
+    // Distributor Toggle
+const distributorToggles = document.querySelectorAll('.distributor-toggle');
+
+distributorToggles.forEach(toggle => {
+    toggle.addEventListener('click', function() {
+        const content = this.nextElementSibling;
+        const icon = this.querySelector('i');
+        
+        // Toggle content
+        content.classList.toggle('hidden');
+        
+        // Rotate icon
+        if (icon.style.transform === 'rotate(180deg)') {
+            icon.style.transform = 'rotate(0deg)';
+        } else {
+            icon.style.transform = 'rotate(180deg)';
+        }
+    });
+});
 });
 </script>
 @endsection

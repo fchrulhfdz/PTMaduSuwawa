@@ -41,7 +41,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produk</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
+                        <!-- KOLOM KATEGORI DIHAPUS -->
                         <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stok</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Berat</th>
@@ -72,11 +72,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                {{ $product->category }}
-                            </span>
-                        </td>
+                        <!-- SEL KATEGORI DIHAPUS -->
                         <td class="px-6 py-4">
                             <div class="text-sm font-semibold text-gray-900">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
                         </td>
@@ -120,7 +116,8 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-12 text-center">
+                        <td colspan="5" class="px-6 py-12 text-center">
+                            <!-- COLSPAN DIUBAH MENJADI 5 KARENA KOLOM KATEGORI DIHAPUS -->
                             <div class="flex flex-col items-center justify-center space-y-3">
                                 <div class="h-16 w-16 rounded-xl bg-gray-100 flex items-center justify-center">
                                     <i class="fas fa-inbox text-gray-400 text-xl"></i>

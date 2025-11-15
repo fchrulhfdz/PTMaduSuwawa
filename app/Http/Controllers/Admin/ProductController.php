@@ -24,7 +24,6 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'berat_isi' => 'nullable|string|max:50',
@@ -55,7 +54,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'required|string|max:255',
+            // 'category' => 'required|string|max:255', // DIHAPUS
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'berat_isi' => 'nullable|string|max:50',

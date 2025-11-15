@@ -84,7 +84,7 @@
         </div>
     </nav>
 
-    <!-- Enhanced Mobile Menu -->
+    <!-- Enhanced Mobile Menu - SUDAH DIPERBAIKI -->
     <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-sm shadow-2xl border-b border-amber-100">
         <div class="px-6 py-6 space-y-4">
             <a href="{{ route('home') }}" class="group flex items-center space-x-4 px-5 py-4 text-gray-700 hover:text-amber-600 hover:bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl transition-all duration-300 border border-transparent hover:border-amber-200">
@@ -105,6 +105,18 @@
                 <div class="flex-1">
                     <span class="font-semibold text-lg">Produk</span>
                     <p class="text-gray-500 text-sm mt-1">Lihat koleksi madu</p>
+                </div>
+                <i class="fas fa-chevron-right text-amber-400 text-sm group-hover:translate-x-1 transition-transform duration-300"></i>
+            </a>
+
+            <!-- Testimoni Menu - YANG DITAMBAHKAN -->
+            <a href="{{ route('testimoni') }}" class="group flex items-center space-x-4 px-5 py-4 text-gray-700 hover:text-amber-600 hover:bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl transition-all duration-300 border border-transparent hover:border-amber-200">
+                <div class="w-10 h-10 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                    <i class="fas fa-comment text-amber-600"></i>
+                </div>
+                <div class="flex-1">
+                    <span class="font-semibold text-lg">Testimoni</span>
+                    <p class="text-gray-500 text-sm mt-1">Ulasan pelanggan</p>
                 </div>
                 <i class="fas fa-chevron-right text-amber-400 text-sm group-hover:translate-x-1 transition-transform duration-300"></i>
             </a>
@@ -239,44 +251,52 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    
+    <!-- jQuery untuk Mobile Menu -->
     <script>
-        // Enhanced Mobile menu toggle
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-
-            if (mobileMenuButton && mobileMenu) {
-                mobileMenuButton.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('hidden');
-                    
-                    // Toggle button icon
-                    const icon = this.querySelector('i');
-                    if (mobileMenu.classList.contains('hidden')) {
-                        icon.className = 'fas fa-bars text-lg';
-                    } else {
-                        icon.className = 'fas fa-times text-lg';
-                    }
-                });
-
-                // Close mobile menu when clicking outside
-                document.addEventListener('click', function(event) {
-                    if (!event.target.closest('#mobile-menu') && 
-                        !event.target.closest('#mobile-menu-button') &&
-                        !mobileMenu.classList.contains('hidden')) {
-                        mobileMenu.classList.add('hidden');
-                        const icon = mobileMenuButton.querySelector('i');
-                        icon.className = 'fas fa-bars text-lg';
-                    }
-                });
-            }
-
-            // Add scroll effect to navbar
-            window.addEventListener('scroll', function() {
-                const nav = document.querySelector('nav');
-                if (window.scrollY > 50) {
-                    nav.classList.add('shadow-2xl', 'bg-white/98');
+        $(document).ready(function() {
+            // Enhanced Mobile menu toggle dengan jQuery
+            $('#mobile-menu-button').click(function(e) {
+                e.stopPropagation();
+                $('#mobile-menu').slideToggle(300);
+                
+                // Toggle button icon
+                const icon = $(this).find('i');
+                if ($('#mobile-menu').is(':visible')) {
+                    icon.removeClass('fa-bars').addClass('fa-times');
                 } else {
-                    nav.classList.remove('shadow-2xl', 'bg-white/98');
+                    icon.removeClass('fa-times').addClass('fa-bars');
+                }
+            });
+
+            // Close mobile menu when clicking on a link
+            $('#mobile-menu a').click(function() {
+                $('#mobile-menu').slideUp(300);
+                $('#mobile-menu-button i').removeClass('fa-times').addClass('fa-bars');
+            });
+
+            // Close mobile menu when clicking outside
+            $(document).click(function(e) {
+                if (!$(e.target).closest('#mobile-menu, #mobile-menu-button').length) {
+                    if ($('#mobile-menu').is(':visible')) {
+                        $('#mobile-menu').slideUp(300);
+                        $('#mobile-menu-button i').removeClass('fa-times').addClass('fa-bars');
+                    }
+                }
+            });
+
+            // Prevent menu from closing when clicking inside menu
+            $('#mobile-menu').click(function(e) {
+                e.stopPropagation();
+            });
+
+            // Add scroll effect to navbar dengan jQuery
+            $(window).scroll(function() {
+                const nav = $('nav');
+                if ($(window).scrollTop() > 50) {
+                    nav.addClass('shadow-2xl bg-white/98');
+                } else {
+                    nav.removeClass('shadow-2xl bg-white/98');
                 }
             });
         });

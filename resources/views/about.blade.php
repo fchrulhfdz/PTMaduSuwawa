@@ -32,16 +32,22 @@
                 </div>
                 <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Perjalanan Kami</h2>
                 <div class="space-y-6 text-gray-600 text-lg leading-relaxed">
-                    <p>
-                        Madu Suwawa bermula dari kecintaan terhadap alam dan warisan leluhur dalam memelihara lebah madu di kawasan Suwawa, Bone Bolango.
-                    </p>
-                    <p>
-                        Sejak 2010, kami berkomitmen untuk menghadirkan madu asli tanpa campuran, diproses dengan cara tradisional yang menjaga kemurnian dan khasiat alaminya.
-                    </p>
-                    <p>
-                        Setiap tetes madu yang kami produksi berasal dari nektar bunga-bunga alami di hutan Suwawa, memberikan cita rasa khas dan manfaat kesehatan yang optimal.
-                    </p>
-                </div>
+    <p>
+        Madu Suwawa merupakan produk madu asli yang berasal dari kawasan Suwawa, Bone Bolango, Gorontalo. Madu ini dihasilkan dari nektar bunga-bunga alami di hutan Suwawa yang dikenal memiliki keanekaragaman hayati yang tinggi.
+    </p>
+    <p>
+        Sejak berdiri, Madu Suwawa berkomitmen untuk memproduksi madu murni 100% tanpa campuran gula atau bahan kimia. Proses produksi dilakukan secara tradisional dengan menjaga kearifan lokal dan kelestarian lingkungan.
+    </p>
+    <p>
+        Madu Suwawa memiliki karakteristik khusus dengan warna yang lebih gelap, aroma yang harum, dan rasa yang manis alami. Kandungan nutrisinya yang lengkap membuat madu ini memiliki berbagai khasiat untuk kesehatan dan daya tahan tubuh.
+    </p>
+    <p>
+        Keunggulan Madu Suwawa terletak pada proses panen yang berkelanjutan, dimana lebah madu dibiarkan hidup secara alami di habitat aslinya tanpa menggunakan bahan kimia atau antibiotik yang dapat merusak kualitas madu.
+    </p>
+    <p>
+        Saat ini Madu Suwawa telah berkembang menjadi salah satu produk unggulan daerah Gorontalo yang tidak hanya dikonsumsi lokal tetapi juga telah sampai ke berbagai wilayah di Indonesia, membawa khasiat madu asli dari bumi Suwawa.
+    </p>
+</div>
 
                 <!-- Stats -->
                 <div class="grid grid-cols-3 gap-6 mt-10">
@@ -67,16 +73,16 @@
             </div>
 
             <div class="relative">
-                <div class="relative z-10">
-                    <div class="bg-gradient-to-br from-amber-200 to-orange-200 rounded-3xl p-2 shadow-2xl">
-                        <img src="https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                            alt="Proses Panen Madu" 
-                            class="w-full h-96 object-cover rounded-2xl">
-                    </div>
-                </div>
-                <div class="absolute -bottom-8 -right-8 w-40 h-40 bg-gradient-to-br from-amber-200 to-orange-200 rounded-3xl blur-2xl opacity-50 z-0"></div>
-                <div class="absolute -top-8 -left-8 w-32 h-32 bg-gradient-to-br from-yellow-200 to-amber-200 rounded-full blur-2xl opacity-50 z-0"></div>
-            </div>
+    <div class="relative z-10">
+        <div class="bg-gradient-to-br from-amber-200 to-orange-200 rounded-3xl p-2 shadow-2xl">
+            <img src="{{ asset('storage/logo/logo madu suwawa.jpg') }}" 
+                alt="Logo Madu Suwawa" 
+                class="w-full h-96 object-cover rounded-2xl">
+        </div>
+    </div>
+    <div class="absolute -bottom-8 -right-8 w-40 h-40 bg-gradient-to-br from-amber-200 to-orange-200 rounded-3xl blur-2xl opacity-50 z-0"></div>
+    <div class="absolute -top-8 -left-8 w-32 h-32 bg-gradient-to-br from-yellow-200 to-amber-200 rounded-full blur-2xl opacity-50 z-0"></div>
+</div>
         </div>
     </div>
 </section>
@@ -97,7 +103,7 @@
                         <h3 class="text-3xl font-bold text-gray-900">Visi Kami</h3>
                     </div>
                     <p class="text-gray-600 text-lg leading-relaxed">
-                        Menjadi produsen madu terpercaya yang melestarikan kearifan lokal dan menghadirkan produk madu berkualitas tinggi untuk kesehatan masyarakat Indonesia.
+                        Menjadi produsen madu asli Suwawa terdepan yang diakui secara nasional dalam melestarikan kearifan lokal dan menghadirkan madu berkualitas premium untuk kesehatan masyarakat Indonesia.
                     </p>
                 </div>
             </div>
@@ -118,25 +124,31 @@
                             <div class="flex-shrink-0 bg-gradient-to-br from-amber-100 to-orange-100 p-2 rounded-lg mr-3 group-hover/item:scale-110 transition-transform duration-300">
                                 <i class="fas fa-check text-amber-600"></i>
                             </div>
-                            <span>Memproduksi madu asli 100% tanpa campuran bahan kimia</span>
+                            <span>Memproduksi madu asli 100% tanpa campuran dengan standar higienis yang ketat</span>
                         </li>
                         <li class="flex items-start group/item">
                             <div class="flex-shrink-0 bg-gradient-to-br from-amber-100 to-orange-100 p-2 rounded-lg mr-3 group-hover/item:scale-110 transition-transform duration-300">
                                 <i class="fas fa-check text-amber-600"></i>
                             </div>
-                            <span>Meningkatkan kesejahteraan petani madu lokal</span>
+                            <span>Meningkatkan kesejahteraan petani madu lokal melalui sistem kemitraan yang berkelanjutan</span>
                         </li>
                         <li class="flex items-start group/item">
                             <div class="flex-shrink-0 bg-gradient-to-br from-amber-100 to-orange-100 p-2 rounded-lg mr-3 group-hover/item:scale-110 transition-transform duration-300">
                                 <i class="fas fa-check text-amber-600"></i>
                             </div>
-                            <span>Melestarikan lingkungan dan ekosistem lebah madu</span>
+                            <span>Melestarikan lingkungan dan ekosistem lebah madu di kawasan hutan Suwawa</span>
                         </li>
                         <li class="flex items-start group/item">
                             <div class="flex-shrink-0 bg-gradient-to-br from-amber-100 to-orange-100 p-2 rounded-lg mr-3 group-hover/item:scale-110 transition-transform duration-300">
                                 <i class="fas fa-check text-amber-600"></i>
                             </div>
-                            <span>Edukasi masyarakat tentang manfaat madu alami</span>
+                            <span>Mengedukasi masyarakat tentang manfaat madu asli dan budidaya lebah yang ramah lingkungan</span>
+                        </li>
+                        <li class="flex items-start group/item">
+                            <div class="flex-shrink-0 bg-gradient-to-br from-amber-100 to-orange-100 p-2 rounded-lg mr-3 group-hover/item:scale-110 transition-transform duration-300">
+                                <i class="fas fa-check text-amber-600"></i>
+                            </div>
+                            <span>Mengembangkan produk turunan madu yang inovatif untuk memenuhi kebutuhan pasar</span>
                         </li>
                     </ul>
                 </div>
@@ -146,19 +158,26 @@
 </section>
 
 <!-- Gallery Section -->
-<section class="py-20 bg-gradient-to-b from-white to-gray-50">
+<section class="py-20 bg-gradient-to-b from-white to-amber-50">
     <div class="max-w-7xl mx-auto px-4">
         <div class="text-center mb-16">
-            <div class="inline-block mb-4 px-4 py-2 bg-amber-100 rounded-full text-amber-700 font-medium text-sm">
-                Gallery Kami
+            <div class="inline-flex items-center gap-2 mb-4 px-6 py-3 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full text-amber-700 font-semibold text-sm shadow-sm">
+                <i class="fas fa-images text-amber-600"></i>
+                <span>Gallery Kami</span>
             </div>
-            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Momen Berharga</h2>
-            <p class="text-gray-600 text-lg max-w-2xl mx-auto">Dokumentasi proses produksi dan kegiatan kami</p>
+            <h2 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent mb-4">
+                Jejak Keberkahan Madu Suwawa
+            </h2>
+            <p class="text-gray-600 text-lg max-w-2xl mx-auto leading-relaxed">
+                Dokumentasi perjalanan madu asli dari hutan Suwawa hingga sampai ke tangan Anda
+            </p>
         </div>
 
         <!-- Photo Gallery -->
 <div class="mb-16">
-    <h3 class="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">Foto Dokumentasi</h3>
+    <h3 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-4 text-center">
+    Foto Dokumentasi
+</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         @php
             $galleryPhotos = \App\Models\Gallery::activePhotos()->limit(4)->get();
@@ -191,7 +210,9 @@
 
 <!-- Video Gallery -->
 <div class="mb-16">
-    <h3 class="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">Video Dokumentasi</h3>
+    <h3 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-4 text-center">
+    Video Dokumentasi
+</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
         @php
             $galleryVideos = \App\Models\Gallery::activeVideos()->limit(2)->get();

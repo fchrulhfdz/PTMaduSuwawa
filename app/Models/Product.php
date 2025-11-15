@@ -16,7 +16,6 @@ class Product extends Model
         'stock',
         'berat_isi',
         'satuan_berat',
-        'category',
         'barcode',
         'image',
         'is_active'
