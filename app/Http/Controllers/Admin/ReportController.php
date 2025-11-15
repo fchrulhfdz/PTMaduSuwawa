@@ -133,7 +133,8 @@ class ReportController extends Controller
             ]
         );
 
-        // Data untuk dropdown
+        // Data untuk dropdown!
+        // hybgygbygbgbg
         $products = Product::orderBy('name')->get();
         $categories = Product::whereNotNull('category')->distinct()->pluck('category');
         return view('admin.reports.index', compact(
