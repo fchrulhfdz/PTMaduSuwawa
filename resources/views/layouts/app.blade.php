@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Madu Suwawa - Madu Asli Berkualitas</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="{{ asset('storage/logo/logo2.png') }}">
+    
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 </head>
@@ -175,16 +179,13 @@
                         Madu asli berkualitas dari alam Suwawa yang kaya akan manfaat untuk kesehatan Anda. Setiap tetes menjaga kemurnian alami.
                     </p>
                     <div class="flex space-x-4">
-                        <a href="#" class="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center text-gray-300 hover:text-amber-400 hover:bg-white/20 transition-all duration-300 hover:scale-110">
+                        <a href="https://www.facebook.com/share/17N2RcZf4n/" class="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center text-gray-300 hover:text-amber-400 hover:bg-white/20 transition-all duration-300 hover:scale-110">
                             <i class="fab fa-facebook-f text-lg"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center text-gray-300 hover:text-amber-400 hover:bg-white/20 transition-all duration-300 hover:scale-110">
+                        <a href="https://www.instagram.com/madusuwawa?igsh=d25ia3lnbXIyMmFx" class="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center text-gray-300 hover:text-amber-400 hover:bg-white/20 transition-all duration-300 hover:scale-110">
                             <i class="fab fa-instagram text-lg"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center text-gray-300 hover:text-amber-400 hover:bg-white/20 transition-all duration-300 hover:scale-110">
-                            <i class="fab fa-whatsapp text-lg"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center text-gray-300 hover:text-amber-400 hover:bg-white/20 transition-all duration-300 hover:scale-110">
+                        <a href="https://www.tiktok.com/@sehat_1.com?_r=1&_t=ZS-91QLOBeNmQJ" class="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center text-gray-300 hover:text-amber-400 hover:bg-white/20 transition-all duration-300 hover:scale-110">
                             <i class="fab fa-tiktok text-lg"></i>
                         </a>
                     </div>

@@ -59,16 +59,15 @@ class Transaction extends Model
             try {
                 $items = $this->attributes['items'] ?? '[]';
                 
-                // Clean the JSON string - remove unwanted characters
-                $items = str_replace('\\"', '"', $items);
-                $items = str_replace('\"', '"', $items);
+                // Clean the JSON string
+                $items = str_replace(['\\"', '\"'], '"', $items);
                 $items = preg_replace('/[^\x20-\x7E]/', '', $items);
                 
                 $decoded = json_decode($items, true);
                 
                 return is_array($decoded) ? $decoded : [];
             } catch (\Exception $e) {
-                \Log::error('Error decoding items JSON: ' . $e->getMessage());
+                \Log::error('Error decoding items JSON for transaction ' . $this->id . ': ' . $e->getMessage());
                 return [];
             }
         }
@@ -84,10 +83,71 @@ class Transaction extends Model
         
         foreach ($items as $item) {
             $quantity = $item['quantity'] ?? 0;
-            $totalQuantity += $quantity;
+            $totalQuantity += intval($quantity);
         }
         
         return $totalQuantity;
+    }
+
+    // Accessor untuk format berat
+    public function getFormattedBeratAttribute()
+    {
+        $berat = $this->total_berat ?? 0;
+        
+        if ($berat >= 1000) {
+            return number_format($berat / 1000, 2) . ' kg';
+        } else {
+            return number_format($berat, 0) . ' g';
+        }
+    }
+
+    // Method untuk mendapatkan ringkasan items
+    public function getItemsSummaryAttribute()
+    {
+        $items = $this->items_array;
+        
+        if (empty($items)) {
+            return [
+                'total_items' => 0,
+                'total_quantity' => 0,
+                'item_names' => [],
+                'formatted_names' => 'Tidak ada item'
+            ];
+        }
+        
+        $totalQuantity = 0;
+        $itemNames = [];
+        
+        foreach ($items as $item) {
+            $quantity = $item['quantity'] ?? 0;
+            $name = $item['name'] ?? 'Produk';
+            $totalQuantity += intval($quantity);
+            $itemNames[] = $name;
+        }
+        
+        return [
+            'total_items' => count($items),
+            'total_quantity' => $totalQuantity,
+            'item_names' => $itemNames,
+            'formatted_names' => $this->formatItemNames($itemNames)
+        ];
+    }
+
+    // Helper method untuk format nama item
+    private function formatItemNames($itemNames)
+    {
+        if (empty($itemNames)) {
+            return 'Tidak ada item';
+        }
+        
+        $displayNames = array_slice($itemNames, 0, 2);
+        $result = implode(', ', $displayNames);
+        
+        if (count($itemNames) > 2) {
+            $result .= ' ... dan ' . (count($itemNames) - 2) . ' lainnya';
+        }
+        
+        return $result;
     }
 
     // Scope untuk transaksi completed
@@ -118,54 +178,5 @@ class Transaction extends Model
         }
         
         return $query;
-    }
-
-    // Scope untuk kategori tertentu
-    public function scopeForCategory($query, $category)
-    {
-        if ($category) {
-            return $query->whereHas('product', function($q) use ($category) {
-                $q->where('category', $category);
-            });
-        }
-        
-        return $query;
-    }
-
-    // Method untuk mendapatkan total revenue dengan filter
-    public static function getFilteredRevenue($startDate = null, $endDate = null, $productId = null, $category = null)
-    {
-        return self::completed()
-            ->dateRange($startDate, $endDate)
-            ->forProduct($productId)
-            ->forCategory($category)
-            ->sum('total');
-    }
-
-    // Method untuk mendapatkan total quantity dengan filter
-    public static function getFilteredQuantity($startDate = null, $endDate = null, $productId = null, $category = null)
-    {
-        $transactions = self::completed()
-            ->dateRange($startDate, $endDate)
-            ->forProduct($productId)
-            ->forCategory($category)
-            ->get();
-
-        $totalQuantity = 0;
-        foreach ($transactions as $transaction) {
-            $totalQuantity += $transaction->calculated_quantity;
-        }
-
-        return $totalQuantity;
-    }
-
-    // Method untuk mendapatkan total transactions dengan filter
-    public static function getFilteredTransactionCount($startDate = null, $endDate = null, $productId = null, $category = null)
-    {
-        return self::completed()
-            ->dateRange($startDate, $endDate)
-            ->forProduct($productId)
-            ->forCategory($category)
-            ->count();
     }
 }

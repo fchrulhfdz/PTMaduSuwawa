@@ -39,13 +39,14 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
     // Additional transaction routes for smart cashier features
     Route::prefix('transactions')->name('transactions.')->group(function () {
         Route::get('/{id}/print', [TransactionController::class, 'printReceipt'])->name('print');
-        Route::get('/today/sales', [TransactionController::class, 'getTodaySales'])->name('today.sales');
-        Route::get('/product/{id}', [TransactionController::class, 'getProduct'])->name('product.get');
+        Route::get('/today-sales', [TransactionController::class, 'getTodaySales'])->name('today-sales');
+        Route::get('/get-product/{id}', [TransactionController::class, 'getProduct'])->name('get-product');
         
         // Tambahkan route baru untuk fitur tambahan - menggunakan GET untuk memudahkan
         Route::get('/{id}/confirm-payment', [TransactionController::class, 'confirmPayment'])->name('confirm-payment');
         Route::get('/{id}/cancel', [TransactionController::class, 'cancelTransaction'])->name('cancel');
-        Route::get('/filter/berat', [TransactionController::class, 'filterByBerat'])->name('filter-berat');
+        
+        // Route untuk statistik berat (jika diperlukan)
         Route::get('/berat/stats', [TransactionController::class, 'getBeratStats'])->name('berat-stats');
     });
 

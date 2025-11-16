@@ -71,15 +71,8 @@
 
                 <!-- Product Info -->
                 <div class="p-8 flex-1 flex flex-col">
-                    <div class="flex items-start justify-between mb-4">
+                    <div class="mb-4">
                         <h3 class="text-2xl font-bold text-gray-900 leading-tight">{{ $product->name }}</h3>
-                        <div class="flex items-center text-amber-400 text-sm">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                        </div>
                     </div>
                     
                     <p class="text-gray-600 mb-6 leading-relaxed line-clamp-2 flex-1">{{ $product->description }}</p>

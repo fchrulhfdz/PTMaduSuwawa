@@ -151,47 +151,33 @@
                                     <div class="text-sm text-gray-500">{{ $transaction->customer_phone }}</div>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900">
-                                        @php
-                                            $items = $transaction->items_array;
-                                            $itemCount = 0;
-                                            $itemNames = [];
-                                            
-                                            if (is_array($items) && count($items) > 0) {
-                                                foreach($items as $item) {
-                                                    $quantity = $item['quantity'] ?? 0;
-                                                    $name = $item['name'] ?? 'Produk';
-                                                    $itemCount += $quantity;
-                                                    $itemNames[] = $name;
-                                                }
-                                                
-                                                echo count($items) . ' item (' . $itemCount . ' pcs)';
-                                                echo '<div class="text-xs text-gray-500 mt-1">';
-                                                echo implode(', ', array_slice($itemNames, 0, 2));
-                                                if (count($itemNames) > 2) {
-                                                    echo ' ... dan ' . (count($itemNames) - 2) . ' lainnya';
-                                                }
-                                                echo '</div>';
-                                                
-                                                // Tampilkan total berat dengan konversi otomatis
-                                                if ($transaction->total_berat > 0) {
-                                                    echo '<div class="text-xs text-blue-600 mt-1">';
-                                                    echo '<i class="fas fa-weight mr-1"></i>';
-                                                    // Konversi otomatis gram ke kg jika >= 1000
-                                                    if ($transaction->total_berat >= 1000) {
-                                                        echo number_format($transaction->total_berat / 1000, 2) . ' kg';
-                                                    } else {
-                                                        echo number_format($transaction->total_berat, 0) . ' g';
-                                                    }
-                                                    echo '</div>';
-                                                }
-                                            } else {
-                                                echo '<span class="text-gray-400">Tidak ada item</span>';
-                                            }
-                                        @endphp
-                                    </div>
-                                </td>
+                                <!-- Dalam bagian tabel, ganti kolom Items & Berat dengan: -->
+<td class="px-6 py-4">
+    <div class="text-sm text-gray-900">
+        @php
+            $itemsSummary = $transaction->items_summary;
+        @endphp
+        
+        @if($itemsSummary['total_items'] > 0)
+            <div class="font-medium">
+                {{ $itemsSummary['total_items'] }} item ({{ $itemsSummary['total_quantity'] }} pcs)
+            </div>
+            <div class="text-xs text-gray-500 mt-1">
+                {{ $itemsSummary['formatted_names'] }}
+            </div>
+            
+            <!-- Tampilkan total berat -->
+            @if($transaction->total_berat > 0)
+            <div class="text-xs text-blue-600 mt-1">
+                <i class="fas fa-weight mr-1"></i>
+                {{ $transaction->formatted_berat }}
+            </div>
+            @endif
+        @else
+            <span class="text-gray-400">Tidak ada item</span>
+        @endif
+    </div>
+</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-bold text-green-600">
                                         Rp {{ number_format($transaction->total, 0, ',', '.') }}

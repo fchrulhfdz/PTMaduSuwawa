@@ -32,14 +32,17 @@
             <div class="relative">
                 <x-text-input 
                     id="password" 
-                    class="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-300 bg-white/50 backdrop-blur-sm"
+                    class="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-300 bg-white/50 backdrop-blur-sm pr-12"
                     type="password"
                     name="password"
                     required 
                     autocomplete="current-password"
                     placeholder="Masukkan password Anda" />
-                <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                    <i class="fas fa-lock text-gray-400"></i>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 space-x-2">
+                    <!-- Password Toggle Button -->
+                    <button type="button" id="password-toggle" class="text-gray-400 hover:text-amber-500 transition-colors duration-300 focus:outline-none">
+                        <i class="fas fa-eye" id="password-toggle-icon"></i>
+                    </button>
                 </div>
             </div>
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
@@ -82,14 +85,57 @@
         </div>
     </form>
 
-    <!-- Register Button -->
-    @if (Route::has('register'))
-        <div class="pt-4">
-            <a href="{{ route('register') }}" class="w-full block text-center bg-gradient-to-r from-gray-200 to-gray-300 text-gray-700 py-3 px-4 rounded-xl font-semibold shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] transform focus:ring-2 focus:ring-gray-400 focus:ring-offset-2">
-                {{ __('Register') }}
-            </a>
-        </div>
-    @endif
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('password');
+            const passwordToggle = document.getElementById('password-toggle');
+            const passwordToggleIcon = document.getElementById('password-toggle-icon');
+            
+            passwordToggle.addEventListener('click', function() {
+                // Toggle password visibility
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Toggle eye icon
+                if (type === 'text') {
+                    passwordToggleIcon.classList.remove('fa-eye');
+                    passwordToggleIcon.classList.add('fa-eye-slash');
+                    passwordToggle.classList.remove('text-gray-400');
+                    passwordToggle.classList.add('text-amber-500');
+                } else {
+                    passwordToggleIcon.classList.remove('fa-eye-slash');
+                    passwordToggleIcon.classList.add('fa-eye');
+                    passwordToggle.classList.remove('text-amber-500');
+                    passwordToggle.classList.add('text-gray-400');
+                }
+            });
+
+            // Handle checkbox styling
+            const rememberCheckbox = document.getElementById('remember_me');
+            const rememberCheckboxDiv = rememberCheckbox.nextElementSibling;
+            const rememberCheckboxSvg = rememberCheckboxDiv.querySelector('svg');
+            const rememberCheckboxGradient = rememberCheckboxDiv.nextElementSibling;
+
+            rememberCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    rememberCheckboxSvg.style.opacity = '1';
+                    rememberCheckboxGradient.style.opacity = '1';
+                    rememberCheckboxDiv.style.borderColor = '#f59e0b';
+                } else {
+                    rememberCheckboxSvg.style.opacity = '0';
+                    rememberCheckboxGradient.style.opacity = '0';
+                    rememberCheckboxDiv.style.borderColor = '#d1d5db';
+                }
+            });
+
+            // Initialize checkbox state
+            if (rememberCheckbox.checked) {
+                rememberCheckboxSvg.style.opacity = '1';
+                rememberCheckboxGradient.style.opacity = '1';
+                rememberCheckboxDiv.style.borderColor = '#f59e0b';
+            }
+        });
+    </script>
 
     <style>
         input:checked + div + div {
@@ -102,6 +148,16 @@
         
         input:checked + div {
             border-color: #f59e0b;
+        }
+
+        /* Optional: Add some spacing for the password toggle */
+        #password-toggle {
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        #password-toggle:hover {
+            background-color: rgba(245, 158, 11, 0.1);
         }
     </style>
 </x-guest-layout>
